@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Amierza/go-boiler-plate/dto"
+	"github.com/Amierza/simponi-backend/dto"
 )
 
 func mapErrorStatus(err error) int {

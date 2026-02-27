@@ -4,9 +4,9 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/Amierza/go-boiler-plate/dto"
-	"github.com/Amierza/go-boiler-plate/response"
-	"github.com/Amierza/go-boiler-plate/service"
+	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/response"
+	"github.com/Amierza/simponi-backend/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

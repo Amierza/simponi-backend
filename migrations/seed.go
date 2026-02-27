@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/Amierza/go-boiler-plate/entity"
+	"github.com/Amierza/simponi-backend/entity"
 	"gorm.io/gorm"
 )
 

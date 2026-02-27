@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 
-	"github.com/Amierza/go-boiler-plate/constants"
+	"github.com/Amierza/simponi-backend/constants"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

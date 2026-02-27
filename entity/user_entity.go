@@ -1,16 +1,18 @@
 package entity
 
 import (
-	"github.com/Amierza/go-boiler-plate/helper"
+	"github.com/Amierza/simponi-backend/helper"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey" json:"user_id"`
-	Name     string    `json:"user_name"`
-	Email    string    `gorm:"unique; not null" json:"user_email"`
-	Password string    `json:"user_password"`
+	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
+	Email    string
+	Password string
+	ImageURL string
+
+	Stores []*Store `gorm:"foreignKey:UserID"`
 
 	TimeStamp
 }

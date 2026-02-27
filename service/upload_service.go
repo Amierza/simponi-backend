@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Amierza/go-boiler-plate/dto"
+	"github.com/Amierza/simponi-backend/dto"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )

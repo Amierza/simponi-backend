@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/Amierza/go-boiler-plate/jwt"
-	"github.com/Amierza/go-boiler-plate/repository"
+	"github.com/Amierza/simponi-backend/jwt"
+	"github.com/Amierza/simponi-backend/repository"
 	"go.uber.org/zap"
 )
 
