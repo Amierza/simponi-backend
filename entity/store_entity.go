@@ -22,10 +22,11 @@ type Store struct {
 	User   *User      `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	PlatformID *uuid.UUID `gorm:"type:uuid"`
-	Platform   *Platform  `gorm:"foreignKey:PlatformID;references:ID"`
+	Platform   *Platform  `gorm:"foreignKey:PlatformID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	// Credential
 	Credentials []*StoreCredential `gorm:"foreignKey:StoreID"`
+	Logs        []*Log             `gorm:"foreignKey:StoreID"`
 
 	// Status
 	IsActive    bool

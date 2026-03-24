@@ -4,11 +4,9 @@ import "github.com/google/uuid"
 
 type Platform struct {
 	ID   uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Name string
+	Name string    `gorm:"uniqueIndex"` // shopee, tiktok
 
-	Stores           []*Store           `gorm:"foreignKey:PlatformID"`
-	ExternalProducts []*ExternalProduct `gorm:"foreignKey:PlatformID"`
-	ExternalOrders   []*ExternalOrder   `gorm:"foreignKey:PlatformID"`
+	Stores []*Store `gorm:"foreignKey:PlatformID"`
 
 	TimeStamp
 }

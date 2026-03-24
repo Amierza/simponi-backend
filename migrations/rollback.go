@@ -7,9 +7,12 @@ import (
 
 func Rollback(db *gorm.DB) error {
 	tables := []interface{}{
+		// LOG
+		&entity.Log{},
+		&entity.InventoryLog{},
+
 		// EXTERNAL DOMAIN
 		&entity.ExternalProduct{},
-		&entity.ExternalOrder{},
 
 		// PAYMENT DOMAIN
 		&entity.Payment{},

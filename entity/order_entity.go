@@ -14,7 +14,7 @@ type Order struct {
 	OrderNumber     string // display ID
 
 	StoreID *uuid.UUID `gorm:"type:uuid"`
-	Store   *Store     `gorm:"foreignKey:StoreID;references:ID"`
+	Store   *Store     `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	// Buyer Snapshot
 	BuyerName  string

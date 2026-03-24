@@ -29,7 +29,10 @@ func Migrate(db *gorm.DB) error {
 
 		// EXTERNAL DOMAIN
 		&entity.ExternalProduct{},
-		&entity.ExternalOrder{},
+
+		// LOG
+		&entity.InventoryLog{},
+		&entity.Log{},
 	); err != nil {
 		return err
 	}

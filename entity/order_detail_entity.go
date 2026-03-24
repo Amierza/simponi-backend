@@ -11,9 +11,8 @@ type OrderDetail struct {
 	ProductID *uuid.UUID `gorm:"type:uuid"`
 	Product   *Product   `gorm:"foreignKey:ProductID;references:ID;constraint:OnDelete:SET NULL;"`
 
-	ExternalProductID string
-	ProductName       string // snapshot
-	SKU               string // snapshot
+	ProductName string // snapshot
+	SKU         string // snapshot
 
 	Quantity int
 	Price    int64

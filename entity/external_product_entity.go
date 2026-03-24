@@ -8,11 +8,12 @@ type ExternalProduct struct {
 	ProductID *uuid.UUID `gorm:"type:uuid"`
 	Product   *Product   `gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
-	PlatformID *uuid.UUID `gorm:"type:uuid"`
-	Platform   *Platform  `gorm:"foreignKey:PlatformID;references:ID"`
+	StoreID *uuid.UUID `gorm:"type:uuid"`
+	Store   Store      `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	ExternalProductID string
 	ExternalModelID   string
+	Price             int64
 
 	TimeStamp
 }

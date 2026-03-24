@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Email    string
+	Email    string    `gorm:"uniqueIndex"`
 	Password string
 	ImageURL string
 
