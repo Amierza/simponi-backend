@@ -28,8 +28,11 @@ const (
 	MESSAGE_FAILED_NO_FILES_UPLOADED    = "failed no files uploaded"
 	MESSAGE_FAILED_UPLOAD_FILES         = "failed upload files"
 
+	// Authentication Errors
+	FAILED_SIGNIN          = "failed signin"
+	FAILED_REFRESH_TOKEN = "failed refresh token"
+
 	// General Errors
-	FAILED_LOGIN          = "failed login"
 	FAILED_CREATE         = "failed to create"
 	FAILED_UPDATE         = "failed to update"
 	FAILED_DELETE         = "failed to delete"
@@ -43,8 +46,11 @@ const (
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
 	MESSAGE_SUCCESS_UPLOAD_FILE  = "success upload file"
 
+	// Authentication Sucess
+	SUCCESS_SIGNIN      = "success signin"
+	SUCCESS_REFRESH_TOKEN = "success refresh token"
+
 	// General Success
-	SUCCESS_LOGIN      = "success login"
 	SUCCESS_CREATE     = "success create"
 	SUCCESS_UPDATE     = "success update"
 	SUCCESS_DELETE     = "success delete"
@@ -53,13 +59,16 @@ const (
 )
 
 var (
+
 	// Token
 	ErrGenerateAccessToken     = errors.New("failed to generate access token")
 	ErrGenerateRefreshToken    = errors.New("failed to generate refresh token")
+	ErrGenerateAccessAndRefreshToken = errors.New("failed to generate access token and refresh token")
 	ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
 	ErrDecryptToken            = errors.New("failed to decrypt token")
 	ErrTokenInvalid            = errors.New("token invalid")
 	ErrValidateToken           = errors.New("failed to validate token")
+	ErrGetUserIDFromToken            = errors.New("failed get user id from token")
 
 	// File
 	ErrNoFilesUploaded    = errors.New("failed no files uploaded")
@@ -77,7 +86,29 @@ var (
 
 	// Input
 
+	// Authentication
+	ErrIncorrectPassword = errors.New("credential incorrect")
+
+	// User
+	ErrGetUserByEmail = errors.New("failed to get user by email")
+
 	// Parse
 )
 
-type ()
+// Authentication for System Admin
+type (
+	SignInRequest struct {
+		Email string `json:"email" binding:"required" example:"admin@mail.com"`
+		Password string `json:"password" binding:"required" example:"secret123"`
+	}
+	SignInResponse struct {
+		AccessToken string `json:"access_token" example:"<access_token_here>"`
+		RefreshToken string `json:"refresh_token" example:"<refresh_token_here>"`
+	}
+	RefreshTokenRequest struct {
+		RefreshToken string `json:"refresh_token" binding:"required" example:"<refresh_token_here>"`
+	}
+	RefreshTokenResponse struct {
+		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
+	}
+)

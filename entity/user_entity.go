@@ -7,10 +7,11 @@ import (
 )
 
 type User struct {
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Email    string    `gorm:"uniqueIndex"`
-	Password string
-	ImageURL string
+	ID       uuid.UUID `gorm:"type:uuid;primaryKey" json:"user_id"`
+	Email    string    `gorm:"uniqueIndex" json:"user_email"`
+	Password string    `json:"user_password"`
+	Name     string    `json:"user_name"`
+	ImageURL string    `json:"image_url"`
 
 	Stores []*Store `gorm:"foreignKey:UserID"`
 

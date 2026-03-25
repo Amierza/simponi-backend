@@ -11,7 +11,7 @@ import (
 
 type (
 	IJWT interface {
-		GenerateToken(userID string, role string, permissions []string) (string, string, error)
+		GenerateToken(userID string) (string, string, error)
 		ValidateToken(token string) (*jwt.Token, error)
 		GetUserIDByToken(tokenString string) (string, error)
 		GetRoleIDByToken(tokenString string) (string, error)
@@ -19,8 +19,6 @@ type (
 
 	jwtCustomClaim struct {
 		UserID      string   `json:"user_id"`
-		RoleID      string   `json:"role_id"`
-		Permissions []string `json:"endpoints"`
 		jwt.RegisteredClaims
 	}
 
@@ -46,11 +44,9 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *JWT) GenerateToken(userID string, roleID string, endpoints []string) (string, string, error) {
+func (j *JWT) GenerateToken(userID string) (string, string, error) {
 	accessClaims := jwtCustomClaim{
 		userID,
-		roleID,
-		endpoints,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 300)),
 			Issuer:    j.issuer,
@@ -66,8 +62,6 @@ func (j *JWT) GenerateToken(userID string, roleID string, endpoints []string) (s
 
 	refreshClaims := jwtCustomClaim{
 		userID,
-		roleID,
-		endpoints,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 3600 * 24 * 7)),
 			Issuer:    j.issuer,
