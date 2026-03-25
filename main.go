@@ -51,17 +51,17 @@ func main() {
 
 
 		// User
-		// userRepo    = repository.NewUserRepository(db)
-		// userService = service.NewUserService(userRepo, jwt, zapLogger)
-		// userHandler = handler.NewUserHandler(userService, zapLogger)
+		userRepo    = repository.NewUserRepository(db)
+		userService = service.NewUserService(userRepo, jwt, zapLogger)
+		userHandler = handler.NewUserHandler(userService, zapLogger)
 	)
 
 	server := gin.Default()
 	server.Use(middleware.CORSMiddleware())
 
 	// routes.Upload(server, uploadHandler, jwt)
-	// routes.User(server, userHandler, jwt)
 	routes.Auth(server, authHandler, jwt)
+	routes.User(server, userHandler, jwt)
 
 
 	server.Static("/uploads", "./uploads")
