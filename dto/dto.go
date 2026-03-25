@@ -2,6 +2,8 @@ package dto
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -32,6 +34,9 @@ const (
 	FAILED_SIGNIN          = "failed signin"
 	FAILED_REFRESH_TOKEN = "failed refresh token"
 
+	// User Errors
+	FAILED_GET_PROFILE = "failed to get profile"
+
 	// General Errors
 	FAILED_CREATE         = "failed to create"
 	FAILED_UPDATE         = "failed to update"
@@ -49,6 +54,9 @@ const (
 	// Authentication Sucess
 	SUCCESS_SIGNIN      = "success signin"
 	SUCCESS_REFRESH_TOKEN = "success refresh token"
+
+	// User Errors
+	SUCCESS_GET_PROFILE = "sucess to get profile"
 
 	// General Success
 	SUCCESS_CREATE     = "success create"
@@ -91,6 +99,7 @@ var (
 
 	// User
 	ErrGetUserByEmail = errors.New("failed to get user by email")
+	ErrGetUserByID    = errors.New("failed get user by id")
 
 	// Parse
 )
@@ -110,5 +119,14 @@ type (
 	}
 	RefreshTokenResponse struct {
 		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
+	}
+)
+
+// User
+type (
+	UserResponse struct {
+		ID uuid.UUID `json:"id"`
+		Email string `json:"email"`
+		Name string `json:"name"`
 	}
 )
