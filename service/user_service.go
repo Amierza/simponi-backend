@@ -12,6 +12,13 @@ import (
 type (
 	IUserService interface {
 		GetProfile(ctx context.Context) (*dto.UserResponse, error)
+
+		// logging
+		GetLogs(ctx context.Context) ([]dto.LoggingResponse, error)
+		GetLogsByStoreID(ctx context.Context, storeID string) ([]dto.LoggingResponse, error)
+		GetLogsByDateRange(ctx context.Context, startDate, endDate string) ([]dto.LoggingResponse, error)
+
+		CreateLog(ctx context.Context, req dto.LoggingRequest) (dto.LoggingResponse, error)
 	}
 
 	userService struct {
@@ -29,7 +36,7 @@ func NewUserService(userRepo repository.IUserRepository, jwtService jwt.IJWT, lo
 	}
 }
 
-func (us *userService) GetProfile(ctx context.Context) (*dto.UserResponse, error){
+func (us *userService) GetProfile(ctx context.Context) (*dto.UserResponse, error) {
 	token := ctx.Value("Authorization").(string)
 	userIDString, err := us.jwtService.GetUserIDByToken(token)
 	if err != nil {
@@ -43,14 +50,14 @@ func (us *userService) GetProfile(ctx context.Context) (*dto.UserResponse, error
 		return nil, dto.ErrGetUserByID
 	}
 
-	if !found{
+	if !found {
 		us.logger.Warn("user not found", zap.String("id", userIDString))
 		return nil, dto.ErrNotFound
 	}
 
 	return &dto.UserResponse{
-		ID: data.ID,
-		Name: data.Name,
+		ID:    data.ID,
+		Name:  data.Name,
 		Email: data.Email,
 	}, nil
 }
