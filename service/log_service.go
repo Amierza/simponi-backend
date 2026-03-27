@@ -19,22 +19,22 @@ type (
 	}
 
 	logService struct {
-		userRepo repository.IUserRepository
-		logger   *zap.Logger
-		jwt      jwt.IJWT
+		logRepo    repository.ILogRepository
+		logger     *zap.Logger
+		jwtService jwt.IJWT
 	}
 )
 
-func NewLogService(userRepo repository.IUserRepository, logger *zap.Logger, jwt jwt.IJWT) *logService {
+func NewLoggingService(logRepo repository.ILogRepository, logger *zap.Logger, jwtService jwt.IJWT) *logService {
 	return &logService{
-		userRepo: userRepo,
-		logger:   logger,
-		jwt:      jwt,
+		logRepo:    logRepo,
+		logger:     logger,
+		jwtService: jwtService,
 	}
 }
 
 func (ls *logService) CreateLog(ctx context.Context, req dto.LoggingRequest) (dto.LoggingResponse, error) {
-	log, err := ls.userRepo.CreateLog(ctx, nil, &entity.Log{
+	log, err := ls.logRepo.CreateLog(ctx, nil, &entity.Log{
 		StoreID: req.StoreID,
 		Action:  req.Action,
 		Message: req.Message,
@@ -54,16 +54,16 @@ func (ls *logService) CreateLog(ctx context.Context, req dto.LoggingRequest) (dt
 	}, nil
 }
 
-func (ls *logService) GetLogsByStoreID(ctx context.Context, storeID string, req dto.PaginationRequest) ([]dto.LoggingResponse, error) {
-	logs, found, err := ls.userRepo.GetLogByStoreID(ctx, nil, storeID)
+func (ls *logService) GetLogsByStoreID(ctx context.Context, storeID string, req dto.PaginationRequest) (dto.LoggingPaginationResponse, error) {
+	logs, err := ls.logRepo.GetLogByStoreID(ctx, nil, storeID)
 	if err != nil {
 		ls.logger.Error("failed to get logs by store ID", zap.Error(err))
-		return nil, err
+		return dto.LoggingPaginationResponse{}, dto.ErrGetLogsByStoreID
 	}
 
-	if !found {
+	if len(logs) == 0 {
 		ls.logger.Warn("logs not found for store ID", zap.String("storeID", storeID))
-		return nil, dto.ErrNotFound
+		return dto.LoggingPaginationResponse{}, dto.ErrNotFound
 	}
 
 	var paginatedLogs []dto.LoggingResponse
@@ -77,19 +77,31 @@ func (ls *logService) GetLogsByStoreID(ctx context.Context, storeID string, req 
 		})
 	}
 
-	return paginatedLogs, nil
+	count := int64(len(paginatedLogs))
+	perPage := int64(req.PerPage)
+	maxPage := (count + perPage - 1) / perPage
+
+	return dto.LoggingPaginationResponse{
+		Data: paginatedLogs,
+		Pagination: dto.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: maxPage,
+			Count:   count,
+		},
+	}, nil
 }
 
-func (ls *logService) GetLogsByDateRange(ctx context.Context, startDate, endDate string, req dto.PaginationRequest) ([]dto.LoggingResponse, error) {
-	logs, found, err := ls.userRepo.GetLogByDateRange(ctx, nil, startDate, endDate)
+func (ls *logService) GetLogsByDateRange(ctx context.Context, startDate, endDate string, req dto.PaginationRequest) (dto.LoggingPaginationResponse, error) {
+	logs, err := ls.logRepo.GetLogByDateRange(ctx, nil, startDate, endDate)
 	if err != nil {
 		ls.logger.Error("failed to get logs by date range", zap.Error(err))
-		return nil, err
+		return dto.LoggingPaginationResponse{}, dto.ErrGetLogsByDateRange
 	}
 
-	if !found {
+	if len(logs) == 0 {
 		ls.logger.Warn("logs not found for date range", zap.String("startDate", startDate), zap.String("endDate", endDate))
-		return nil, dto.ErrNotFound
+		return dto.LoggingPaginationResponse{}, dto.ErrNotFound
 	}
 
 	var paginatedLogs []dto.LoggingResponse
@@ -103,20 +115,32 @@ func (ls *logService) GetLogsByDateRange(ctx context.Context, startDate, endDate
 		})
 	}
 
-	return paginatedLogs, nil
+	count := int64(len(paginatedLogs))
+	perPage := int64(req.PerPage)
+	maxPage := (count + perPage - 1) / perPage
+
+	return dto.LoggingPaginationResponse{
+		Data: paginatedLogs,
+		Pagination: dto.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: maxPage,
+			Count:   count,
+		},
+	}, nil
 }
 
-func (ls *logService) GetAllLogs(ctx context.Context, req dto.PaginationRequest) ([]dto.LoggingResponse, error) {
-	logs, found, err := ls.userRepo.GetAllLogs(ctx, nil)
+func (ls *logService) GetLogs(ctx context.Context, req dto.PaginationRequest) (dto.LoggingPaginationResponse, error) {
+	logs, err := ls.logRepo.GetLogs(ctx, nil)
 
 	if err != nil {
 		ls.logger.Error("failed to get all logs", zap.Error(err))
-		return nil, err
+		return dto.LoggingPaginationResponse{}, dto.ErrGetLogs
 	}
 
-	if !found {
+	if len(logs) == 0 {
 		ls.logger.Warn("logs not found")
-		return nil, dto.ErrNotFound
+		return dto.LoggingPaginationResponse{}, dto.ErrNotFound
 	}
 
 	var paginatedLogs []dto.LoggingResponse
@@ -130,5 +154,17 @@ func (ls *logService) GetAllLogs(ctx context.Context, req dto.PaginationRequest)
 		})
 	}
 
-	return paginatedLogs, nil
+	count := int64(len(paginatedLogs))
+	perPage := int64(req.PerPage)
+	maxPage := (count + perPage - 1) / perPage
+
+	return dto.LoggingPaginationResponse{
+		Data: paginatedLogs,
+		Pagination: dto.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: maxPage,
+			Count:   count,
+		},
+	}, nil
 }

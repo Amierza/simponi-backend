@@ -11,11 +11,5 @@ func User(route *gin.Engine, userHandler handler.IUserHandler, jwtService jwt.IJ
 	routes := route.Group("/api/v1/users").Use(middleware.Authentication(jwtService))
 	{
 		routes.GET("/profile", userHandler.GetProfile)
-
-		routes.POST("/logs", userHandler.CreateLog)
-
-		routes.GET("/logs", userHandler.GetLogs)
-		routes.GET("/logs/store/:storeID", userHandler.GetLogsByStoreID)
-		routes.GET("/logs/date-range", userHandler.GetLogsByDateRange)
 	}
 }

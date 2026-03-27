@@ -45,15 +45,19 @@ func main() {
 		// uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
 
 		// Authentication
-		authRepo = repository.NewAuthRepository(db)
+		authRepo    = repository.NewAuthRepository(db)
 		authService = service.NewAuthService(authRepo, zapLogger, jwt)
 		authHandler = handler.NewAuthHandler(authService)
-
 
 		// User
 		userRepo    = repository.NewUserRepository(db)
 		userService = service.NewUserService(userRepo, jwt, zapLogger)
 		userHandler = handler.NewUserHandler(userService, zapLogger)
+
+		// Logging
+		loggingRepo    = repository.NewLoggingRepository(db)
+		loggingService = service.NewLoggingService(loggingRepo, zapLogger, jwt)
+		loggingHandler = handler.NewLoggingHandler(loggingService, zapLogger)
 	)
 
 	server := gin.Default()
@@ -62,7 +66,7 @@ func main() {
 	// routes.Upload(server, uploadHandler, jwt)
 	routes.Auth(server, authHandler, jwt)
 	routes.User(server, userHandler, jwt)
-
+	routes.Logging(server, loggingHandler, jwt)
 
 	server.Static("/uploads", "./uploads")
 
