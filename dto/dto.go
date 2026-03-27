@@ -44,6 +44,15 @@ const (
 	// User Errors
 	FAILED_GET_PROFILE = "failed to get profile"
 
+	// Product Errors
+	FAILED_CREATE_PRODUCT            = "failed to create product"
+	FAILED_UPDATE_PRODUCT            = "failed to update product"
+	FAILED_DELETE_PRODUCT            = "failed to delete product"
+	FAILED_GET_ALL_PRODUCTS          = "failed to get all products"
+	FAILED_GET_PRODUCT_DETAIL        = "failed to get product detail"
+	FAILED_GET_PRODUCTS_BY_CATEGORY  = "failed to get products by category"
+	FAILED_UPDATE_STOCK              = "failed to update stock"
+
 	// General Errors
 	FAILED_CREATE         = "failed to create"
 	FAILED_UPDATE         = "failed to update"
@@ -70,6 +79,15 @@ const (
 
 	// User Errors
 	SUCCESS_GET_PROFILE = "sucess to get profile"
+
+	// Product Errors
+	SUCCESS_CREATE_PRODUCT           = "success create product"
+	SUCCESS_UPDATE_PRODUCT           = "success update product"
+	SUCCESS_DELETE_PRODUCT           = "success delete product"
+	SUCCESS_GET_ALL_PRODUCTS         = "success get all products"
+	SUCCESS_GET_PRODUCT_DETAIL       = "success get product detail"
+	SUCCESS_GET_PRODUCTS_BY_CATEGORY = "success get products by category"
+	SUCCESS_UPDATE_STOCK             = "success update stock"
 
 	// General Success
 	SUCCESS_CREATE     = "success create"
@@ -119,6 +137,17 @@ var (
 	// User
 	ErrGetUserByEmail = errors.New("failed to get user by email")
 	ErrGetUserByID    = errors.New("failed get user by id")
+
+	// Product
+	ErrCreateProduct           = errors.New("failed to create product")
+	ErrUpdateProduct           = errors.New("failed to update product")
+	ErrDeleteProduct           = errors.New("failed to delete product")
+	ErrGetAllProducts          = errors.New("failed to get all products")
+	ErrGetProductByID          = errors.New("failed to get product by id")
+	ErrGetProductBySKU         = errors.New("failed to get product by sku")
+	ErrGetProductsByCategory   = errors.New("failed to get products by category")
+	ErrUpdateStock             = errors.New("failed to update stock")
+	ErrProductSKUAlreadyExists = errors.New("product SKU already exists")
 
 	// Parse
 )
@@ -170,5 +199,94 @@ type (
 		ID    uuid.UUID `json:"id"`
 		Email string    `json:"email"`
 		Name  string    `json:"name"`
+	}
+)
+
+
+// Product
+
+type (
+	// Product Category
+	ProductCategoryRequest struct {
+		Name string `json:"name" binding:"required" example:"Electronics"`
+	}
+	ProductCategoryResponse struct {
+		ID        uuid.UUID `json:"id"`
+		Name      string    `json:"name" example:"Electronics"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+)
+
+type (
+	// Product Image
+	ProductImageResponse struct {
+		ID       uuid.UUID `json:"id"`
+		ImageURL string    `json:"image_url" example:"https://example.com/image.jpg"`
+	}
+)
+
+type (
+	// External Product
+	ExternalProductResponse struct {
+		ID                uuid.UUID  `json:"id"`
+		ProductID         *uuid.UUID `json:"product_id,omitempty"`
+		StoreID           *uuid.UUID `json:"store_id,omitempty"`
+		ExternalProductID string     `json:"external_product_id" example:"SP-L1L-448"`
+		ExternalModelID   string     `json:"external_model_id"`
+		Price             int64      `json:"price" example:"150000"`
+	}
+)
+
+type (
+	CreateProductRequest struct {
+		Name        string     `json:"name" binding:"required" example:"Refined Bronze Hat"`
+		Description string     `json:"description" example:"A very nice hat"`
+		SKU         string     `json:"sku" binding:"required" example:"L1L-448"`
+		Stock       int        `json:"stock" binding:"required,min=0" example:"100"`
+		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+	}
+
+	UpdateProductRequest struct {
+		Name        string     `json:"name" example:"Refined Bronze Hat"`
+		Description string     `json:"description" example:"A very nice hat"`
+		SKU         string     `json:"sku" example:"L1L-448"`
+		Stock       int        `json:"stock" example:"100"`
+		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+	}
+
+	UpdateStockRequest struct {
+		Change int    `json:"change" binding:"required" example:"-1"`
+		Source string `json:"source" binding:"required" example:"shopee"`
+		Note   string `json:"note" example:"Order #12345"`
+	}
+
+	ProductResponse struct {
+		ID               uuid.UUID                 `json:"id"`
+		Name             string                    `json:"name" example:"Refined Bronze Hat"`
+		Description      string                    `json:"description"`
+		SKU              string                    `json:"sku" example:"L1L-448"`
+		Stock            int                       `json:"stock" example:"100"`
+		Category         *ProductCategoryResponse  `json:"category,omitempty"`
+		Images           []ProductImageResponse    `json:"images,omitempty"`
+		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
+		CreatedAt        time.Time                 `json:"created_at"`
+		UpdatedAt        time.Time                 `json:"updated_at"`
+	}
+
+	ProductListResponse struct {
+		ID               uuid.UUID                 `json:"id"`
+		Name             string                    `json:"name"`
+		SKU              string                    `json:"sku"`
+		Stock            int                       `json:"stock"`
+		Category         *ProductCategoryResponse  `json:"category,omitempty"`
+		Images           []ProductImageResponse    `json:"images,omitempty"`
+		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
+		Status           string                    `json:"status"` // "Mapped", "Unmapped", "Low Stock", "Out of Stock"
+		CreatedAt        time.Time                 `json:"created_at"`
+	}
+
+	ProductPaginationResponse struct {
+		Data       []ProductListResponse `json:"data"`
+		Pagination PaginationResponse    `json:"pagination"`
 	}
 )
