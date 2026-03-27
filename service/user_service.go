@@ -12,13 +12,6 @@ import (
 type (
 	IUserService interface {
 		GetProfile(ctx context.Context) (*dto.UserResponse, error)
-
-		// logging
-		GetLogs(ctx context.Context) ([]dto.LoggingResponse, error)
-		GetLogsByStoreID(ctx context.Context, storeID string) ([]dto.LoggingResponse, error)
-		GetLogsByDateRange(ctx context.Context, startDate, endDate string) ([]dto.LoggingResponse, error)
-
-		CreateLog(ctx context.Context, req dto.LoggingRequest) (dto.LoggingResponse, error)
 	}
 
 	userService struct {
