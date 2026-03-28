@@ -14,7 +14,7 @@ import (
 type (
 	IProductService interface {
 		CreateProduct(ctx context.Context, req dto.CreateProductRequest) (dto.ProductResponse, error)
-		GetProducts(ctx context.Context, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
+		GetAllProducts(ctx context.Context, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
 		GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
 		GetProductsByCategoryID(ctx context.Context, categoryID string, req dto.PaginationRequest) (dto.ProductResponse, error)
@@ -30,6 +30,14 @@ type (
 		jwtService	jwt.IJWT
 	}
 )
+
+func NewProductService(productRepo repository.IProductRepository, logger *zap.Logger, jwtService jwt.IJWT) *productService {
+	return &productService{
+		productRepo:	productRepo,
+		logger:			logger,
+		jwtService: 	jwtService,
+	}
+}
 
 func getProductStatus(p entity.Product) string {
 	if p.Stock == 0 {
