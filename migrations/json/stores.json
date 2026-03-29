@@ -1,0 +1,47 @@
+[
+  {
+    "id": "e2b2c3d4-0007-4000-8000-000000000001",
+    "name": "Michael Official Store",
+    "description": "Toko resmi Michael",
+    "image_url": "https://placehold.co/200x200?text=Michael+Store",
+    "external_shop_id": "SP-SHOP-10001",
+    "external_name": "MichaelStore_Official",
+    "user_id": "d7f3e1c2-4e27-4d83-91d3-8cda0b1b68a1",
+    "platform_id": "f1b2c3d4-0006-4000-8000-000000000001",
+    "is_active": true,
+    "is_connected": true,
+    "last_sync_at": "2024-03-01T08:00:00Z",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "e2b2c3d4-0007-4000-8000-000000000002",
+    "name": "Michael TikTok Store",
+    "description": "Toko TikTok Michael",
+    "image_url": "https://placehold.co/200x200?text=Michael+TikTok",
+    "external_shop_id": "TK-SHOP-10001",
+    "external_name": "MichaelStore_TikTok",
+    "user_id": "d7f3e1c2-4e27-4d83-91d3-8cda0b1b68a1",
+    "platform_id": "f1b2c3d4-0006-4000-8000-000000000002",
+    "is_active": true,
+    "is_connected": true,
+    "last_sync_at": "2024-03-01T08:00:00Z",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "e2b2c3d4-0007-4000-8000-000000000003",
+    "name": "Jessica Beauty Shop",
+    "description": "Toko kecantikan Jessica",
+    "image_url": "https://placehold.co/200x200?text=Jessica+Store",
+    "external_shop_id": "SP-SHOP-10002",
+    "external_name": "JessicaBeauty_Official",
+    "user_id": "9b6f1b48-fc88-43f0-b28e-56718efcf139",
+    "platform_id": "f1b2c3d4-0006-4000-8000-000000000001",
+    "is_active": true,
+    "is_connected": true,
+    "last_sync_at": "2024-03-01T08:00:00Z",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]
