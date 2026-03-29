@@ -35,3 +35,7 @@
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-27T15:51:08.909+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"michael01@gmail.com"}
 {"level":"\u001b[33mWARN\u001b[0m","timestamp":"2026-03-29T13:56:10.206+0700","caller":"handler/auth_handler.go:37","msg":"user not found","email":"barimbingpilemon@gmail.com"}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-29T13:56:26.955+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"jessica99@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-29T14:59:30.426+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-29T15:09:55.111+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-29T15:16:33.428+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-03-29T15:23:53.879+0700","caller":"handler/auth_handler.go:37","msg":"Sign In Success","email":"michael01@gmail.com"}
