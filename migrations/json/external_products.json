@@ -1,0 +1,52 @@
+[
+  {
+    "id": "d1b2c3d4-0004-4000-8000-000000000001",
+    "product_id": "b1b2c3d4-0002-4000-8000-000000000001",
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
+    "external_product_id": "SP-ELC-WEP-001",
+    "external_model_id": "SP-MODEL-001",
+    "price": 459000,
+    "created_at": "2024-01-05T08:00:00Z",
+    "updated_at": "2024-01-05T08:00:00Z"
+  },
+  {
+    "id": "d1b2c3d4-0004-4000-8000-000000000002",
+    "product_id": "b1b2c3d4-0002-4000-8000-000000000001",
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000002",
+    "external_product_id": "TK-ELC-WEP-001",
+    "external_model_id": "TK-MODEL-001",
+    "price": 449000,
+    "created_at": "2024-01-05T08:00:00Z",
+    "updated_at": "2024-01-05T08:00:00Z"
+  },
+  {
+    "id": "d1b2c3d4-0004-4000-8000-000000000003",
+    "product_id": "b1b2c3d4-0002-4000-8000-000000000002",
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
+    "external_product_id": "SP-FSH-SCP-002",
+    "external_model_id": "SP-MODEL-002",
+    "price": 189000,
+    "created_at": "2024-01-06T08:00:00Z",
+    "updated_at": "2024-01-06T08:00:00Z"
+  },
+  {
+    "id": "d1b2c3d4-0004-4000-8000-000000000004",
+    "product_id": "b1b2c3d4-0002-4000-8000-000000000005",
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
+    "external_product_id": "SP-ELC-MKT-005",
+    "external_model_id": "SP-MODEL-005",
+    "price": 899000,
+    "created_at": "2024-01-09T08:00:00Z",
+    "updated_at": "2024-01-09T08:00:00Z"
+  },
+  {
+    "id": "d1b2c3d4-0004-4000-8000-000000000005",
+    "product_id": "b1b2c3d4-0002-4000-8000-000000000005",
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000002",
+    "external_product_id": "TK-ELC-MKT-005",
+    "external_model_id": "TK-MODEL-005",
+    "price": 879000,
+    "created_at": "2024-01-09T08:00:00Z",
+    "updated_at": "2024-01-09T08:00:00Z"
+  }
+]
