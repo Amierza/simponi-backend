@@ -5,15 +5,15 @@ import (
 )
 
 type InventoryLog struct {
-	ID uuid.UUID `gorm:"type:uuid;primaryKey"`
+	ID uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 
-	ProductID *uuid.UUID `gorm:"type:uuid"`
-	Product   *Product   `gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
+	Product   *Product   `gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"product,omitempty"`
 
-	Change int // -1, -2, +10
+	Change int `json:"change"` // -1, -2, +10
 
-	Source string // shopee, tiktok, manual
-	Note   string
+	Source string `json:"source"` // shopee, tiktok, manual
+	Note   string `json:"note"`
 
 	TimeStamp
 }
