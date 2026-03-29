@@ -24,15 +24,15 @@ type (
 	}
 
 	productHandler struct {
-		productService	service.IProductService
-		logger			*zap.Logger
+		productService service.IProductService
+		logger         *zap.Logger
 	}
 )
 
 func NewProductHandler(productService service.IProductService, logger *zap.Logger) *productHandler {
 	return &productHandler{
-		productService:	productService,
-		logger:			logger,
+		productService: productService,
+		logger:         logger,
 	}
 }
 

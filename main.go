@@ -58,6 +58,11 @@ func main() {
 		loggingRepo    = repository.NewLoggingRepository(db)
 		loggingService = service.NewLoggingService(loggingRepo, zapLogger, jwt)
 		loggingHandler = handler.NewLoggingHandler(loggingService, zapLogger)
+
+		// Product
+		productRepo    = repository.NewProductRepository(db)
+		productService = service.NewProductService(productRepo, zapLogger, jwt)
+		productHandler = handler.NewProductHandler(productService, zapLogger)
 	)
 
 	server := gin.Default()
@@ -67,6 +72,7 @@ func main() {
 	routes.Auth(server, authHandler, jwt)
 	routes.User(server, userHandler, jwt)
 	routes.Logging(server, loggingHandler, jwt)
+	routes.Product(server, productHandler, jwt)
 
 	server.Static("/uploads", "./uploads")
 
