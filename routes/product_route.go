@@ -10,6 +10,7 @@ import (
 func Product(route *gin.Engine, productHandler handler.IProductHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/products").Use(middleware.Authentication(jwtService))
 	{
+		routes.GET("/stats", productHandler.GetProductStats)
 		routes.POST("/", productHandler.CreateProduct)
 		routes.GET("/", productHandler.GetAllProducts)
 		routes.GET("/:id", productHandler.GetProductByID)

@@ -15,6 +15,7 @@ type (
 	IProductService interface {
 		CreateProduct(ctx context.Context, req dto.CreateProductRequest) (dto.ProductResponse, error)
 		GetAllProducts(ctx context.Context, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
+		GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
 		GetProductsByCategoryID(ctx context.Context, categoryID string, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
@@ -192,6 +193,16 @@ func (ps *productService) GetAllProducts(ctx context.Context, req dto.Pagination
 			Count:   count,
 		},
 	}, nil
+}
+
+func (ps *productService) GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error) {
+	stats, err := ps.productRepo.GetProductStats(ctx, nil)
+	if err != nil {
+		ps.logger.Error("failed to get product stats", zap.Error(err))
+		return dto.ProductStatsResponse{}, dto.ErrGetAllProducts
+	}
+
+	return stats, nil
 }
 
 func (ps *productService) GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error) {

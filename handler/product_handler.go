@@ -15,6 +15,7 @@ type (
 	IProductHandler interface {
 		CreateProduct(ctx *gin.Context)
 		GetAllProducts(ctx *gin.Context)
+		GetProductStats(ctx *gin.Context)
 		GetProductByID(ctx *gin.Context)
 		GetProductBySKU(ctx *gin.Context)
 		GetProductsByCategory(ctx *gin.Context)
@@ -82,6 +83,19 @@ func (ph *productHandler) GetAllProducts(ctx *gin.Context) {
 	}
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s products", dto.SUCCESS_GET_ALL_PRODUCTS), result)
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (ph *productHandler) GetProductStats(ctx *gin.Context) {
+	result, err := ph.productService.GetProductStats(ctx)
+	if err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(dto.FAILED_GET_ALL_PRODUCTS, err.Error(), nil)
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess("success get product stats", result)
 	ctx.JSON(http.StatusOK, res)
 }
 

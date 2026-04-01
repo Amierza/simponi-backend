@@ -11,6 +11,7 @@ type (
 	IProductRepository interface {
 		CreateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
 		GetProducts(ctx context.Context, tx *gorm.DB) ([]entity.Product, error)
+		GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, tx *gorm.DB, productID string) (*entity.Product, error)
 		GetProductBySKU(ctx context.Context, tx *gorm.DB, sku string) (*entity.Product, error)
 		GetProductsByCategoryID(ctx context.Context, tx *gorm.DB, categoryId string) ([]entity.Product, error)
@@ -55,6 +56,55 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB) ([]en
 	}
 
 	return products, nil
+}
+
+func (pr *productRepository) GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error) {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	var stats dto.ProductStatsResponse
+
+	if err := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Count(&stats.TotalProducts).Error; err != nil {
+		return dto.ProductStatsResponse{}, err
+	}
+	stats.TotalSKUs = stats.TotalProducts
+
+	if err := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Select("COALESCE(SUM(stock), 0)").
+		Scan(&stats.StockUnits).Error; err != nil {
+		return dto.ProductStatsResponse{}, err
+	}
+
+	if err := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Where("stock > 0 AND stock <= 10").
+		Count(&stats.LowStock).Error; err != nil {
+		return dto.ProductStatsResponse{}, err
+	}
+
+	if err := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Where("stock = 0").
+		Count(&stats.OutOfStock).Error; err != nil {
+		return dto.ProductStatsResponse{}, err
+	}
+
+	if err := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Where("id NOT IN (?)",
+			tx.Model(&entity.ExternalProduct{}).
+				Select("DISTINCT product_id").
+				Where("product_id IS NOT NULL"),
+		).
+		Count(&stats.Unsynced).Error; err != nil {
+		return dto.ProductStatsResponse{}, err
+	}
+
+	return stats, nil
 }
 
 func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, productID string) (*entity.Product, error) {
