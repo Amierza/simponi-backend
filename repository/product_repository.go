@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
 	"gorm.io/gorm"
 )
