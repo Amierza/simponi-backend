@@ -237,6 +237,17 @@ type (
 	}
 )
 
+type 
+	// Product Stats
+	ProductStatsResponse struct {
+		TotalProducts int64 `json:"total_products"`
+		TotalSKUs     int64 `json:"total_skus"`
+		StockUnits    int64 `json:"stock_units"`
+		LowStock      int64 `json:"low_stock"`
+		OutOfStock    int64 `json:"out_of_stock"`
+		Unsynced      int64 `json:"unsynced"`
+}
+
 type (
 	CreateProductRequest struct {
 		Name        string     `json:"name" binding:"required" example:"Refined Bronze Hat"`
