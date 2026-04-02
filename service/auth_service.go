@@ -16,29 +16,28 @@ type (
 		RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error)
 	}
 
-	authSevice struct{
+	authSevice struct {
 		authRepo repository.IAuthRepository
-		logger *zap.Logger
-		jwt jwt.IJWT
+		logger   *zap.Logger
+		jwt      jwt.IJWT
 	}
 )
 
 func NewAuthService(authRepo repository.IAuthRepository, logger *zap.Logger, jwt jwt.IJWT) *authSevice {
 	return &authSevice{
 		authRepo: authRepo,
-		logger: logger,
-		jwt: jwt,
+		logger:   logger,
+		jwt:      jwt,
 	}
 }
 
-func (as *authSevice) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error){
+func (as *authSevice) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error) {
 	user, found, err := as.authRepo.GetUserByEmail(ctx, nil, &req.Email)
 	if err != nil {
 		as.logger.Error("failed to get user by email", zap.String("email", req.Email), zap.Error(err))
 		return dto.SignInResponse{}, dto.ErrGetUserByEmail
-
 	}
-	if !found{
+	if !found {
 		as.logger.Warn("user not found", zap.String("email", req.Email))
 		return dto.SignInResponse{}, dto.ErrNotFound
 	}
@@ -58,12 +57,12 @@ func (as *authSevice) SignIn(ctx context.Context, req dto.SignInRequest) (dto.Si
 	as.logger.Info("Sign In Success", zap.String("email", req.Email))
 
 	return dto.SignInResponse{
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (as *authSevice) RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error){
+func (as *authSevice) RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error) {
 	_, err := as.jwt.ValidateToken(req.RefreshToken)
 	if err != nil {
 		as.logger.Error("invalid token", zap.String("refresh_token", req.RefreshToken), zap.Error(err))

@@ -8,15 +8,10 @@ type OrderDetail struct {
 	OrderID *uuid.UUID `gorm:"type:uuid"`
 	Order   *Order     `gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE;"`
 
-	ProductID *uuid.UUID `gorm:"type:uuid"`
-	Product   *Product   `gorm:"foreignKey:ProductID;references:ID;constraint:OnDelete:SET NULL;"`
-
-	ProductName string // snapshot
-	SKU         string // snapshot
+	ExternalProductID *uuid.UUID       `gorm:"type:uuid" json:"external_product_id"`
+	ExternalProduct   *ExternalProduct `gorm:"foreignKey:ExternalProductID;references:ID;constraint:OnDelete:SET NULL;"`
 
 	Quantity int
-	Price    int64
-	Total    int64
 
 	TimeStamp
 }

@@ -9,11 +9,10 @@ import (
 type Order struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey"`
 
-	// External Identity
 	ExternalOrderID string // order_sn
 	OrderNumber     string // display ID
 
-	StoreID *uuid.UUID `gorm:"type:uuid"`
+	StoreID *uuid.UUID `gorm:"type:uuid" json:"store_id,omitempty"`
 	Store   *Store     `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	// Buyer Snapshot
@@ -41,9 +40,9 @@ type Order struct {
 	NetAmount      int64
 
 	// Status
-	OrderStatus       string // PENDING, READY_TO_SHIP, COMPLETED
-	PaymentStatus     string // UNPAID, PAID
-	FulfillmentStatus string
+	OrderStatus   string // PENDING, READY_TO_SHIP, COMPLETED
+	PaymentStatus string // UNPAID, PAID
+	PaymentMethod string
 
 	// Timestamps from marketplace
 	OrderedAt   *time.Time

@@ -73,12 +73,12 @@ func mapToProductListResponse(p entity.Product) dto.ProductListResponse {
 	var externalProducts []dto.ExternalProductResponse
 	for _, ep := range p.ExternalProducts {
 		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:                ep.ID,
-			ProductID:         ep.ProductID,
-			StoreID:           ep.StoreID,
-			ExternalProductID: ep.ExternalProductID,
-			ExternalModelID:   ep.ExternalModelID,
-			Price:             ep.Price,
+			ID:        ep.ID,
+			ProductID: ep.ProductID,
+			// StoreID:           ep.StoreID,
+			// ExternalProductID: ep.ExternalProductID,
+			// ExternalModelID:   ep.ExternalModelID,
+			Price: ep.Price,
 		})
 	}
 
@@ -115,12 +115,12 @@ func mapToProductResponse(p entity.Product) dto.ProductResponse {
 	var externalProducts []dto.ExternalProductResponse
 	for _, ep := range p.ExternalProducts {
 		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:                ep.ID,
-			ProductID:         ep.ProductID,
-			StoreID:           ep.StoreID,
-			ExternalProductID: ep.ExternalProductID,
-			ExternalModelID:   ep.ExternalModelID,
-			Price:             ep.Price,
+			ID:        ep.ID,
+			ProductID: ep.ProductID,
+			// StoreID:           ep.StoreID,
+			// ExternalProductID: ep.ExternalProductID,
+			// ExternalModelID:   ep.ExternalModelID,
+			Price: ep.Price,
 		})
 	}
 
