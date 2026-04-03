@@ -44,35 +44,44 @@ func main() {
 		// uploadService = service.NewUploadService(zapLogger)
 		// uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
 
-		// Authentication
-		authRepo    = repository.NewAuthRepository(db)
-		authService = service.NewAuthService(authRepo, zapLogger, jwt)
-		authHandler = handler.NewAuthHandler(authService)
-
 		// User
 		userRepo    = repository.NewUserRepository(db)
 		userService = service.NewUserService(userRepo, jwt, zapLogger)
 		userHandler = handler.NewUserHandler(userService, zapLogger)
 
+		// Authentication
+		authService = service.NewAuthService(userRepo, zapLogger, jwt)
+		authHandler = handler.NewAuthHandler(authService)
+
+		// Permission
+		permissionRepo    = repository.NewPermissionRepository(db)
+		permissionService = service.NewPermissionService(permissionRepo)
+
 		// Logging
-		loggingRepo    = repository.NewLoggingRepository(db)
-		loggingService = service.NewLoggingService(loggingRepo, zapLogger, jwt)
-		loggingHandler = handler.NewLoggingHandler(loggingService, zapLogger)
+		logRepo    = repository.NewLogRepository(db)
+		logService = service.NewLogService(logRepo, zapLogger, jwt)
+		logHandler = handler.NewLogHandler(logService, zapLogger)
 
 		// Product
 		productRepo    = repository.NewProductRepository(db)
 		productService = service.NewProductService(productRepo, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
+
+		// Vendor
+		vendorRepo    = repository.NewVendorRepository(db)
+		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
+		vendorHandler = handler.NewVendorHandler(vendorService, zapLogger)
 	)
 
 	server := gin.Default()
 	server.Use(middleware.CORSMiddleware())
 
 	// routes.Upload(server, uploadHandler, jwt)
-	routes.Auth(server, authHandler, jwt)
-	routes.User(server, userHandler, jwt)
-	routes.Logging(server, loggingHandler, jwt)
-	routes.Product(server, productHandler, jwt)
+	routes.Auth(server, authHandler)
+	routes.User(server, userHandler, jwt, permissionService)
+	routes.Log(server, logHandler, jwt, permissionService)
+	routes.Product(server, productHandler, jwt, permissionService)
+	routes.Vendor(server, vendorHandler, jwt, permissionService)
 
 	server.Static("/uploads", "./uploads")
 

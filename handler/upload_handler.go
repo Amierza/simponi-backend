@@ -33,7 +33,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil || form.File == nil {
 		uh.logger.Error("No files found in multipart form", zap.Error(err))
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded", nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded")
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
@@ -45,7 +45,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 		file, err := ctx.FormFile("files")
 		if err != nil {
 			uh.logger.Error("Failed to get file from form", zap.Error(err))
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded", nil)
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded")
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 			return
 		}
@@ -55,7 +55,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 	// call service
 	uploadedURLs, err := uh.uploadService.Upload(ctx, files)
 	if err != nil {
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error())
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}

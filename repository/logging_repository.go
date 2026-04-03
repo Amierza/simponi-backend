@@ -10,7 +10,6 @@ import (
 type (
 	ILogRepository interface {
 		CreateLog(ctx context.Context, tx *gorm.DB, log *entity.Log) (*entity.Log, error)
-
 		GetLogs(ctx context.Context, tx *gorm.DB) ([]entity.Log, error)
 		GetLogByStoreID(ctx context.Context, tx *gorm.DB, storeID string) ([]entity.Log, error)
 		GetLogByDateRange(ctx context.Context, tx *gorm.DB, startDate, endDate string) ([]entity.Log, error)
@@ -21,7 +20,7 @@ type (
 	}
 )
 
-func NewLoggingRepository(db *gorm.DB) *logRepository {
+func NewLogRepository(db *gorm.DB) *logRepository {
 	return &logRepository{
 		db: db,
 	}

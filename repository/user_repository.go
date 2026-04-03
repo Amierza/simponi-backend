@@ -11,6 +11,7 @@ import (
 type (
 	IUserRepository interface {
 		GetUserByID(ctx context.Context, tx *gorm.DB, id string) (*entity.User, bool, error)
+		GetUserByEmail(ctx context.Context, tx *gorm.DB, email *string) (*entity.User, bool, error)
 	}
 
 	userRepository struct {
@@ -34,7 +35,23 @@ func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id strin
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
 	}
+	if err != nil {
+		return nil, false, err
+	}
 
+	return user, true, nil
+}
+
+func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email *string) (*entity.User, bool, error) {
+	if tx == nil {
+		tx = ur.db
+	}
+
+	user := new(entity.User)
+	err := tx.WithContext(ctx).Where("email = ?", email).Take(user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, false, nil
+	}
 	if err != nil {
 		return nil, false, err
 	}

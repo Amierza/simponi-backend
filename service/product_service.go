@@ -7,6 +7,7 @@ import (
 	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
+	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -14,11 +15,11 @@ import (
 type (
 	IProductService interface {
 		CreateProduct(ctx context.Context, req dto.CreateProductRequest) (dto.ProductResponse, error)
-		GetAllProducts(ctx context.Context, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
+		GetAllProducts(ctx context.Context, req response.PaginationRequest) (dto.ProductPaginationResponse, error)
 		GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
-		GetProductsByCategoryID(ctx context.Context, categoryID string, req dto.PaginationRequest) (dto.ProductPaginationResponse, error)
+		GetProductsByCategoryID(ctx context.Context, categoryID string, req response.PaginationRequest) (dto.ProductPaginationResponse, error)
 		UpdateProduct(ctx context.Context, productID string, req dto.UpdateProductRequest) (dto.ProductResponse, error)
 		DeleteProduct(ctx context.Context, productID string) error
 
@@ -162,7 +163,7 @@ func (ps *productService) CreateProduct(ctx context.Context, req dto.CreateProdu
 	return mapToProductResponse(*product), nil
 }
 
-func (ps *productService) GetAllProducts(ctx context.Context, req dto.PaginationRequest) (dto.ProductPaginationResponse, error) {
+func (ps *productService) GetAllProducts(ctx context.Context, req response.PaginationRequest) (dto.ProductPaginationResponse, error) {
 	products, err := ps.productRepo.GetProducts(ctx, nil)
 
 	if err != nil {
@@ -186,7 +187,7 @@ func (ps *productService) GetAllProducts(ctx context.Context, req dto.Pagination
 
 	return dto.ProductPaginationResponse{
 		Data: productList,
-		Pagination: dto.PaginationResponse{
+		Pagination: response.PaginationResponse{
 			Page:    req.Page,
 			PerPage: req.PerPage,
 			MaxPage: maxPage,
@@ -237,7 +238,7 @@ func (ps *productService) GetProductBySKU(ctx context.Context, sku string) (dto.
 	return mapToProductResponse(*product), nil
 }
 
-func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryID string, req dto.PaginationRequest) (dto.ProductPaginationResponse, error) {
+func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryID string, req response.PaginationRequest) (dto.ProductPaginationResponse, error) {
 	products, err := ps.productRepo.GetProductsByCategoryID(ctx, nil, categoryID)
 
 	if err != nil {
@@ -261,7 +262,7 @@ func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryI
 
 	return dto.ProductPaginationResponse{
 		Data: productList,
-		Pagination: dto.PaginationResponse{
+		Pagination: response.PaginationResponse{
 			Page:    req.Page,
 			PerPage: req.PerPage,
 			MaxPage: maxPage,

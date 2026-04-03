@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/Amierza/simponi-backend/entity"
+	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 )
 
@@ -16,9 +18,11 @@ const (
 	MESSAGE_FAILED_ACCESS_DENIED       = "failed access denied"
 	MESSAGE_FAILED_TOKEN_NOT_FOUND     = "failed token not found"
 	MESSAGE_FAILED_TOKEN_NOT_VALID     = "failed token not valid"
+	MESSAGE_FAILED_TOKEN_EXPIRED       = "failed token expired"
 	MESSAGE_FAILED_TOKEN_DENIED_ACCESS = "failed token denied access"
-	MESSAGE_FAILED_GET_CUSTOM_CLAIMS   = "failed get custom claims"
 	MESSAGE_FAILED_GET_ROLE_USER       = "failed get role user"
+	MESSAGE_FAILED_CHECK_PERMISSION    = "failed to check permission"
+	MESSAGE_FAILED_FORBIDDEN           = "forbidden"
 
 	// Query Params
 	MESSAGE_INVALID_QUERY_PARAMS = "invalid query params"
@@ -45,13 +49,13 @@ const (
 	FAILED_GET_PROFILE = "failed to get profile"
 
 	// Product Errors
-	FAILED_CREATE_PRODUCT            = "failed to create product"
-	FAILED_UPDATE_PRODUCT            = "failed to update product"
-	FAILED_DELETE_PRODUCT            = "failed to delete product"
-	FAILED_GET_ALL_PRODUCTS          = "failed to get all products"
-	FAILED_GET_PRODUCT_DETAIL        = "failed to get product detail"
-	FAILED_GET_PRODUCTS_BY_CATEGORY  = "failed to get products by category"
-	FAILED_UPDATE_STOCK              = "failed to update stock"
+	FAILED_CREATE_PRODUCT           = "failed to create product"
+	FAILED_UPDATE_PRODUCT           = "failed to update product"
+	FAILED_DELETE_PRODUCT           = "failed to delete product"
+	FAILED_GET_ALL_PRODUCTS         = "failed to get all products"
+	FAILED_GET_PRODUCT_DETAIL       = "failed to get product detail"
+	FAILED_GET_PRODUCTS_BY_CATEGORY = "failed to get products by category"
+	FAILED_UPDATE_STOCK             = "failed to update stock"
 
 	// General Errors
 	FAILED_CREATE         = "failed to create"
@@ -61,6 +65,7 @@ const (
 	FAILED_GET_DETAIL     = "failed to get detail"
 	NOT_FOUND             = "not found"
 	INTERNAL_SERVER_ERROR = "internal server error"
+	UNAUTHORIZED          = "unauthorized"
 
 	// ====================================== Success ======================================
 	// File
@@ -98,7 +103,6 @@ const (
 )
 
 var (
-
 	// Token
 	ErrGenerateAccessToken           = errors.New("failed to generate access token")
 	ErrGenerateRefreshToken          = errors.New("failed to generate refresh token")
@@ -117,11 +121,11 @@ var (
 	ErrDeleteOldImage     = errors.New("failed to delete old image")
 
 	// General
-	ErrNotFound         = errors.New("not found")
-	ErrValidationFailed = errors.New("validation failed")
-	ErrAlreadyExists    = errors.New("already exists")
-	ErrInternal         = errors.New("error internal")
-	ErrUnauthorized     = errors.New("unauthorized")
+	ErrNotFound      = errors.New("not found")
+	ErrBadRequest    = errors.New("bad request")
+	ErrAlreadyExists = errors.New("already exists")
+	ErrInternal      = errors.New("error internal")
+	ErrUnauthorized  = errors.New("unauthorized")
 
 	// Input
 
@@ -154,9 +158,9 @@ var (
 
 // Pagination
 type (
-	LoggingPaginationResponse struct {
-		Data       []LoggingResponse  `json:"data"`
-		Pagination PaginationResponse `json:"pagination"`
+	LogPaginationResponse struct {
+		Data       []LogResponse               `json:"data"`
+		Pagination response.PaginationResponse `json:"pagination"`
 	}
 )
 
@@ -178,13 +182,13 @@ type (
 		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
 	}
 
-	// Logging
-	LoggingRequest struct {
+	// Log
+	LogRequest struct {
 		StoreID *uuid.UUID `json:"store_id,omitempty"`
 		Action  string     `json:"action" example:"Create"`
 		Message string     `json:"message" binding:"required" example:"Created a new store"`
 	}
-	LoggingResponse struct {
+	LogResponse struct {
 		ID        uuid.UUID  `json:"id"`
 		StoreID   *uuid.UUID `json:"store_id,omitempty"`
 		Action    string     `json:"action" example:"Create"`
@@ -201,7 +205,6 @@ type (
 		Name  string    `json:"name"`
 	}
 )
-
 
 // Product
 
@@ -237,15 +240,15 @@ type (
 	}
 )
 
-type 
-	// Product Stats
-	ProductStatsResponse struct {
-		TotalProducts int64 `json:"total_products"`
-		TotalSKUs     int64 `json:"total_skus"`
-		StockUnits    int64 `json:"stock_units"`
-		LowStock      int64 `json:"low_stock"`
-		OutOfStock    int64 `json:"out_of_stock"`
-		Unsynced      int64 `json:"unsynced"`
+type
+// Product Stats
+ProductStatsResponse struct {
+	TotalProducts int64 `json:"total_products"`
+	TotalSKUs     int64 `json:"total_skus"`
+	StockUnits    int64 `json:"stock_units"`
+	LowStock      int64 `json:"low_stock"`
+	OutOfStock    int64 `json:"out_of_stock"`
+	Unsynced      int64 `json:"unsynced"`
 }
 
 type (
@@ -297,7 +300,45 @@ type (
 	}
 
 	ProductPaginationResponse struct {
-		Data       []ProductListResponse `json:"data"`
-		Pagination PaginationResponse    `json:"pagination"`
+		Data       []ProductListResponse       `json:"data"`
+		Pagination response.PaginationResponse `json:"pagination"`
+	}
+)
+
+// Vendor
+type (
+	VendorResponse struct {
+		ID          uuid.UUID `json:"id"`
+		Name        string    `json:"name"`
+		Email       string    `json:"email"`
+		PhoneNumber string    `json:"phone"`
+		Address     string    `json:"address"`
+		ImageURL    string    `json:"image_url"`
+		Description string    `json:"description"`
+	}
+	CreateVendorRequest struct {
+		Name        string `json:"name" binding:"required,min=3,max=100"`
+		Email       string `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string `json:"phone_number" binding:"required"`
+		Address     string `json:"address,omitempty"`
+		ImageURL    string `json:"image_url,omitempty"`
+		Description string `json:"description,omitempty"`
+	}
+	UpdateVendorRequest struct {
+		ID          uuid.UUID `json:"-"`
+		Name        string    `json:"name" binding:"required,min=3,max=100"`
+		Email       *string   `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string    `json:"phone_number" binding:"required"`
+		Address     *string   `json:"address,omitempty" binding:"omitempty"`
+		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
+		Description *string   `json:"description,omitempty" binding:"omitempty"`
+	}
+	VendorPaginationResponse struct {
+		response.PaginationResponse
+		Data []VendorResponse `json:"data"`
+	}
+	VendorPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Vendors []entity.Vendor
 	}
 )

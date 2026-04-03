@@ -30,10 +30,17 @@ func NewUserHandler(userService service.IUserService, logger *zap.Logger) *userH
 }
 
 func (uh *userHandler) GetProfile(ctx *gin.Context) {
-	result, err := uh.userService.GetProfile(ctx)
+	userID, exists := ctx.Get("user_id")
+	if !exists {
+		res := response.BuildResponseFailed(dto.UNAUTHORIZED, dto.UNAUTHORIZED)
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
+		return
+	}
+
+	result, err := uh.userService.GetProfile(ctx, userID.(string))
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_GET_PROFILE), err.Error(), nil)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_GET_PROFILE), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}

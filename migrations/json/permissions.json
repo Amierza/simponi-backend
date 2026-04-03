@@ -1,0 +1,131 @@
+[
+  {
+    "id": "11111111-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "Signin",
+    "endpoint": "/api/v1/auth/signin",
+    "method": "POST"
+  },
+  {
+    "id": "22222222-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "RefreshToken",
+    "endpoint": "/api/v1/auth/refresh-token",
+    "method": "POST"
+  },
+
+  {
+    "id": "33333333-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProfile",
+    "endpoint": "/api/v1/users/profile",
+    "method": "GET"
+  },
+
+  {
+    "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateLog",
+    "endpoint": "/api/v1/logs/logs",
+    "method": "POST"
+  },
+  {
+    "id": "55555555-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogs",
+    "endpoint": "/api/v1/logs/logs",
+    "method": "GET"
+  },
+  {
+    "id": "66666666-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogsByStore",
+    "endpoint": "/api/v1/logs/logs/store/:storeID",
+    "method": "GET"
+  },
+  {
+    "id": "77777777-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogsByDateRange",
+    "endpoint": "/api/v1/logs/logs/date-range",
+    "method": "GET"
+  },
+
+  {
+    "id": "88888888-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductStats",
+    "endpoint": "/api/v1/products/stats",
+    "method": "GET"
+  },
+  {
+    "id": "99999999-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateProduct",
+    "endpoint": "/api/v1/products/",
+    "method": "POST"
+  },
+  {
+    "id": "aaaaaaaa-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetAllProducts",
+    "endpoint": "/api/v1/products/",
+    "method": "GET"
+  },
+  {
+    "id": "bbbbbbbb-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductByID",
+    "endpoint": "/api/v1/products/:id",
+    "method": "GET"
+  },
+  {
+    "id": "cccccccc-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductBySKU",
+    "endpoint": "/api/v1/products/sku",
+    "method": "GET"
+  },
+  {
+    "id": "dddddddd-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductsByCategory",
+    "endpoint": "/api/v1/products/category/:categoryId",
+    "method": "GET"
+  },
+  {
+    "id": "eeeeeeee-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "UpdateProduct",
+    "endpoint": "/api/v1/products/:id",
+    "method": "PUT"
+  },
+  {
+    "id": "ffffffff-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "UpdateStock",
+    "endpoint": "/api/v1/products/:id/stock",
+    "method": "PATCH"
+  },
+  {
+    "id": "12345678-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "DeleteProduct",
+    "endpoint": "/api/v1/products/:id",
+    "method": "DELETE"
+  },
+  {
+    "id": "87654321-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateVendor",
+    "endpoint": "/api/v1/vendors/",
+    "method": "POST"
+  },
+  {
+    "id": "40077ea2-351c-46b9-a78f-1da15c23138e",
+    "name": "GetVendors",
+    "endpoint": "/api/v1/vendors/",
+    "method": "GET"
+  },
+  {
+    "id": "97f3ee37-748c-49af-a84d-f9e2b7a3e29b",
+    "name": "GetVendorByID",
+    "endpoint": "/api/v1/vendors/:id",
+    "method": "GET"
+  },
+  {
+    "id": "3bf9ec57-f2e5-4620-a0c9-f37f70180a19",
+    "name": "UpdateVendor",
+    "endpoint": "/api/v1/vendors/:id",
+    "method": "PUT"
+  },
+  {
+    "id": "d0c75e68-e7fa-4bc9-a8e5-0ec64ec63fa0",
+    "name": "DeleteVendorByID",
+    "endpoint": "/api/v1/vendors/:id",
+    "method": "DELETE"
+  }
+]

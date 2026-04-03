@@ -11,7 +11,7 @@ import (
 
 type (
 	IUserService interface {
-		GetProfile(ctx context.Context) (*dto.UserResponse, error)
+		GetProfile(ctx context.Context, userID string) (*dto.UserResponse, error)
 	}
 
 	userService struct {
@@ -29,22 +29,15 @@ func NewUserService(userRepo repository.IUserRepository, jwtService jwt.IJWT, lo
 	}
 }
 
-func (us *userService) GetProfile(ctx context.Context) (*dto.UserResponse, error) {
-	token := ctx.Value("Authorization").(string)
-	userIDString, err := us.jwtService.GetUserIDByToken(token)
+func (us *userService) GetProfile(ctx context.Context, userID string) (*dto.UserResponse, error) {
+	data, found, err := us.userRepo.GetUserByID(ctx, nil, userID)
 	if err != nil {
-		us.logger.Error("failed to get user_id by token", zap.String("id", userIDString), zap.Error(err))
-		return &dto.UserResponse{}, dto.ErrGetUserIDFromToken
-	}
-
-	data, found, err := us.userRepo.GetUserByID(ctx, nil, userIDString)
-	if err != nil {
-		us.logger.Error("failed to get user by id", zap.String("id", userIDString), zap.Error((err)))
+		us.logger.Error("failed to get user by id", zap.String("id", userID), zap.Error((err)))
 		return nil, dto.ErrGetUserByID
 	}
 
 	if !found {
-		us.logger.Warn("user not found", zap.String("id", userIDString))
+		us.logger.Warn("user not found", zap.String("id", userID))
 		return nil, dto.ErrNotFound
 	}
 

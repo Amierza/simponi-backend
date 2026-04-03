@@ -26,10 +26,10 @@ func NewAuthHandler(authService service.IAuthService) *authHandler {
 	}
 }
 
-func (ah *authHandler) SignIn(ctx *gin.Context){
+func (ah *authHandler) SignIn(ctx *gin.Context) {
 	var payload dto.SignInRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
-		res := response.BuildResponseFailed(dto.MESSAGE_INVALID_REQUEST_PAYLOAD, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_INVALID_REQUEST_PAYLOAD, err.Error())
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
@@ -37,7 +37,7 @@ func (ah *authHandler) SignIn(ctx *gin.Context){
 	result, err := ah.authService.SignIn(ctx, payload)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(dto.FAILED_SIGNIN, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.FAILED_SIGNIN, err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -46,10 +46,10 @@ func (ah *authHandler) SignIn(ctx *gin.Context){
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (ah *authHandler) RefreshToken(ctx *gin.Context){
+func (ah *authHandler) RefreshToken(ctx *gin.Context) {
 	var payload dto.RefreshTokenRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
-		res := response.BuildResponseFailed(dto.MESSAGE_INVALID_REQUEST_PAYLOAD, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_INVALID_REQUEST_PAYLOAD, err.Error())
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
@@ -57,7 +57,7 @@ func (ah *authHandler) RefreshToken(ctx *gin.Context){
 	result, err := ah.authService.RefreshToken(ctx, payload)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(dto.FAILED_REFRESH_TOKEN, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.FAILED_REFRESH_TOKEN, err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -65,4 +65,3 @@ func (ah *authHandler) RefreshToken(ctx *gin.Context){
 	res := response.BuildResponseSuccess(dto.SUCCESS_REFRESH_TOKEN, result)
 	ctx.JSON(http.StatusOK, res)
 }
-
