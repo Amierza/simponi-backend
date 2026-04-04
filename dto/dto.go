@@ -218,6 +218,14 @@ type (
 		Name      string    `json:"name" example:"Electronics"`
 		CreatedAt time.Time `json:"created_at"`
 	}
+	ProductCategoryPaginationResponse struct {
+		response.PaginationResponse
+		Data []ProductPaginationResponse `json:"data"`
+	}
+	ProductCategoryPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		ProductCategories []entity.ProductCategory
+	}
 )
 
 type (
@@ -233,36 +241,36 @@ type (
 	ExternalProductResponse struct {
 		ID                uuid.UUID  `json:"id"`
 		ProductID         *uuid.UUID `json:"product_id,omitempty"`
-		StoreID           *uuid.UUID `json:"store_id,omitempty"`
-		ExternalProductID string     `json:"external_product_id" example:"SP-L1L-448"`
-		ExternalModelID   string     `json:"external_model_id"`
+		StorePlatformID   *uuid.UUID `json:"store_platform_id,omitempty"`
 		Price             int64      `json:"price" example:"150000"`
 	}
 )
 
-type
-// Product Stats
-ProductStatsResponse struct {
-	TotalProducts int64 `json:"total_products"`
-	TotalSKUs     int64 `json:"total_skus"`
-	StockUnits    int64 `json:"stock_units"`
-	LowStock      int64 `json:"low_stock"`
-	OutOfStock    int64 `json:"out_of_stock"`
-	Unsynced      int64 `json:"unsynced"`
-}
+type (
+	// Product Stats
+	ProductStatsResponse struct {
+		TotalProducts int64 `json:"total_products"`
+		TotalSKUs     int64 `json:"total_skus"`
+		StockUnits    int64 `json:"stock_units"`
+		LowStock      int64 `json:"low_stock"`
+		OutOfStock    int64 `json:"out_of_stock"`
+		Unsynced      int64 `json:"unsynced"`
+	}
+)
 
 type (
 	CreateProductRequest struct {
-		Name        string     `json:"name" binding:"required" example:"Refined Bronze Hat"`
-		Description string     `json:"description" example:"A very nice hat"`
+		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
+		Description string     `json:"description,omitempty" example:"A very nice hat"`
 		SKU         string     `json:"sku" binding:"required" example:"L1L-448"`
 		Stock       int        `json:"stock" binding:"required,min=0" example:"100"`
 		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
 	}
 
 	UpdateProductRequest struct {
+		ID			uuid.UUID	`json:"-"`
 		Name        string     `json:"name" example:"Refined Bronze Hat"`
-		Description string     `json:"description" example:"A very nice hat"`
+		Description *string    `json:"description,omitempty" example:"A very nice hat"`
 		SKU         string     `json:"sku" example:"L1L-448"`
 		Stock       int        `json:"stock" example:"100"`
 		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
@@ -300,8 +308,12 @@ type (
 	}
 
 	ProductPaginationResponse struct {
-		Data       []ProductListResponse       `json:"data"`
-		Pagination response.PaginationResponse `json:"pagination"`
+		response.PaginationResponse
+		Data []ProductListResponse `json:"data"`
+	}
+	ProductPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Products []entity.Product
 	}
 )
 

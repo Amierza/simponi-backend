@@ -3,3 +3,5 @@ storage/
 !assets/
 volumes/
 .vscode/
+logs/
+*.log

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -14,16 +15,16 @@ import (
 
 type (
 	IProductService interface {
-		CreateProduct(ctx context.Context, req dto.CreateProductRequest) (dto.ProductResponse, error)
-		GetAllProducts(ctx context.Context, req response.PaginationRequest) (dto.ProductPaginationResponse, error)
+		CreateProduct(ctx context.Context, req *dto.CreateProductRequest) (dto.ProductResponse, error)
+		GetProducts(ctx context.Context, req *response.PaginationRequest) (dto.ProductPaginationResponse, error)
 		GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error)
-		GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error)
+		GetProductByID(ctx context.Context, productID *uuid.UUID) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
-		GetProductsByCategoryID(ctx context.Context, categoryID string, req response.PaginationRequest) (dto.ProductPaginationResponse, error)
-		UpdateProduct(ctx context.Context, productID string, req dto.UpdateProductRequest) (dto.ProductResponse, error)
-		DeleteProduct(ctx context.Context, productID string) error
+		GetProductsByCategoryID(ctx context.Context, categoryID *uuid.UUID, req *response.PaginationRequest) (dto.ProductPaginationResponse, error)
+		UpdateProduct(ctx context.Context, productID *uuid.UUID, req *dto.UpdateProductRequest) (dto.ProductResponse, error)
+		DeleteProductByID(ctx context.Context, productID *uuid.UUID) error
 
-		UpdateStock(ctx context.Context, productID string, req dto.UpdateStockRequest) error
+		UpdateStock(ctx context.Context, productID *uuid.UUID, req *dto.UpdateStockRequest) error
 	}
 
 	productService struct {
@@ -54,99 +55,84 @@ func getProductStatus(p entity.Product) string {
 	return "Mapped"
 }
 
-func mapToProductListResponse(p entity.Product) dto.ProductListResponse {
-	var category *dto.ProductCategoryResponse
-	if p.CategoryID != nil {
-		category = &dto.ProductCategoryResponse{
-			ID:   p.Category.ID,
-			Name: p.Category.Name,
-		}
+func mapToProductCategoryResponse(p entity.Product) *dto.ProductCategoryResponse {
+	if p.CategoryID == nil {
+		return nil
 	}
+	return &dto.ProductCategoryResponse{
+		ID:		p.Category.ID,
+		Name:	p.Category.Name,
+	}
+}
 
+func mapToProductImageResponse(p entity.Product) []dto.ProductImageResponse {
 	var images []dto.ProductImageResponse
+	
 	for _, img := range p.Images {
 		images = append(images, dto.ProductImageResponse{
-			ID:       img.ID,
-			ImageURL: img.ImageURL,
+			ID:			img.ID,
+			ImageURL: 	img.ImageURL,
 		})
 	}
+	return images
+}
 
+func mapToExternalProductResponse(p entity.Product) []dto.ExternalProductResponse {
 	var externalProducts []dto.ExternalProductResponse
+
 	for _, ep := range p.ExternalProducts {
 		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:        ep.ID,
-			ProductID: ep.ProductID,
-			// StoreID:           ep.StoreID,
-			// ExternalProductID: ep.ExternalProductID,
-			// ExternalModelID:   ep.ExternalModelID,
-			Price: ep.Price,
+			ID:              ep.ID,
+			ProductID:       ep.ProductID,
+			StorePlatformID: ep.StorePlatformID,
+			Price:           ep.Price,
 		})
 	}
+	return externalProducts
+}
 
+func mapToProductListResponse(p entity.Product) dto.ProductListResponse {
 	return dto.ProductListResponse{
 		ID:               p.ID,
 		Name:             p.Name,
 		SKU:              p.SKU,
 		Stock:            p.Stock,
-		Category:         category,
-		Images:           images,
-		ExternalProducts: externalProducts,
+		Category:         mapToProductCategoryResponse(p),
+		Images:           mapToProductImageResponse(p),
+		ExternalProducts: mapToExternalProductResponse(p),
 		Status:           getProductStatus(p),
 		CreatedAt:        p.CreatedAt,
 	}
 }
 
 func mapToProductResponse(p entity.Product) dto.ProductResponse {
-	var category *dto.ProductCategoryResponse
-	if p.CategoryID != nil {
-		category = &dto.ProductCategoryResponse{
-			ID:   p.Category.ID,
-			Name: p.Category.Name,
-		}
-	}
-
-	var images []dto.ProductImageResponse
-	for _, img := range p.Images {
-		images = append(images, dto.ProductImageResponse{
-			ID:       img.ID,
-			ImageURL: img.ImageURL,
-		})
-	}
-
-	var externalProducts []dto.ExternalProductResponse
-	for _, ep := range p.ExternalProducts {
-		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:        ep.ID,
-			ProductID: ep.ProductID,
-			// StoreID:           ep.StoreID,
-			// ExternalProductID: ep.ExternalProductID,
-			// ExternalModelID:   ep.ExternalModelID,
-			Price: ep.Price,
-		})
-	}
-
 	return dto.ProductResponse{
 		ID:               p.ID,
 		Name:             p.Name,
 		Description:      p.Description,
 		SKU:              p.SKU,
 		Stock:            p.Stock,
-		Category:         category,
-		Images:           images,
-		ExternalProducts: externalProducts,
+		Category:         mapToProductCategoryResponse(p),
+		Images:           mapToProductImageResponse(p),
+		ExternalProducts: mapToExternalProductResponse(p),
 		CreatedAt:        p.CreatedAt,
 		UpdatedAt:        p.UpdatedAt,
 	}
 }
 
-func (ps *productService) CreateProduct(ctx context.Context, req dto.CreateProductRequest) (dto.ProductResponse, error) {
-	existing, _ := ps.productRepo.GetProductBySKU(ctx, nil, req.SKU)
-	if existing != nil {
-		ps.logger.Warn("Product SKU already exists", zap.String("sku", req.SKU))
-		return dto.ProductResponse{}, dto.ErrProductSKUAlreadyExists
+func (ps *productService) CreateProduct(ctx context.Context, req *dto.CreateProductRequest) (dto.ProductResponse, error) {
+	_, found, err := ps.productRepo.GetProductBySKU(ctx, nil, req.SKU)
+	if err != nil {
+		ps.logger.Error("failed to get product by sku", zap.String("sku", req.SKU), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to get product by SKU: %w", dto.ErrInternal)
 	}
 
-	product, err := ps.productRepo.CreateProduct(ctx, nil, &entity.Product{
+	if found {
+		ps.logger.Warn("product SKU already exists", zap.String("sku", req.SKU))
+		return dto.ProductResponse{}, fmt.Errorf("product already exists: %w", dto.ErrAlreadyExists)
+	}
+
+	newProduct, err := ps.productRepo.CreateProduct(ctx, nil, &entity.Product{
 		ID:          uuid.New(),
 		Name:        req.Name,
 		Description: req.Description,
@@ -157,42 +143,32 @@ func (ps *productService) CreateProduct(ctx context.Context, req dto.CreateProdu
 
 	if err != nil {
 		ps.logger.Error("failed to create product", zap.Error(err))
-		return dto.ProductResponse{}, dto.ErrCreateProduct
+		return dto.ProductResponse{}, fmt.Errorf("failed to create product: %w", dto.ErrInternal)
 	}
 
-	return mapToProductResponse(*product), nil
+	ps.logger.Info("success to create product", zap.String("id", newProduct.ID.String()))
+
+	return mapToProductResponse(*newProduct), nil
 }
 
-func (ps *productService) GetAllProducts(ctx context.Context, req response.PaginationRequest) (dto.ProductPaginationResponse, error) {
-	products, err := ps.productRepo.GetProducts(ctx, nil)
+func (ps *productService) GetProducts(ctx context.Context, req *response.PaginationRequest) (dto.ProductPaginationResponse, error) {
+	datas, err := ps.productRepo.GetProducts(ctx, nil, req)
 
 	if err != nil {
-		ps.logger.Error("failed to get all products", zap.Error(err))
-		return dto.ProductPaginationResponse{}, dto.ErrGetAllProducts
+		ps.logger.Error("failed to get products", zap.Error(err))
+		return dto.ProductPaginationResponse{}, fmt.Errorf("failed to get products: %w", dto.ErrInternal)
 	}
 
-	if len(products) == 0 {
-		ps.logger.Warn("products not found")
-		return dto.ProductPaginationResponse{}, dto.ErrNotFound
-	}
+	ps.logger.Info("success to get products", zap.Int64("count", datas.Count))
 
 	var productList []dto.ProductListResponse
-	for _, p := range products {
+	for _, p := range datas.Products {
 		productList = append(productList, mapToProductListResponse(p))
 	}
 
-	count := int64(len(productList))
-	perPage := int64(req.PerPage)
-	maxPage := (count + perPage - 1) / perPage
-
 	return dto.ProductPaginationResponse{
-		Data: productList,
-		Pagination: response.PaginationResponse{
-			Page:    req.Page,
-			PerPage: req.PerPage,
-			MaxPage: maxPage,
-			Count:   count,
-		},
+		Data:				productList,
+		PaginationResponse:	datas.PaginationResponse,
 	}, nil
 }
 
@@ -200,104 +176,104 @@ func (ps *productService) GetProductStats(ctx context.Context) (dto.ProductStats
 	stats, err := ps.productRepo.GetProductStats(ctx, nil)
 	if err != nil {
 		ps.logger.Error("failed to get product stats", zap.Error(err))
-		return dto.ProductStatsResponse{}, dto.ErrGetAllProducts
+		return dto.ProductStatsResponse{}, fmt.Errorf("failed to get product stats: %w", dto.ErrInternal)
 	}
+
+	ps.logger.Info("success to get product stats")
 
 	return stats, nil
 }
 
-func (ps *productService) GetProductByID(ctx context.Context, productID string) (dto.ProductResponse, error) {
-	product, err := ps.productRepo.GetProductByID(ctx, nil, productID)
+func (ps *productService) GetProductByID(ctx context.Context, productID *uuid.UUID) (dto.ProductResponse, error) {
+	product, found, err := ps.productRepo.GetProductByID(ctx, nil, productID)
 
 	if err != nil {
-		ps.logger.Error("failed to get product by ID", zap.String("productID", productID), zap.Error(err))
-		return dto.ProductResponse{}, dto.ErrGetProductByID
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
 	}
 
-	if product == nil {
-		ps.logger.Error("product not found", zap.String("productID", productID))
-		return dto.ProductResponse{}, dto.ErrGetProductByID
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return dto.ProductResponse{}, fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
+
+	ps.logger.Info("success to get product by ID", zap.String("id", productID.String()))
 
 	return mapToProductResponse(*product), nil
 }
 
 func (ps *productService) GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error) {
-	product, err := ps.productRepo.GetProductBySKU(ctx, nil, sku)
+	product, found, err := ps.productRepo.GetProductBySKU(ctx, nil, sku)
 
 	if err != nil {
 		ps.logger.Error("failed to get product by SKU", zap.String("sku", sku), zap.Error(err))
-		return dto.ProductResponse{}, dto.ErrGetProductBySKU
+		return dto.ProductResponse{}, fmt.Errorf("failed to get product by SKU: %w", dto.ErrInternal)
 	}
 
-	if product == nil {
-		ps.logger.Error("product not found", zap.String("sku", sku))
-		return dto.ProductResponse{}, dto.ErrGetProductBySKU
+	if !found {
+		ps.logger.Warn("product not found", zap.String("sku", sku))
+		return dto.ProductResponse{}, fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
+
+	ps.logger.Info("success to get product by SKU", zap.String("sku", sku))
 
 	return mapToProductResponse(*product), nil
 }
 
-func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryID string, req response.PaginationRequest) (dto.ProductPaginationResponse, error) {
+func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryID *uuid.UUID, req *response.PaginationRequest) (dto.ProductPaginationResponse, error) {
 	products, err := ps.productRepo.GetProductsByCategoryID(ctx, nil, categoryID)
 
 	if err != nil {
-		ps.logger.Error("failed to get products by category", zap.String("categoryID", categoryID), zap.Error(err))
-		return dto.ProductPaginationResponse{}, dto.ErrGetProductsByCategory
+		ps.logger.Error("failed to get products by category", zap.String("categoryID", categoryID.String()), zap.Error(err))
+		return dto.ProductPaginationResponse{}, fmt.Errorf("failed to get products by category ID: %w", dto.ErrInternal)
 	}
 
-	if len(products) == 0 {
-		ps.logger.Warn("no products found for category", zap.String("catergoryID", categoryID))
-		return dto.ProductPaginationResponse{}, dto.ErrGetProductsByCategory
-	}
+	ps.logger.Info("success to get products by category ID", zap.String("categoryID", categoryID.String()), zap.Int("count", len(products)))	
 
 	var productList []dto.ProductListResponse
 	for _, p := range products {
 		productList = append(productList, mapToProductListResponse(p))
 	}
 
-	count := int64(len(productList))
-	perPage := int64(req.PerPage)
-	maxPage := (count + perPage - 1) / perPage
-
 	return dto.ProductPaginationResponse{
 		Data: productList,
-		Pagination: response.PaginationResponse{
-			Page:    req.Page,
-			PerPage: req.PerPage,
-			MaxPage: maxPage,
-			Count:   count,
+		PaginationResponse: response.PaginationResponse{
+			Page:		req.Page,
+			PerPage: 	req.PerPage,
+			Count: 		int64(len(productList)),
 		},
 	}, nil
 }
 
-func (ps *productService) UpdateProduct(ctx context.Context, productID string, req dto.UpdateProductRequest) (dto.ProductResponse, error) {
-	product, err := ps.productRepo.GetProductByID(ctx, nil, productID)
+func (ps *productService) UpdateProduct(ctx context.Context, productID *uuid.UUID, req *dto.UpdateProductRequest) (dto.ProductResponse, error) {
+	product, found, err := ps.productRepo.GetProductByID(ctx, nil, productID)
 	if err != nil {
-		ps.logger.Warn("Product not found for update", zap.String("productID", productID))
-		return dto.ProductResponse{}, dto.ErrNotFound
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
 	}
 
-	if product == nil {
-		ps.logger.Warn("Product not found for update", zap.String("productID", productID))
-		return dto.ProductResponse{}, dto.ErrNotFound
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return dto.ProductResponse{}, fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
 
 	if req.SKU != "" && req.SKU != product.SKU {
-		existing, _ := ps.productRepo.GetProductBySKU(ctx, nil, req.SKU)
-		if existing != nil {
-			ps.logger.Warn("SKU already taken", zap.String("sku", req.SKU))
-			return dto.ProductResponse{}, dto.ErrProductSKUAlreadyExists
+		_, found, err := ps.productRepo.GetProductBySKU(ctx, nil, req.SKU)
+		if err != nil {
+			ps.logger.Error("failed to get product by SKU", zap.String("sku", req.SKU), zap.Error(err))
+			return dto.ProductResponse{}, fmt.Errorf("failed to get product by SKU: %w", dto.ErrInternal)
+		}
+		
+		if found {
+			ps.logger.Warn("product SKU already exists", zap.String("sku", req.SKU))
+			return dto.ProductResponse{}, fmt.Errorf("product SKU already exists: %w", dto.ErrAlreadyExists)
 		}
 		product.SKU = req.SKU
 	}
-
-	if req.Name != "" {
-		product.Name = req.Name
-	}
-
-	if req.Description != "" {
-		product.Description = req.Description
+	
+	product.Name = req.Name
+	if req.Description != nil {
+		product.Description = *req.Description
 	}
 
 	if req.CategoryID != nil {
@@ -308,52 +284,57 @@ func (ps *productService) UpdateProduct(ctx context.Context, productID string, r
 		product.Stock = req.Stock
 	}
 
-	updated, err := ps.productRepo.UpdateProduct(ctx, nil, product)
+	updatedProduct, err := ps.productRepo.UpdateProduct(ctx, nil, product)
 
 	if err != nil {
-		ps.logger.Error("failed to update product", zap.String("productID", productID), zap.Error(err))
-		return dto.ProductResponse{}, dto.ErrUpdateProduct
+		ps.logger.Error("failed to update product", zap.String("id", productID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to update product: %w", dto.ErrInternal)
 	}
 
-	return mapToProductResponse(*updated), nil
+	return mapToProductResponse(*updatedProduct), nil
 }
 
-func (ps *productService) UpdateStock(ctx context.Context, productID string, req dto.UpdateStockRequest) error {
-	product, err := ps.productRepo.GetProductByID(ctx, nil, productID)
+func (ps *productService) UpdateStock(ctx context.Context, productID *uuid.UUID, req *dto.UpdateStockRequest) error {
+	_, found, err := ps.productRepo.GetProductByID(ctx, nil, productID)
 	if err != nil {
-		ps.logger.Warn("Product not found for stock update", zap.String("productID", productID), zap.Error(err))
-		return dto.ErrNotFound
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
 	}
 
-	if product == nil {
-		ps.logger.Warn("Product not found for stock update", zap.String("productID", productID))
-		return dto.ErrNotFound
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
 
 	if err := ps.productRepo.UpdateStock(ctx, nil, productID, req.Change); err != nil {
-		ps.logger.Error("failed to update stock", zap.String("productID", productID), zap.Error(err))
-		return dto.ErrUpdateProduct
+		ps.logger.Error("failed to update stock", zap.String("productID", productID.String()), zap.Error(err))
+		return dto.ErrInternal
 	}
+
+	ps.logger.Info("success to update stock", zap.String("categoryID", productID.String()), zap.Int("change", req.Change))	
 
 	return nil
 }
 
-func (ps *productService) DeleteProduct(ctx context.Context, productID string) error {
-	product, err := ps.productRepo.GetProductByID(ctx, nil, productID)
+func (ps *productService) DeleteProduct(ctx context.Context, productID *uuid.UUID) error {
+	_, found, err := ps.productRepo.GetProductByID(ctx, nil, productID)
 	if err != nil {
-		ps.logger.Warn("Product not found for delete", zap.String("productID", productID), zap.Error(err))
-		return dto.ErrNotFound
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
 	}
 
-	if product == nil {
-		ps.logger.Warn("Product not found for delete", zap.String("productID", productID))
-		return dto.ErrNotFound
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
 
-	if err := ps.productRepo.DeleteProduct(ctx, nil, productID); err != nil {
-		ps.logger.Error("failed to delete product", zap.String("productID", productID), zap.Error(err))
-		return dto.ErrDeleteProduct
+
+	if err := ps.productRepo.DeleteProductByID(ctx, nil, productID); err != nil {
+		ps.logger.Error("failed to delete product", zap.String("productID", productID.String()), zap.Error(err))
+		return fmt.Errorf("product not found: %w", dto.ErrInternal)
 	}
+	
+	ps.logger.Info("success to delete product", zap.String("id", productID.String()))	
 
 	return nil
 }
