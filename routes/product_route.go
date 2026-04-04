@@ -13,12 +13,12 @@ func Product(route *gin.Engine, productHandler handler.IProductHandler, jwtServi
 	{
 		routes.GET("/stats", middleware.RBAC(rolePermissionRepo, "GetProductStats"), productHandler.GetProductStats)
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateProduct"), productHandler.CreateProduct)
-		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetAllProducts"), productHandler.GetProducts)
+		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetProducts"), productHandler.GetProducts)
 		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetProductByID"), productHandler.GetProductByID)
 		routes.GET("/sku", middleware.RBAC(rolePermissionRepo, "GetProductBySKU"), productHandler.GetProductBySKU)
-		routes.GET("/category/:categoryId", middleware.RBAC(rolePermissionRepo, "GetProductsByCategory"), productHandler.GetProductsByCategoryID)
+		routes.GET("/category/:categoryId", middleware.RBAC(rolePermissionRepo, "GetProductsByCategoryID"), productHandler.GetProductsByCategoryID)
 		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateProduct"), productHandler.UpdateProduct)
 		routes.PATCH("/:id/stock", middleware.RBAC(rolePermissionRepo, "UpdateStock"), productHandler.UpdateStock)
-		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteProduct"), productHandler.DeleteProductByID)
+		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteProductByID"), productHandler.DeleteProductByID)
 	}
 }

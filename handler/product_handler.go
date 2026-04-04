@@ -164,7 +164,7 @@ func (ph *productHandler) GetProductsByCategoryID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := ph.productService.GetProductsByCategoryID(ctx, &categoryID ,&payload)
+	result, err := ph.productService.GetProductsByCategoryID(ctx, &categoryID, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
