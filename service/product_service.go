@@ -316,7 +316,7 @@ func (ps *productService) UpdateStock(ctx context.Context, productID *uuid.UUID,
 	return nil
 }
 
-func (ps *productService) DeleteProduct(ctx context.Context, productID *uuid.UUID) error {
+func (ps *productService) DeleteProductByID(ctx context.Context, productID *uuid.UUID) error {
 	_, found, err := ps.productRepo.GetProductByID(ctx, nil, productID)
 	if err != nil {
 		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))

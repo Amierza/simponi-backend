@@ -11,14 +11,12 @@
     "endpoint": "/api/v1/auth/refresh-token",
     "method": "POST"
   },
-
   {
     "id": "33333333-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetProfile",
     "endpoint": "/api/v1/users/profile",
     "method": "GET"
   },
-
   {
     "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateLog",
@@ -43,7 +41,6 @@
     "endpoint": "/api/v1/logs/logs/date-range",
     "method": "GET"
   },
-
   {
     "id": "88888888-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetProductStats",
@@ -58,7 +55,7 @@
   },
   {
     "id": "aaaaaaaa-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetAllProducts",
+    "name": "GetProducts",
     "endpoint": "/api/v1/products/",
     "method": "GET"
   },
@@ -76,7 +73,7 @@
   },
   {
     "id": "dddddddd-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProductsByCategory",
+    "name": "GetProductsByCategoryID",
     "endpoint": "/api/v1/products/category/:categoryId",
     "method": "GET"
   },
@@ -94,7 +91,7 @@
   },
   {
     "id": "12345678-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "DeleteProduct",
+    "name": "DeleteProductByID",
     "endpoint": "/api/v1/products/:id",
     "method": "DELETE"
   },
