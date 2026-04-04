@@ -15,13 +15,20 @@ import (
 
 type (
 	IVendorRepository interface {
-		CreateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) (*entity.Vendor, error)
+		// CREATE
+		CreateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error
+
+		// READ
 		GetVendors(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error)
 		GetVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) (*entity.Vendor, bool, error)
 		GetVendorByPhoneNumber(ctx context.Context, tx *gorm.DB, phoneNumber string) (*entity.Vendor, bool, error)
 		GetVendorByEmail(ctx context.Context, tx *gorm.DB, email string) (*entity.Vendor, bool, error)
-		UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) (*entity.Vendor, error)
-		DeleteVendorByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) error
+
+		// UPDATE
+		UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error
+
+		// DELETE
+		DeleteVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) error
 	}
 
 	vendorRepository struct {
@@ -35,24 +42,22 @@ func NewVendorRepository(db *gorm.DB) *vendorRepository {
 	}
 }
 
-func (vr *vendorRepository) CreateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) (*entity.Vendor, error) {
+// CREATE
+func (vr *vendorRepository) CreateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error {
 	if tx == nil {
 		tx = vr.db
 	}
 
-	if err := tx.WithContext(ctx).Create(vendor).Error; err != nil {
-		return nil, err
-	}
-
-	return vendor, nil
+	return tx.WithContext(ctx).Create(vendor).Error
 }
 
+// READ
 func (vr *vendorRepository) GetVendors(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = vr.db
 	}
 
-	var vendors []entity.Vendor
+	var vendors []*entity.Vendor
 	var err error
 	var count int64
 
@@ -93,7 +98,6 @@ func (vr *vendorRepository) GetVendors(ctx context.Context, tx *gorm.DB, req *re
 		},
 	}, err
 }
-
 func (vr *vendorRepository) GetVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
@@ -114,7 +118,6 @@ func (vr *vendorRepository) GetVendorByID(ctx context.Context, tx *gorm.DB, vend
 
 	return vendor, true, nil
 }
-
 func (vr *vendorRepository) GetVendorByPhoneNumber(ctx context.Context, tx *gorm.DB, phoneNumber string) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
@@ -135,7 +138,6 @@ func (vr *vendorRepository) GetVendorByPhoneNumber(ctx context.Context, tx *gorm
 
 	return &vendor, true, nil
 }
-
 func (vr *vendorRepository) GetVendorByEmail(ctx context.Context, tx *gorm.DB, email string) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
@@ -157,22 +159,20 @@ func (vr *vendorRepository) GetVendorByEmail(ctx context.Context, tx *gorm.DB, e
 	return &vendor, true, nil
 }
 
-func (vr *vendorRepository) UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) (*entity.Vendor, error) {
+// UPDATE
+func (vr *vendorRepository) UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error {
 	if tx == nil {
 		tx = vr.db
 	}
 
-	if err := tx.WithContext(ctx).Where("id = ?", vendor.ID).Updates(&vendor).Error; err != nil {
-		return nil, err
-	}
-
-	return vendor, nil
+	return tx.WithContext(ctx).Model(&entity.Vendor{}).Where("id = ?", vendor.ID).Updates(&vendor).Error
 }
 
-func (pr *vendorRepository) DeleteVendorByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) error {
+// DELETE
+func (vr *vendorRepository) DeleteVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) error {
 	if tx == nil {
-		tx = pr.db
+		tx = vr.db
 	}
 
-	return tx.WithContext(ctx).Where("id = ?", &id).Delete(&entity.Vendor{}).Error
+	return tx.WithContext(ctx).Where("id = ?", &vendorID).Delete(&entity.Vendor{}).Error
 }

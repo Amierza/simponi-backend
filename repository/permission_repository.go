@@ -2,13 +2,23 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"math"
+	"strings"
 
+	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
+	"github.com/Amierza/simponi-backend/response"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type (
 	IPermissionRepository interface {
-		CheckPermissionByName(ctx context.Context, roleID, permissionName string) (bool, error)
+		// READ
+		GetPermissionByID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error)
+		GetPermissions(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error)
+		GetPermissionsByRoleID(ctx context.Context, tx *gorm.DB, roleID *uuid.UUID) ([]*entity.Permission, error)
 	}
 
 	permissionRepository struct {
@@ -22,17 +32,90 @@ func NewPermissionRepository(db *gorm.DB) *permissionRepository {
 	}
 }
 
-func (pr *permissionRepository) CheckPermissionByName(ctx context.Context, roleID, permissionName string) (bool, error) {
-	var count int64
-	err := pr.db.WithContext(ctx).
-		Table("role_permissions rp").
-		Joins("JOIN permissions p ON p.id = rp.permission_id").
-		Where("rp.role_id = ?", roleID).
-		Where("p.name = ?", permissionName).
-		Count(&count).Error
-	if err != nil {
-		return false, err
+// READ
+func (pr *permissionRepository) GetPermissionByID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error) {
+	if tx == nil {
+		tx = pr.db
 	}
 
-	return count > 0, nil
+	permission := new(entity.Permission)
+	err := tx.WithContext(ctx).
+		Preload("RolePermissions").
+		Where("id = ?", permissionID).
+		Take(permission).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, false, nil
+	}
+	if err != nil {
+		return nil, false, err
+	}
+
+	return permission, true, nil
+}
+func (pr *permissionRepository) GetPermissionsByRoleID(ctx context.Context, tx *gorm.DB, roleID *uuid.UUID) ([]*entity.Permission, error) {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	var permissions []*entity.Permission
+	err := tx.WithContext(ctx).
+		Table("permissions p").
+		Select("p.*").
+		Joins("JOIN role_permissions rp ON rp.permission_id = p.id").
+		Where("rp.role_id = ?", *roleID).
+		Find(&permissions).Error
+	if err != nil {
+		return nil, err
+	}
+	if len(permissions) == 0 {
+		return nil, nil
+	}
+
+	return permissions, nil
+}
+func (pr *permissionRepository) GetPermissions(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error) {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	var permissions []*entity.Permission
+	var err error
+	var count int64
+
+	if req.PerPage == 0 {
+		req.PerPage = 10
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
+	query := tx.WithContext(ctx).
+		Model(&entity.Permission{}).
+		Preload("RolePermissions")
+
+	if req.Search != "" {
+		searchValue := "%" + strings.ToLower(req.Search) + "%"
+		query = query.Where("LOWER(name) LIKE ? OR LOWER(endpoint) LIKE ? OR LOWER(method) LIKE ?", searchValue, searchValue, searchValue)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return dto.PermissionPaginationRepositoryResponse{}, err
+	}
+
+	if err := query.Order(`"created_at" DESC`).Scopes(response.Paginate(req.Page, req.PerPage)).Find(&permissions).Error; err != nil {
+		return dto.PermissionPaginationRepositoryResponse{}, err
+	}
+
+	totalPage := int64(math.Ceil(float64(count) / float64(req.PerPage)))
+
+	return dto.PermissionPaginationRepositoryResponse{
+		Permissions: permissions,
+		PaginationResponse: response.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: totalPage,
+			Count:   count,
+		},
+	}, err
 }

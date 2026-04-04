@@ -12,11 +12,80 @@
     "method": "POST"
   },
   {
+    "id": "23ab5085-924c-4c7f-9038-2bc213f99d10",
+    "name": "GetPermissions",
+    "endpoint": "/api/v1/permissions",
+    "method": "GET"
+  },
+
+  {
+    "id": "328359e3-7abc-45b4-8fa6-a07b3e0990f5",
+    "name": "CreateRole",
+    "endpoint": "/api/v1/roles",
+    "method": "POST"
+  },
+  {
+    "id": "2e93d440-bc56-46b2-afd7-a7acaa6f9275",
+    "name": "GetRoles",
+    "endpoint": "/api/v1/roles",
+    "method": "GET"
+  },
+  {
+    "id": "eaf90d01-2db3-476b-b8fa-85b9ce510a41",
+    "name": "GetRoleByID",
+    "endpoint": "/api/v1/roles/:id",
+    "method": "GET"
+  },
+  {
+    "id": "39baf21f-9746-4f21-9eb6-e0ff3a0bd4cb",
+    "name": "UpdateRole",
+    "endpoint": "/api/v1/roles/:id",
+    "method": "PUT"
+  },
+  {
+    "id": "5bad4700-1a2d-4788-9327-7db99b6d6ba5",
+    "name": "DeleteRoleByID",
+    "endpoint": "/api/v1/roles/:id",
+    "method": "DELETE"
+  },
+
+  {
+    "id": "12f2bc0a-cfe8-44ee-bda8-2fa5e8ee266c",
+    "name": "CreateUser",
+    "endpoint": "/api/v1/users",
+    "method": "POST"
+  },
+  {
+    "id": "090331cb-5d7e-4ca2-84c7-d420bc8c2c0d",
+    "name": "GetUsers",
+    "endpoint": "/api/v1/users",
+    "method": "GET"
+  },
+  {
+    "id": "4286a4d0-96e5-4b82-84e2-a9775e597e7a",
+    "name": "GetUserByID",
+    "endpoint": "/api/v1/users/:id",
+    "method": "GET"
+  },
+  {
     "id": "33333333-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetProfile",
     "endpoint": "/api/v1/users/profile",
     "method": "GET"
   },
+  {
+    "id": "7a5e749c-85e2-4678-b235-3cbaec91c8f2",
+    "name": "UpdateUser",
+    "endpoint": "/api/v1/users/:id",
+    "method": "PUT"
+  },
+  {
+    "id": "793aaad8-d456-4d1d-9699-867196659bbe",
+    "name": "DeleteUserByID",
+    "endpoint": "/api/v1/users/:id",
+    "method": "DELETE"
+  },
+
   {
     "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateLog",
@@ -95,16 +164,17 @@
     "endpoint": "/api/v1/products/:id",
     "method": "DELETE"
   },
+
   {
     "id": "87654321-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateVendor",
-    "endpoint": "/api/v1/vendors/",
+    "endpoint": "/api/v1/vendors",
     "method": "POST"
   },
   {
     "id": "40077ea2-351c-46b9-a78f-1da15c23138e",
     "name": "GetVendors",
-    "endpoint": "/api/v1/vendors/",
+    "endpoint": "/api/v1/vendors",
     "method": "GET"
   },
   {

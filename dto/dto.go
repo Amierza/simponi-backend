@@ -197,17 +197,7 @@ type (
 	}
 )
 
-// User
-type (
-	UserResponse struct {
-		ID    uuid.UUID `json:"id"`
-		Email string    `json:"email"`
-		Name  string    `json:"name"`
-	}
-)
-
 // Product
-
 type (
 	// Product Category
 	ProductCategoryRequest struct {
@@ -317,6 +307,75 @@ type (
 	}
 )
 
+// Role
+type (
+	RoleResponse struct {
+		ID          uuid.UUID            `json:"id"`
+		Name        string               `json:"name"`
+		Permissions []PermissionResponse `json:"permissions"`
+	}
+	CreateRoleRequest struct {
+		Name           string       `json:"name" binding:"required"`
+		PermissionsIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
+	}
+	UpdateRoleRequest struct {
+		ID            uuid.UUID    `json:"-"`
+		Name          string       `json:"name" binding:"required"`
+		PermissionIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
+	}
+)
+
+// Permission
+type (
+	PermissionResponse struct {
+		ID       uuid.UUID `json:"id"`
+		Name     string    `json:"name"`
+		Endpoint string    `json:"endpoint"`
+		Method   string    `json:"method"`
+	}
+	PermissionPaginationResponse struct {
+		response.PaginationResponse
+		Data []*PermissionResponse `json:"data"`
+	}
+	PermissionPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Permissions []*entity.Permission
+	}
+)
+
+// User
+type (
+	UserResponse struct {
+		ID       uuid.UUID    `json:"id"`
+		Email    string       `json:"email"`
+		Name     string       `json:"name"`
+		ImageURL string       `json:"image_url"`
+		Role     RoleResponse `json:"role"`
+	}
+	CreateUserRequest struct {
+		Email    string     `json:"email" binding:"email"`
+		Password string     `json:"password" binding:"required,min=5,max=8"`
+		Name     string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL string     `json:"image_url"`
+		RoleID   *uuid.UUID `json:"role_id"`
+	}
+	UpdateUserRequest struct {
+		ID       uuid.UUID  `json:"-"`
+		Email    string     `json:"email" binding:"email"`
+		Name     string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL *string    `json:"image_url,omitempty" binding:"omitempty"`
+		RoleID   *uuid.UUID `json:"role_id"`
+	}
+	UserPaginationResponse struct {
+		response.PaginationResponse
+		Data []*UserResponse `json:"data"`
+	}
+	UserPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Users []*entity.User
+	}
+)
+
 // Vendor
 type (
 	VendorResponse struct {
@@ -347,10 +406,10 @@ type (
 	}
 	VendorPaginationResponse struct {
 		response.PaginationResponse
-		Data []VendorResponse `json:"data"`
+		Data []*VendorResponse `json:"data"`
 	}
 	VendorPaginationRepositoryResponse struct {
 		response.PaginationResponse
-		Vendors []entity.Vendor
+		Vendors []*entity.Vendor
 	}
 )

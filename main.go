@@ -44,18 +44,27 @@ func main() {
 		// uploadService = service.NewUploadService(zapLogger)
 		// uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
 
+		// Permission
+		permissionRepo    = repository.NewPermissionRepository(db)
+		permissionService = service.NewPermissionService(permissionRepo, zapLogger, jwt)
+		permissionHandler = handler.NewPermissionHandler(permissionService, zapLogger)
+
+		// Role Permission
+		rolePermissionRepo = repository.NewRolePermissionRepository(db)
+
+		// Role
+		roleRepo    = repository.NewRoleRepository(db)
+		roleService = service.NewRoleService(roleRepo, permissionRepo, rolePermissionRepo, zapLogger, jwt)
+		roleHandler = handler.NewRoleHandler(roleService, zapLogger)
+
 		// User
 		userRepo    = repository.NewUserRepository(db)
-		userService = service.NewUserService(userRepo, jwt, zapLogger)
+		userService = service.NewUserService(userRepo, roleRepo, zapLogger, jwt)
 		userHandler = handler.NewUserHandler(userService, zapLogger)
 
 		// Authentication
 		authService = service.NewAuthService(userRepo, zapLogger, jwt)
 		authHandler = handler.NewAuthHandler(authService, zapLogger)
-
-		// Permission
-		permissionRepo    = repository.NewPermissionRepository(db)
-		permissionService = service.NewPermissionService(permissionRepo)
 
 		// Logging
 		logRepo    = repository.NewLogRepository(db)
@@ -78,10 +87,12 @@ func main() {
 
 	// routes.Upload(server, uploadHandler, jwt)
 	routes.Auth(server, authHandler)
-	routes.User(server, userHandler, jwt, permissionService)
-	routes.Log(server, logHandler, jwt, permissionService)
-	routes.Product(server, productHandler, jwt, permissionService)
-	routes.Vendor(server, vendorHandler, jwt, permissionService)
+	routes.User(server, userHandler, jwt, rolePermissionRepo)
+	routes.Log(server, logHandler, jwt, rolePermissionRepo)
+	routes.Product(server, productHandler, jwt, rolePermissionRepo)
+	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
+	routes.Permission(server, permissionHandler, jwt, rolePermissionRepo)
+	routes.Role(server, roleHandler, jwt, rolePermissionRepo)
 
 	server.Static("/uploads", "./uploads")
 
