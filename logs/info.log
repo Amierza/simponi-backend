@@ -99,3 +99,98 @@
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:31:01.740+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:32:08.431+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:32:20.195+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:44:01.272+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:54:21.781+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:54:53.545+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:55:09.300+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:55:20.280+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:55:25.167+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:55:39.914+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:56:12.441+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:56:46.687+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:56:59.448+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:40.164+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:46.135+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:46.678+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:48.958+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:49.626+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:56.699+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:57:57.319+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:10.859+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:11.372+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:25.425+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:33.034+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:44.220+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:58:59.514+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:59:58.412+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM3NDk4LCJpYXQiOjE3NzU0MzcxOTgsImp0aSI6IjE3YTRkZTQ5LTUyYzgtNGQ4ZS1hYTFkLTJhMTU2MTA0MTY3NSJ9.veYJWNXyMbouao0mFcJZ9E8ZjxUokAQBLKtCD6vCJoA"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T07:59:58.513+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:00:04.091+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:00:22.379+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:00:27.794+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:00:49.021+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:00:59.992+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:01:00.087+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:01:26.185+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:01:26.746+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:15.846+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:16.383+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:26.744+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:30.255+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:37.134+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:02:41.744+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:03:25.689+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:03:47.618+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:04:20.752+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:04:27.022+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:08:09.546+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM3OTg5LCJpYXQiOjE3NzU0Mzc2ODksImp0aSI6ImU0MjgyYmI0LWNjNmEtNDgwZi04NzQyLWFmY2I4MjkzYWE1ZSJ9.BlrHmu6PReU-1SXrUvqQNhFlabXbXGWWa35MXMSKF0M"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:08:09.568+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:08:12.437+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:08:14.651+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:08:14.655+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":9}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:09:43.120+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:11:32.225+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[33mWARN\u001b[0m","timestamp":"2026-04-06T08:15:48.746+0700","caller":"handler/product_handler.go:51","msg":"product SKU already exists","sku":"SKU-002"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:15:56.958+0700","caller":"handler/product_handler.go:51","msg":"success to create product","id":"6d334726-f91c-4699-9f01-f15286d1adf4"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:21:32.924+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM4NzkyLCJpYXQiOjE3NzU0Mzg0OTIsImp0aSI6IjVhMjNkNTZjLTY0MDAtNDgwNC05Yzk4LTRjOGY5ZDc0OWIwNyJ9.kziAvSkSeYwrsFt96Wnnhxf9sqaPy6qZxjCUqAayIvI"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:21:32.965+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:21:33.090+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:23:11.473+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:23:15.632+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:24:26.205+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:24:34.615+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:24:34.630+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:24:37.730+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:24:38.186+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:43.358+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM5MTYzLCJpYXQiOjE3NzU0Mzg4NjMsImp0aSI6ImM4NTEwYmFlLTUyZjItNGMzMC05NDAyLTQyMzIzYWQ5Mzg3YSJ9.hxqahbeHX_24Lwjt5jVCGMQp1HAfRo8ERdUFBhEvNJM"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:43.479+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:43.502+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:45.990+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:46.134+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:49.186+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:49.358+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:27:49.386+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:01.986+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:03.202+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:03.427+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:10.602+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:10.624+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:13.625+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:21.387+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:24.882+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:30:45.749+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:31:34.973+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:33:06.915+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM5NDg2LCJpYXQiOjE3NzU0MzkxODYsImp0aSI6ImRjNWM1YzIyLTgyNjgtNGM1OC1iZTliLWM0MTMzYWMwOTg3NyJ9.97MsFyOdJa-TXsVGbP3_m1HWEIZTM0EH5GlEmlVDFNQ"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:33:06.963+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:33:14.914+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:35:02.949+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:35:11.139+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:35:13.978+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:35:56.568+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:37:49.373+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:37:53.343+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:03.014+0700","caller":"handler/product_handler.go:91","msg":"success to get product stats"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:03.022+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":10}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:19.173+0700","caller":"handler/auth_handler.go:65","msg":"refresh token sucess","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwicm9sZV9pZCI6IjU4MDAxYzk1LWVhYjYtNGY3YS1iM2NlLWY2Mjc0OTlkM2ViZSIsImlzcyI6IlRlbXBsYXRlIiwic3ViIjoiZDdmM2UxYzItNGUyNy00ZDgzLTkxZDMtOGNkYTBiMWI2OGExIiwiZXhwIjoxNzc1NDM5Nzk5LCJpYXQiOjE3NzU0Mzk0OTksImp0aSI6ImRkMjY5NjJjLTIyMjktNDI4My1hODFhLWM0NDZmYzk2MDE5NCJ9.ZE_VzTyxy_Etl7GOxLAUOpt4y6zqNHU-sa8aKhYcxbE"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:19.281+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:33.971+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-06T08:38:41.382+0700","caller":"handler/external_product_handler.go:71","msg":"success to get external products","count":5}

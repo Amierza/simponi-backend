@@ -66,7 +66,9 @@ func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, t
 	query := tx.WithContext(ctx).
 		Model(&entity.ExternalProduct{}).
 		Preload("Product").
-		Preload("StorePlatform")
+		Preload("Product.Images").
+		Preload("StorePlatform").
+		Preload("StorePlatform.Platform")
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
@@ -106,7 +108,9 @@ func (epr *externalProductRepository) GetExternalProductByID(ctx context.Context
 	err := tx.WithContext(ctx).
 		Model(&entity.ExternalProduct{}).
 		Preload("Product").
+		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Platform").
 		Where("id = ?", externalProductID).
 		First(&externalProduct).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -129,7 +133,9 @@ func (epr *externalProductRepository) GetExternalProductByProductID(ctx context.
 	if err := tx.WithContext(ctx).
 		Model(&entity.ExternalProduct{}).
 		Preload("Product").
+		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Platform").
 		Where("product_id = ?", productID).
 		Find(&externalProducts).Error; err != nil {
 		return nil, err
@@ -148,7 +154,9 @@ func (epr *externalProductRepository) GetExternalProductByStorePlatformID(ctx co
 	if err := tx.WithContext(ctx).
 		Model(&entity.ExternalProduct{}).
 		Preload("Product").
+		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Platform").
 		Where("store_platform_id = ?", storePlatformID).
 		Find(&externalProducts).Error; err != nil {
 		return nil, err

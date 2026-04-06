@@ -16,6 +16,8 @@ import (
 type (
 	IProductRepository interface {
 		CreateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
+		CreateProductImage(ctx context.Context, tx *gorm.DB, productImage *entity.ProductImage) (*entity.ProductImage, error)
+		AttachProductImageToProduct(ctx context.Context, tx *gorm.DB, imageID *uuid.UUID, productID *uuid.UUID) error
 		GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error)
 		GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) (*entity.Product, bool, error)
@@ -50,6 +52,38 @@ func (pr *productRepository) CreateProduct(ctx context.Context, tx *gorm.DB, pro
 	return product, nil
 }
 
+func (pr *productRepository) CreateProductImage(ctx context.Context, tx *gorm.DB, productImage *entity.ProductImage) (*entity.ProductImage, error) {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	if err := tx.WithContext(ctx).Create(productImage).Error; err != nil {
+		return nil, err
+	}
+
+	return productImage, nil
+}
+
+func (pr *productRepository) AttachProductImageToProduct(ctx context.Context, tx *gorm.DB, imageID *uuid.UUID, productID *uuid.UUID) error {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	result := tx.WithContext(ctx).
+		Model(&entity.ProductImage{}).
+		Where("id = ?", imageID).
+		Where("product_id IS NULL").
+		Update("product_id", productID)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
+
 func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = pr.db
@@ -70,7 +104,9 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 		Model(&entity.Product{}).
 		Preload("Category").
 		Preload("Images").
-		Preload("ExternalProducts")
+		Preload("ExternalProducts").
+		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Platform")
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
@@ -159,6 +195,8 @@ func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, pr
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
+		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Platform").
 		Preload("Logs").
 		Where("id = ?", productID).
 		First(&product).Error
@@ -184,6 +222,8 @@ func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, s
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
+		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Platform").
 		Where("sku = ?", sku).
 		First(&product).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -208,6 +248,8 @@ func (pr *productRepository) GetProductsByCategoryID(ctx context.Context, tx *go
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
+		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Platform").
 		Where("category_id = ?", categoryId).
 		Find(&products).Error; err != nil {
 		return nil, err

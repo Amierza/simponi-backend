@@ -166,6 +166,11 @@ type (
 
 // Without Pagination
 type (
+	UploadImageResponse struct {
+		ImageID  uuid.UUID `json:"image_id"`
+		ImageURL string    `json:"image_url"`
+	}
+
 	// Authentication
 	SignInRequest struct {
 		Email    string `json:"email" binding:"required" example:"admin@mail.com"`
@@ -245,6 +250,7 @@ type (
 		SKU         string     `json:"sku" binding:"required" example:"L1L-448"`
 		Stock       int        `json:"stock" binding:"required,min=0" example:"100"`
 		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+		ImageID     *uuid.UUID `json:"image_id" binding:"required"`
 	}
 
 	UpdateProductRequest struct {
@@ -312,12 +318,13 @@ type (
 	}
 
 	ExternalProductResponse struct {
-		ID              uuid.UUID  `json:"id"`
-		ProductID       *uuid.UUID `json:"product_id,omitempty"`
-		StorePlatformID *uuid.UUID `json:"store_platform_id,omitempty"`
-		Price           int64      `json:"price"`
-		CreatedAt       time.Time  `json:"created_at"`
-		UpdatedAt       time.Time  `json:"updated_at"`
+		ID          uuid.UUID `json:"id"`
+		ImageURL    string    `json:"image"`
+		ProductName string    `json:"product_name"`
+		Platform    string    `json:"platform"`
+		Price       int64     `json:"price"`
+		CreatedAt   time.Time `json:"created_at"`
+		UpdatedAt   time.Time `json:"updated_at"`
 	}
 
 	ExternalProductPaginationResponse struct {

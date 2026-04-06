@@ -80,12 +80,25 @@ func mapToProductImageResponse(p entity.Product) []dto.ProductImageResponse {
 func mapToExternalProductResponse(p entity.Product) []dto.ExternalProductResponse {
 	var externalProducts []dto.ExternalProductResponse
 
+	primaryImageURL := ""
+	if len(p.Images) > 0 {
+		primaryImageURL = p.Images[0].ImageURL
+	}
+
 	for _, ep := range p.ExternalProducts {
+		platformName := ""
+		if ep.StorePlatform.Platform != nil {
+			platformName = ep.StorePlatform.Platform.Name
+		}
+
 		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:              ep.ID,
-			ProductID:       ep.ProductID,
-			StorePlatformID: ep.StorePlatformID,
-			Price:           ep.Price,
+			ID:          ep.ID,
+			ImageURL:    primaryImageURL,
+			ProductName: p.Name,
+			Platform:    platformName,
+			Price:       ep.Price,
+			CreatedAt:   ep.CreatedAt,
+			UpdatedAt:   ep.UpdatedAt,
 		})
 	}
 	return externalProducts
@@ -144,6 +157,17 @@ func (ps *productService) CreateProduct(ctx context.Context, req *dto.CreateProd
 	if err != nil {
 		ps.logger.Error("failed to create product", zap.Error(err))
 		return dto.ProductResponse{}, fmt.Errorf("failed to create product: %w", dto.ErrInternal)
+	}
+
+	if err := ps.productRepo.AttachProductImageToProduct(ctx, nil, req.ImageID, &newProduct.ID); err != nil {
+		ps.logger.Error("failed to attach image to product", zap.String("productID", newProduct.ID.String()), zap.String("imageID", req.ImageID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to attach image to product: %w", dto.ErrBadRequest)
+	}
+
+	newProduct, _, err = ps.productRepo.GetProductByID(ctx, nil, &newProduct.ID)
+	if err != nil {
+		ps.logger.Error("failed to reload product after image attach", zap.String("productID", newProduct.ID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to load product: %w", dto.ErrInternal)
 	}
 
 	ps.logger.Info("success to create product", zap.String("id", newProduct.ID.String()))
