@@ -39,11 +39,6 @@ func main() {
 		// External API
 		// externalGateway = gateway.NewExternalGateway(os.Getenv("API_EXTERNAL"), zapLogger)
 
-		// Resource
-		// Upload
-		// uploadService = service.NewUploadService(zapLogger)
-		// uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
-
 		// Permission
 		permissionRepo    = repository.NewPermissionRepository(db)
 		permissionService = service.NewPermissionService(permissionRepo, zapLogger, jwt)
@@ -76,6 +71,10 @@ func main() {
 		productService = service.NewProductService(productRepo, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
+		// Upload
+		uploadService = service.NewUploadService(productRepo, zapLogger)
+		uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
+
 		// External Product 
 		externalProductRepo    = repository.NewExternalProductRepository(db)
 		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, zapLogger, jwt)
@@ -90,7 +89,7 @@ func main() {
 	server := gin.Default()
 	server.Use(middleware.CORSMiddleware())
 
-	// routes.Upload(server, uploadHandler, jwt)
+	routes.Upload(server, uploadHandler, jwt)
 	routes.Auth(server, authHandler)
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)

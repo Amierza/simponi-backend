@@ -47,18 +47,33 @@ func NewExternalProductService(
 }
 
 func mapEntityToExternalProductResponse(ep entity.ExternalProduct) dto.ExternalProductResponse {
+	imageURL := ""
+	productName := ""
+	platformName := ""
+
+	if ep.Product != nil {
+		productName = ep.Product.Name
+		if len(ep.Product.Images) > 0 {
+			imageURL = ep.Product.Images[0].ImageURL
+		}
+	}
+
+	if ep.StorePlatform.Platform != nil {
+		platformName = ep.StorePlatform.Platform.Name
+	}
+
 	return dto.ExternalProductResponse{
-		ID:              ep.ID,
-		ProductID:       ep.ProductID,
-		StorePlatformID: ep.StorePlatformID,
-		Price:           ep.Price,
-		CreatedAt:       ep.CreatedAt,
-		UpdatedAt:       ep.UpdatedAt,
+		ID:          ep.ID,
+		ImageURL:    imageURL,
+		ProductName: productName,
+		Platform:    platformName,
+		Price:       ep.Price,
+		CreatedAt:   ep.CreatedAt,
+		UpdatedAt:   ep.UpdatedAt,
 	}
 }
 
 func (eps *externalProductService) CreateExternalProduct(ctx context.Context, req *dto.CreateExternalProductRequest) (dto.ExternalProductResponse, error) {
-	// validate product exists
 	_, found, err := eps.productRepo.GetProductByID(ctx, nil, req.ProductID)
 	if err != nil {
 		eps.logger.Error("failed to get product by ID", zap.String("productID", req.ProductID.String()), zap.Error(err))
@@ -78,6 +93,12 @@ func (eps *externalProductService) CreateExternalProduct(ctx context.Context, re
 	if err != nil {
 		eps.logger.Error("failed to create external product", zap.Error(err))
 		return dto.ExternalProductResponse{}, fmt.Errorf("failed to create external product: %w", dto.ErrInternal)
+	}
+
+	newExternalProduct, _, err = eps.externalProductRepo.GetExternalProductByID(ctx, nil, &newExternalProduct.ID)
+	if err != nil {
+		eps.logger.Error("failed to reload external product after create", zap.String("id", newExternalProduct.ID.String()), zap.Error(err))
+		return dto.ExternalProductResponse{}, fmt.Errorf("failed to load external product: %w", dto.ErrInternal)
 	}
 
 	eps.logger.Info("success to create external product", zap.String("id", newExternalProduct.ID.String()))
@@ -172,6 +193,12 @@ func (eps *externalProductService) UpdateExternalProduct(ctx context.Context, ex
 	if err != nil {
 		eps.logger.Error("failed to update external product", zap.String("id", externalProductID.String()), zap.Error(err))
 		return dto.ExternalProductResponse{}, fmt.Errorf("failed to update external product: %w", dto.ErrInternal)
+	}
+
+	updatedExternalProduct, _, err = eps.externalProductRepo.GetExternalProductByID(ctx, nil, &updatedExternalProduct.ID)
+	if err != nil {
+		eps.logger.Error("failed to reload external product after update", zap.String("id", externalProductID.String()), zap.Error(err))
+		return dto.ExternalProductResponse{}, fmt.Errorf("failed to load external product: %w", dto.ErrInternal)
 	}
 
 	eps.logger.Info("success to update external product", zap.String("id", externalProductID.String()))
