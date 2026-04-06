@@ -194,5 +194,47 @@
     "name": "DeleteVendorByID",
     "endpoint": "/api/v1/vendors/:id",
     "method": "DELETE"
+  },
+  {
+    "id": "ab000001-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateExternalProduct",
+    "endpoint": "/api/v1/external-products/",
+    "method": "POST"
+  },
+  {
+    "id": "ab000002-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProducts",
+    "endpoint": "/api/v1/external-products/",
+    "method": "GET"
+  },
+  {
+    "id": "ab000003-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProductByID",
+    "endpoint": "/api/v1/external-products/:id",
+    "method": "GET"
+  },
+  {
+    "id": "ab000004-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProductsByProductID",
+    "endpoint": "/api/v1/external-products/product/:productId",
+    "method": "GET"
+  },
+  {
+    "id": "ab000005-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProductsByStorePlatformID",
+    "endpoint": "/api/v1/external-products/store-platform/:storePlatformId",
+    "method": "GET"
+  },
+  {
+    "id": "ab000006-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "UpdateExternalProduct",
+    "endpoint": "/api/v1/external-products/:id",
+    "method": "PUT"
+  },
+  {
+    "id": "ab000007-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "DeleteExternalProductByID",
+    "endpoint": "/api/v1/external-products/:id",
+    "method": "DELETE"
   }
 ]

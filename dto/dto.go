@@ -227,16 +227,6 @@ type (
 )
 
 type (
-	// External Product
-	ExternalProductResponse struct {
-		ID                uuid.UUID  `json:"id"`
-		ProductID         *uuid.UUID `json:"product_id,omitempty"`
-		StorePlatformID   *uuid.UUID `json:"store_platform_id,omitempty"`
-		Price             int64      `json:"price" example:"150000"`
-	}
-)
-
-type (
 	// Product Stats
 	ProductStatsResponse struct {
 		TotalProducts int64 `json:"total_products"`
@@ -304,6 +294,40 @@ type (
 	ProductPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Products []entity.Product
+	}
+)
+
+// External Product
+
+type (
+	CreateExternalProductRequest struct {
+		ProductID       *uuid.UUID `json:"product_id" binding:"required"`
+		StorePlatformID *uuid.UUID `json:"store_platform_id" binding:"required"`
+		Price           int64      `json:"price" binding:"required,min=0"`
+	}
+
+	UpdateExternalProductRequest struct {
+		ID    uuid.UUID `json:"-"`
+		Price int64     `json:"price" binding:"required,min=0"`
+	}
+
+	ExternalProductResponse struct {
+		ID              uuid.UUID  `json:"id"`
+		ProductID       *uuid.UUID `json:"product_id,omitempty"`
+		StorePlatformID *uuid.UUID `json:"store_platform_id,omitempty"`
+		Price           int64      `json:"price"`
+		CreatedAt       time.Time  `json:"created_at"`
+		UpdatedAt       time.Time  `json:"updated_at"`
+	}
+
+	ExternalProductPaginationResponse struct {
+		response.PaginationResponse
+		Data []ExternalProductResponse `json:"data"`
+	}
+
+	ExternalProductPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		ExternalProducts []entity.ExternalProduct
 	}
 )
 

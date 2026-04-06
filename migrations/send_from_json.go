@@ -46,14 +46,23 @@ func SeedFromJSON[T any](db *gorm.DB, filePath string, model T, uniqueFields ...
 				if !f.IsValid() {
 					return fmt.Errorf("field %s not found in model", field)
 				}
-				query = query.Where(fmt.Sprintf("%s = ?", helper.SnakeCase(field)), f.Interface())
+
+				// Use IS NULL for nil pointer unique fields (e.g. nullable foreign keys).
+				if f.Kind() == reflect.Ptr && f.IsNil() {
+					query = query.Where(fmt.Sprintf("%s IS NULL", helper.SnakeCase(field)))
+				} else {
+					query = query.Where(fmt.Sprintf("%s = ?", helper.SnakeCase(field)), f.Interface())
+				}
 			}
 		}
 
 		var existing T
 		err := query.First(&existing).Error
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
+		if err == nil {
 			continue
+		}
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("failed to check existing data: %w", err)
 		}
 
 		if err := db.Create(&data).Error; err != nil {
