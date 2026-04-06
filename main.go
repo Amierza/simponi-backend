@@ -76,6 +76,11 @@ func main() {
 		productService = service.NewProductService(productRepo, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
+		// External Product 
+		externalProductRepo    = repository.NewExternalProductRepository(db)
+		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, zapLogger, jwt)
+		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
+
 		// Vendor
 		vendorRepo    = repository.NewVendorRepository(db)
 		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
@@ -90,6 +95,7 @@ func main() {
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
+	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
 	routes.Permission(server, permissionHandler, jwt, rolePermissionRepo)
 	routes.Role(server, roleHandler, jwt, rolePermissionRepo)
