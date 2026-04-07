@@ -41,6 +41,7 @@ func NewUserService(userRepo repository.IUserRepository, roleRepo repository.IRo
 }
 
 func mapToUserResponse(u *entity.User, r *entity.Role) *dto.UserResponse {
+
 	return &dto.UserResponse{
 		ID:       u.ID,
 		Name:     u.Name,
@@ -49,6 +50,33 @@ func mapToUserResponse(u *entity.User, r *entity.Role) *dto.UserResponse {
 		Role: dto.RoleResponse{
 			ID:   r.ID,
 			Name: r.Name,
+		},
+	}
+}
+
+func mapToProfileResponse(u *entity.User, r *entity.Role) *dto.UserResponse {
+	permissions := []dto.PermissionResponse{}
+
+	if r.RolePermissions != nil {
+		for _, rp := range r.RolePermissions {
+			permissions = append(permissions, dto.PermissionResponse{
+				ID:       rp.Permission.ID,
+				Name:     rp.Permission.Name,
+				Endpoint: rp.Permission.Endpoint,
+				Method:   rp.Permission.Method,
+			})
+		}
+	}
+
+	return &dto.UserResponse{
+		ID:       u.ID,
+		Name:     u.Name,
+		Email:    u.Email,
+		ImageURL: u.ImageURL,
+		Role: dto.RoleResponse{
+			ID:          r.ID,
+			Name:        r.Name,
+			Permissions: permissions,
 		},
 	}
 }
@@ -141,7 +169,7 @@ func (us *userService) GetProfile(ctx context.Context, userID *uuid.UUID) (*dto.
 		return nil, fmt.Errorf("user not found: %v", dto.ErrNotFound)
 	}
 
-	return mapToUserResponse(data, &data.Role), nil
+	return mapToProfileResponse(data, &data.Role), nil
 }
 
 func (us *userService) UpdateUser(ctx context.Context, userID *uuid.UUID, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
