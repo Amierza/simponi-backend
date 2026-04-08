@@ -106,6 +106,7 @@ func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id *uuid
 	user := new(entity.User)
 	err := tx.WithContext(ctx).
 		Preload("Role").
+		Preload("Role.RolePermissions.Permission").
 		Preload("Stores").
 		Where("id = ?", id).
 		Take(user).Error
