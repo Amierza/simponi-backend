@@ -6,6 +6,18 @@ import (
 )
 
 func Seed(db *gorm.DB) error {
+	if err := SeedFromJSON[entity.Role](db, "./migrations/json/roles.json", entity.Role{}, "Name"); err != nil {
+		return err
+	}
+
+	if err := SeedFromJSON[entity.Permission](db, "./migrations/json/permissions.json", entity.Permission{}, "Name"); err != nil {
+		return err
+	}
+
+	if err := SeedFromJSON[entity.RolePermission](db, "./migrations/json/role_permissions.json", entity.RolePermission{}, "RoleID", "PermissionID"); err != nil {
+		return err
+	}
+
 	if err := SeedFromJSON[entity.Platform](db, "./migrations/json/platforms.json", entity.Platform{}, "Name"); err != nil {
 		return err
 	}
@@ -30,11 +42,11 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
-	if err := SeedFromJSON[entity.ExternalProduct](db, "./migrations/json/external_products.json", entity.ExternalProduct{}, "ExternalProductID"); err != nil {
+	if err := SeedFromJSON[entity.ExternalProduct](db, "./migrations/json/external_products.json", entity.ExternalProduct{}, "StorePlatformID", "ProductID"); err != nil {
 		return err
 	}
 
-	if err := SeedFromJSON[entity.InventoryLog](db, "./migrations/json/inventory_logs.json", entity.InventoryLog{}, ""); err != nil {
+	if err := SeedFromJSON[entity.InventoryLog](db, "./migrations/json/inventory_logs.json", entity.InventoryLog{}, "ProductID", "Change", "Source", "Note"); err != nil {
 		return err
 	}
 

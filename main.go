@@ -39,40 +39,65 @@ func main() {
 		// External API
 		// externalGateway = gateway.NewExternalGateway(os.Getenv("API_EXTERNAL"), zapLogger)
 
-		// Resource
-		// Upload
-		// uploadService = service.NewUploadService(zapLogger)
-		// uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
+		// Permission
+		permissionRepo    = repository.NewPermissionRepository(db)
+		permissionService = service.NewPermissionService(permissionRepo, zapLogger, jwt)
+		permissionHandler = handler.NewPermissionHandler(permissionService, zapLogger)
 
-		// Authentication
-		authRepo    = repository.NewAuthRepository(db)
-		authService = service.NewAuthService(authRepo, zapLogger, jwt)
-		authHandler = handler.NewAuthHandler(authService)
+		// Role Permission
+		rolePermissionRepo = repository.NewRolePermissionRepository(db)
+
+		// Role
+		roleRepo    = repository.NewRoleRepository(db)
+		roleService = service.NewRoleService(roleRepo, permissionRepo, rolePermissionRepo, zapLogger, jwt)
+		roleHandler = handler.NewRoleHandler(roleService, zapLogger)
 
 		// User
 		userRepo    = repository.NewUserRepository(db)
-		userService = service.NewUserService(userRepo, jwt, zapLogger)
+		userService = service.NewUserService(userRepo, roleRepo, zapLogger, jwt)
 		userHandler = handler.NewUserHandler(userService, zapLogger)
 
+		// Authentication
+		authService = service.NewAuthService(userRepo, zapLogger, jwt)
+		authHandler = handler.NewAuthHandler(authService, zapLogger)
+
 		// Logging
-		loggingRepo    = repository.NewLoggingRepository(db)
-		loggingService = service.NewLoggingService(loggingRepo, zapLogger, jwt)
-		loggingHandler = handler.NewLoggingHandler(loggingService, zapLogger)
+		logRepo    = repository.NewLogRepository(db)
+		logService = service.NewLogService(logRepo, zapLogger, jwt)
+		logHandler = handler.NewLogHandler(logService, zapLogger)
 
 		// Product
-		// productRepo    = repository.NewProductRepository(db)
-		// productService = service.NewProductService(productRepo, zapLogger, jwt)
-		// productHandler = handler.NewProductHandler(productService, zapLogger)
+		productRepo    = repository.NewProductRepository(db)
+		productService = service.NewProductService(productRepo, zapLogger, jwt)
+		productHandler = handler.NewProductHandler(productService, zapLogger)
+
+		// Upload
+		uploadService = service.NewUploadService(productRepo, zapLogger)
+		uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
+
+		// External Product
+		externalProductRepo    = repository.NewExternalProductRepository(db)
+		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, zapLogger, jwt)
+		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
+
+		// Vendor
+		vendorRepo    = repository.NewVendorRepository(db)
+		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
+		vendorHandler = handler.NewVendorHandler(vendorService, zapLogger)
 	)
 
 	server := gin.Default()
 	server.Use(middleware.CORSMiddleware())
 
-	// routes.Upload(server, uploadHandler, jwt)
-	routes.Auth(server, authHandler, jwt)
-	routes.User(server, userHandler, jwt)
-	routes.Logging(server, loggingHandler, jwt)
-	// routes.Product(server, productHandler, jwt)
+	routes.Upload(server, uploadHandler, jwt)
+	routes.Auth(server, authHandler)
+	routes.User(server, userHandler, jwt, rolePermissionRepo)
+	routes.Log(server, logHandler, jwt, rolePermissionRepo)
+	routes.Product(server, productHandler, jwt, rolePermissionRepo)
+	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
+	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
+	routes.Permission(server, permissionHandler, jwt, rolePermissionRepo)
+	routes.Role(server, roleHandler, jwt, rolePermissionRepo)
 
 	server.Static("/uploads", "./uploads")
 

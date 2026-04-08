@@ -2,8 +2,8 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
 )
@@ -12,7 +12,7 @@ func mapErrorStatus(err error) int {
 	switch {
 	case errors.Is(err, dto.ErrNotFound):
 		return http.StatusNotFound
-	case errors.Is(err, dto.ErrValidationFailed):
+	case errors.Is(err, dto.ErrBadRequest):
 		return http.StatusBadRequest
 	case errors.Is(err, dto.ErrAlreadyExists):
 		return http.StatusConflict
@@ -23,20 +23,12 @@ func mapErrorStatus(err error) int {
 	}
 }
 
-func mapErrorMessage(err error) string {
-	switch {
-	case errors.Is(err, dto.ErrNotFound):
-		return "data not found"
-	case errors.Is(err, dto.ErrValidationFailed):
-		if !errors.Is(err, fmt.Errorf("validation failed")) {
-			return err.Error()
-		}
-		return "validation failed"
-	case errors.Is(err, dto.ErrAlreadyExists):
-		return "data already exists"
-	case errors.Is(err, dto.ErrUnauthorized):
-		return "unauthorized access"
-	default:
-		return "internal server error"
+func cleanErrorMessage(err error) string {
+	if err == nil {
+		return ""
 	}
+
+	msg := err.Error()
+	parts := strings.Split(msg, ":")
+	return strings.TrimSpace(parts[0])
 }

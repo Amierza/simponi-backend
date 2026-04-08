@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/helper"
@@ -16,70 +18,72 @@ type (
 		RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error)
 	}
 
-	authSevice struct{
-		authRepo repository.IAuthRepository
-		logger *zap.Logger
-		jwt jwt.IJWT
+	authService struct {
+		userRepo repository.IUserRepository
+		logger   *zap.Logger
+		jwt      jwt.IJWT
 	}
 )
 
-func NewAuthService(authRepo repository.IAuthRepository, logger *zap.Logger, jwt jwt.IJWT) *authSevice {
-	return &authSevice{
-		authRepo: authRepo,
-		logger: logger,
-		jwt: jwt,
+func NewAuthService(userRepo repository.IUserRepository, logger *zap.Logger, jwt jwt.IJWT) *authService {
+	return &authService{
+		userRepo: userRepo,
+		logger:   logger,
+		jwt:      jwt,
 	}
 }
 
-func (as *authSevice) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error){
-	user, found, err := as.authRepo.GetUserByEmail(ctx, nil, &req.Email)
+func (as *authService) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error) {
+	user, found, err := as.userRepo.GetUserByEmail(ctx, nil, &req.Email)
 	if err != nil {
 		as.logger.Error("failed to get user by email", zap.String("email", req.Email), zap.Error(err))
-		return dto.SignInResponse{}, dto.ErrGetUserByEmail
-
+		return dto.SignInResponse{}, fmt.Errorf("failed to get user by email: %w", dto.ErrInternal)
 	}
-	if !found{
+	if !found {
 		as.logger.Warn("user not found", zap.String("email", req.Email))
-		return dto.SignInResponse{}, dto.ErrNotFound
+		return dto.SignInResponse{}, fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
 	checkPassword, err := helper.CheckPassword(user.Password, []byte(req.Password))
 	if err != nil || !checkPassword {
-		as.logger.Error("incorrect credentials", zap.String("passwrd", req.Password), zap.Error(err))
-		return dto.SignInResponse{}, dto.ErrIncorrectPassword
+		as.logger.Error("incorrect password", zap.String("password", req.Password), zap.Error(err))
+		return dto.SignInResponse{}, fmt.Errorf("incorrect password: %w", dto.ErrBadRequest)
 	}
 
-	accessToken, refreshToken, err := as.jwt.GenerateToken(user.ID.String())
+	accessToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), 5*time.Minute)
 	if err != nil {
-		as.logger.Error("failed to generate access token and refresh token", zap.String("email", req.Email), zap.Error(err))
-		return dto.SignInResponse{}, dto.ErrGenerateAccessAndRefreshToken
+		as.logger.Error("failed to generate access token", zap.String("email", req.Email), zap.Error(err))
+		return dto.SignInResponse{}, fmt.Errorf("failed to generate access token: %w", dto.ErrInternal)
+	}
+
+	refreshToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), 7*24*time.Hour)
+	if err != nil {
+		as.logger.Error("failed to generate refresh token", zap.String("email", req.Email), zap.Error(err))
+		return dto.SignInResponse{}, fmt.Errorf("failed to generate refresh token: %w", dto.ErrInternal)
 	}
 
 	as.logger.Info("Sign In Success", zap.String("email", req.Email))
 
 	return dto.SignInResponse{
-		AccessToken: accessToken,
+		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (as *authSevice) RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error){
-	_, err := as.jwt.ValidateToken(req.RefreshToken)
+func (as *authService) RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error) {
+	claims, err := as.jwt.ValidateToken(req.RefreshToken)
 	if err != nil {
-		as.logger.Error("invalid token", zap.String("refresh_token", req.RefreshToken), zap.Error(err))
-		return dto.RefreshTokenResponse{}, dto.ErrValidateToken
+		as.logger.Error("invalid access token", zap.String("refresh_token", req.RefreshToken), zap.Error(err))
+		return dto.RefreshTokenResponse{}, fmt.Errorf("invalid access token: %w", dto.ErrInternal)
 	}
 
-	userID, err := as.jwt.GetUserIDByToken(req.RefreshToken)
-	if err != nil {
-		as.logger.Error("failed to get user id by token", zap.String("refresh_token", req.RefreshToken), zap.Error(err))
-		return dto.RefreshTokenResponse{}, dto.ErrGetUserIDFromToken
-	}
+	userID := claims.UserID
+	roleID := claims.RoleID
 
-	accessToken, _, err := as.jwt.GenerateToken(userID)
+	accessToken, err := as.jwt.GenerateToken(userID, roleID, 5*time.Minute)
 	if err != nil {
-		as.logger.Error("failed to generate token", zap.String("user_id", userID), zap.Error(err))
-		return dto.RefreshTokenResponse{}, dto.ErrGenerateAccessToken
+		as.logger.Error("failed to generate token", zap.String("user_id", userID), zap.String("role_id", roleID), zap.Error(err))
+		return dto.RefreshTokenResponse{}, fmt.Errorf("failed to generate token: %w", dto.ErrInternal)
 	}
 
 	as.logger.Info("refresh token sucess", zap.String("access_token", accessToken))

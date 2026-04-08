@@ -1,0 +1,203 @@
+[
+  {
+    "id": "a0000001-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "11111111-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000002-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "22222222-0ea2-426c-89e7-e25e71c0b88f"
+  },
+
+  {
+    "id": "78ed897f-d571-45a3-a96f-e89878f9fb6d",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "23ab5085-924c-4c7f-9038-2bc213f99d10"
+  },
+
+  {
+    "id": "ad004413-95b4-4426-b29c-53acc9d3497e",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "328359e3-7abc-45b4-8fa6-a07b3e0990f5"
+  },
+  {
+    "id": "5db69097-a3bd-48f4-836f-681fa2eeb14a",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "2e93d440-bc56-46b2-afd7-a7acaa6f9275"
+  },
+  {
+    "id": "14b6aa22-8576-486f-ba7f-1626f4af0e6f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "eaf90d01-2db3-476b-b8fa-85b9ce510a41"
+  },
+  {
+    "id": "7ac54a4b-5fb2-4cde-b505-3045bd799800",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "39baf21f-9746-4f21-9eb6-e0ff3a0bd4cb"
+  },
+  {
+    "id": "a981728d-52fc-40b1-be2c-df16c1fe9d09",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "5bad4700-1a2d-4788-9327-7db99b6d6ba5"
+  },
+
+  {
+    "id": "65be5f93-cb6b-4f5b-9046-402aa4daa4c1",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "12f2bc0a-cfe8-44ee-bda8-2fa5e8ee266c"
+  },
+  {
+    "id": "d50f9ef8-c6bc-4990-8e69-9378653fc269",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "090331cb-5d7e-4ca2-84c7-d420bc8c2c0d"
+  },
+  {
+    "id": "917d1c67-ce1f-4e05-98a7-23589f4c4354",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "4286a4d0-96e5-4b82-84e2-a9775e597e7a"
+  },
+  {
+    "id": "a0000003-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "33333333-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "80dfefbc-c4fa-4c07-8fc1-5001e05c9484",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "7a5e749c-85e2-4678-b235-3cbaec91c8f2"
+  },
+  {
+    "id": "285864f0-ab7f-4907-86fc-080c479f66fd",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "793aaad8-d456-4d1d-9699-867196659bbe"
+  },
+
+  {
+    "id": "a0000004-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "44444444-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000005-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "55555555-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000006-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "66666666-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000007-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "77777777-0ea2-426c-89e7-e25e71c0b88f"
+  },
+
+  {
+    "id": "a0000008-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "88888888-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000009-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "99999999-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000a-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "aaaaaaaa-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000b-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "bbbbbbbb-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000c-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "cccccccc-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000d-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "dddddddd-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000e-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "eeeeeeee-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a000000f-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ffffffff-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "a0000010-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "12345678-0ea2-426c-89e7-e25e71c0b88f"
+  },
+
+  {
+    "id": "a0000011-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "87654321-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "097bfb6d-1971-4619-86b9-ac9220aa162a",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "40077ea2-351c-46b9-a78f-1da15c23138e"
+  },
+  {
+    "id": "a4d323b6-6e08-43d3-a685-73469db6dfee",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "97f3ee37-748c-49af-a84d-f9e2b7a3e29b"
+  },
+  {
+    "id": "79b667e0-2a87-418b-b9e5-699ae24357a0",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "3bf9ec57-f2e5-4620-a0c9-f37f70180a19"
+  },
+  {
+    "id": "c0770080-1ef0-4097-acd5-c8561e7aec42",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "d0c75e68-e7fa-4bc9-a8e5-0ec64ec63fa0"
+  },
+  {
+    "id": "ac100001-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000001-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100002-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000002-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100003-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000003-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100004-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000004-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100005-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000005-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100006-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000006-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "ac100007-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "ab000007-0ea2-426c-89e7-e25e71c0b88f"
+  }
+]

@@ -7,32 +7,27 @@ import (
 
 func Rollback(db *gorm.DB) error {
 	tables := []interface{}{
-		// LOG
-		&entity.Log{},
-		&entity.InventoryLog{},
-
-		// EXTERNAL DOMAIN
-		&entity.ExternalProduct{},
-
-		// PAYMENT DOMAIN
-		&entity.Payment{},
-
-		// ORDER DOMAIN
 		&entity.OrderDetail{},
 		&entity.Order{},
 
-		// PRODUCT DOMAIN
+		&entity.InventoryLog{},
+		&entity.ExternalProduct{},
+		&entity.ProductVendor{},
+		&entity.Vendor{},
 		&entity.ProductImage{},
 		&entity.Product{},
+		&entity.ProductCategory{},
 
-		// STORE DOMAIN
+		&entity.StorePlatform{},
+		&entity.Log{},
 		&entity.StoreCredential{},
 		&entity.Store{},
-
-		// MASTER
-		&entity.ProductCategory{},
 		&entity.Platform{},
+
+		&entity.RolePermission{},
+		&entity.Permission{},
 		&entity.User{},
+		&entity.Role{},
 	}
 
 	for _, table := range tables {

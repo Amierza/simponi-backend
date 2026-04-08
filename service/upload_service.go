@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
+	"github.com/Amierza/simponi-backend/repository"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -17,7 +19,7 @@ import (
 type (
 	IUploadService interface {
 		// public function
-		Upload(ctx context.Context, files []*multipart.FileHeader) ([]string, error)
+		Upload(ctx context.Context, files []*multipart.FileHeader) ([]dto.UploadImageResponse, error)
 		// private / helper function
 		saveUploadedFile(file *multipart.FileHeader, savePath string) error
 		createFile(path string) (*os.File, error)
@@ -25,13 +27,15 @@ type (
 	}
 
 	uploadService struct {
-		logger *zap.Logger
+		productRepo repository.IProductRepository
+		logger      *zap.Logger
 	}
 )
 
-func NewUploadService(logger *zap.Logger) *uploadService {
+func NewUploadService(productRepo repository.IProductRepository, logger *zap.Logger) *uploadService {
 	return &uploadService{
-		logger: logger,
+		productRepo: productRepo,
+		logger:      logger,
 	}
 }
 
@@ -47,13 +51,13 @@ var allowedExt = map[string]bool{
 }
 
 // Upload bisa handle single atau multiple file
-func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHeader) ([]string, error) {
+func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHeader) ([]dto.UploadImageResponse, error) {
 	if len(files) == 0 {
 		us.logger.Warn("Upload attempted with no files")
 		return nil, dto.ErrNoFilesUploaded
 	}
 
-	var uploadedPaths []string
+	var uploadedImages []dto.UploadImageResponse
 	for _, file := range files {
 		ext := strings.ToLower(filepath.Ext(file.Filename))
 		if !allowedExt[ext] {
@@ -77,10 +81,22 @@ func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHead
 			return nil, dto.ErrSaveFile
 		}
 
-		uploadedPaths = append(uploadedPaths, storagePath)
+		newImage, err := us.productRepo.CreateProductImage(ctx, nil, &entity.ProductImage{
+			ID:       uuid.New(),
+			ImageURL: storagePath,
+		})
+		if err != nil {
+			us.logger.Error("Failed to store uploaded image metadata", zap.String("path", storagePath), zap.Error(err))
+			return nil, dto.ErrInternal
+		}
+
+		uploadedImages = append(uploadedImages, dto.UploadImageResponse{
+			ImageID:  newImage.ID,
+			ImageURL: newImage.ImageURL,
+		})
 	}
 
-	return uploadedPaths, nil
+	return uploadedImages, nil
 }
 
 func (us *uploadService) saveUploadedFile(file *multipart.FileHeader, savePath string) error {

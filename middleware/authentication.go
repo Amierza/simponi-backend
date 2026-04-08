@@ -14,40 +14,30 @@ func Authentication(jwtService jwt.IJWT) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_FOUND, nil)
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_FOUND)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
 			return
 		}
 
-		if !strings.Contains(authHeader, "Bearer") {
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_VALID, nil)
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_VALID)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
 			return
 		}
 
-		authHeader = strings.Replace(authHeader, "Bearer ", "", -1)
-		token, err := jwtService.ValidateToken(authHeader)
+		tokenString := parts[1]
+
+		claims, err := jwtService.ValidateToken(tokenString)
 		if err != nil {
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_VALID, nil)
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_EXPIRED)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
 			return
 		}
 
-		if !token.Valid {
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_DENIED_ACCESS, nil)
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
-			return
-		}
+		ctx.Set("user_id", claims.UserID)
+		ctx.Set("role_id", claims.RoleID)
 
-		userID, err := jwtService.GetUserIDByToken(authHeader)
-		if err != nil {
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, err.Error(), nil)
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
-			return
-		}
-
-		ctx.Set("Authorization", authHeader)
-		ctx.Set("user_id", userID)
 		ctx.Next()
 	}
 }

@@ -33,7 +33,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil || form.File == nil {
 		uh.logger.Error("No files found in multipart form", zap.Error(err))
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded", nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded")
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
@@ -45,7 +45,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 		file, err := ctx.FormFile("files")
 		if err != nil {
 			uh.logger.Error("Failed to get file from form", zap.Error(err))
-			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded", nil)
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded")
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 			return
 		}
@@ -53,21 +53,21 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 	}
 
 	// call service
-	uploadedURLs, err := uh.uploadService.Upload(ctx, files)
+	uploadedImages, err := uh.uploadService.Upload(ctx, files)
 	if err != nil {
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error(), nil)
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error())
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	// kalau hanya 1 file → balikin string saja
-	if len(uploadedURLs) == 1 {
-		res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILE, uploadedURLs[0])
+	// kalau hanya 1 file → balikin object image
+	if len(uploadedImages) == 1 {
+		res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILE, uploadedImages[0])
 		ctx.JSON(http.StatusOK, res)
 		return
 	}
 
-	// kalau banyak file → balikin array
-	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILES, uploadedURLs)
+	// kalau banyak file → balikin array object image
+	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILES, uploadedImages)
 	ctx.JSON(http.StatusOK, res)
 }

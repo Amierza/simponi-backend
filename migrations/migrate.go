@@ -7,32 +7,27 @@ import (
 
 func Migrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
-		// MASTER
+		&entity.Role{},
 		&entity.User{},
-		&entity.Platform{},
-		&entity.ProductCategory{},
+		&entity.Permission{},
+		&entity.RolePermission{},
 
-		// STORE DOMAIN
+		&entity.Platform{},
 		&entity.Store{},
 		&entity.StoreCredential{},
+		&entity.Log{},
+		&entity.StorePlatform{},
 
-		// PRODUCT DOMAIN
+		&entity.ProductCategory{},
 		&entity.Product{},
 		&entity.ProductImage{},
+		&entity.Vendor{},
+		&entity.ProductVendor{},
+		&entity.ExternalProduct{},
+		&entity.InventoryLog{},
 
-		// ORDER DOMAIN
 		&entity.Order{},
 		&entity.OrderDetail{},
-
-		// PAYMENT DOMAIN
-		&entity.Payment{},
-
-		// EXTERNAL DOMAIN
-		&entity.ExternalProduct{},
-
-		// LOG
-		&entity.InventoryLog{},
-		&entity.Log{},
 	); err != nil {
 		return err
 	}

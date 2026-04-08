@@ -7,7 +7,7 @@ type ProductImage struct {
 	ImageURL string    `json:"image_url"`
 
 	ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
-	Product   Product    `gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"product,omitempty"`
+	Product   Product    `gorm:"foreignKey:ProductID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
 	TimeStamp
 }

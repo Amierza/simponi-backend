@@ -1,24 +1,23 @@
 package jwt
 
 import (
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type (
 	IJWT interface {
-		GenerateToken(userID string) (string, string, error)
-		ValidateToken(token string) (*jwt.Token, error)
-		GetUserIDByToken(tokenString string) (string, error)
-		GetRoleIDByToken(tokenString string) (string, error)
+		GenerateToken(userID, roleID string, duration time.Duration) (string, error)
+		ValidateToken(tokenString string) (*jwtCustomClaim, error)
 	}
 
 	jwtCustomClaim struct {
 		UserID string `json:"user_id"`
+		RoleID string `json:"role_id"`
 		jwt.RegisteredClaims
 	}
 
@@ -38,44 +37,28 @@ func NewJWT() *JWT {
 func getSecretKey() string {
 	secretKey := os.Getenv("JWT_SECRET")
 	if secretKey == "" {
-		secretKey = "Template"
+		panic("JWT_SECRET is required")
 	}
 
 	return secretKey
 }
 
-func (j *JWT) GenerateToken(userID string) (string, string, error) {
-	accessClaims := jwtCustomClaim{
-		userID,
-		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 300)),
+func (j *JWT) GenerateToken(userID, roleID string, duration time.Duration) (string, error) {
+	claims := jwtCustomClaim{
+		UserID: userID,
+		RoleID: roleID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(duration))),
 			Issuer:    j.issuer,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Subject:   userID,
+			ID:        uuid.NewString(), // jti
 		},
 	}
 
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
-	accessTokenString, err := accessToken.SignedString([]byte(j.secretKey))
-	if err != nil {
-		return "", "", dto.ErrGenerateAccessToken
-	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	refreshClaims := jwtCustomClaim{
-		userID,
-		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 3600 * 24 * 7)),
-			Issuer:    j.issuer,
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
-	refreshTokenString, err := refreshToken.SignedString([]byte(j.secretKey))
-	if err != nil {
-		return "", "", dto.ErrGenerateRefreshToken
-	}
-
-	return accessTokenString, refreshTokenString, nil
+	return token.SignedString([]byte(j.secretKey))
 }
 
 func (j *JWT) parseToken(t_ *jwt.Token) (any, error) {
@@ -86,43 +69,16 @@ func (j *JWT) parseToken(t_ *jwt.Token) (any, error) {
 	return []byte(j.secretKey), nil
 }
 
-func (j *JWT) ValidateToken(tokenString string) (*jwt.Token, error) {
-	token, err := jwt.Parse(tokenString, j.parseToken)
+func (j *JWT) ValidateToken(tokenString string) (*jwtCustomClaim, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwtCustomClaim{}, j.parseToken)
 	if err != nil {
-		return nil, err
+		return nil, dto.ErrValidateToken
 	}
 
-	return token, err
-}
-
-func (j *JWT) GetUserIDByToken(tokenString string) (string, error) {
-	token, err := j.ValidateToken(tokenString)
-	if err != nil {
-		return "", dto.ErrValidateToken
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*jwtCustomClaim)
 	if !ok || !token.Valid {
-		return "", dto.ErrTokenInvalid
+		return nil, dto.ErrTokenInvalid
 	}
 
-	userID := fmt.Sprintf("%v", claims["user_id"])
-
-	return userID, nil
-}
-
-func (j *JWT) GetRoleIDByToken(tokenString string) (string, error) {
-	token, err := j.ValidateToken(tokenString)
-	if err != nil {
-		return "", dto.ErrValidateToken
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return "", dto.ErrTokenInvalid
-	}
-
-	roleID := fmt.Sprintf("%v", claims["role_id"])
-
-	return roleID, nil
+	return claims, nil
 }
