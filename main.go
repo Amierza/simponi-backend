@@ -75,7 +75,7 @@ func main() {
 		uploadService = service.NewUploadService(productRepo, zapLogger)
 		uploadHandler = handler.NewUploadHandler(uploadService, zapLogger)
 
-		// External Product 
+		// External Product
 		externalProductRepo    = repository.NewExternalProductRepository(db)
 		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, zapLogger, jwt)
 		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
