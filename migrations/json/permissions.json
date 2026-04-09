@@ -236,5 +236,17 @@
     "name": "DeleteExternalProductByID",
     "endpoint": "/api/v1/external-products/:id",
     "method": "DELETE"
+  },
+  {
+    "id": "inv000001-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateInventoryLog",
+    "endpoint": "/api/v1/inventory-logs",
+    "method": "POST"
+  },
+  {
+    "id": "inv000002-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetInventoryLogs",
+    "endpoint": "/api/v1/inventory-logs",
+    "method": "GET"
   }
 ]
