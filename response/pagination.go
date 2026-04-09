@@ -4,9 +4,11 @@ import "gorm.io/gorm"
 
 type (
 	PaginationRequest struct {
-		Search  string `form:"search"`
-		Page    int    `form:"page"`
-		PerPage int    `form:"per_page"`
+		Search		string	`form:"search"`
+		Page		int		`form:"page"`
+		PerPage		int		`form:"per_page"`
+		SKU			string	`form:"sku"`
+		CategoryID	string	`form:"category_id"`
 	}
 
 	PaginationResponse struct {
