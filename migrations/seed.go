@@ -30,6 +30,10 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
+	if err := SeedFromJSON[entity.StorePlatform](db, "./migrations/json/store_platforms.json", entity.StorePlatform{}, "StoreID", "PlatformID"); err != nil {
+		return err
+	}
+
 	if err := SeedFromJSON[entity.ProductCategory](db, "./migrations/json/product_categories.json", entity.ProductCategory{}, "Name"); err != nil {
 		return err
 	}

@@ -390,3 +390,9 @@
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:12:14.190+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":13}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:12:50.783+0700","caller":"handler/product_handler.go:73","msg":"success to get products","count":13}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:13:24.536+0700","caller":"handler/product_handler.go:71","msg":"success to get products","count":1}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:24:28.322+0700","caller":"handler/product_handler.go:71","msg":"success to get products","count":1}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:34:06.363+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:34:37.047+0700","caller":"handler/user_handler.go:70","msg":"success to get users","count":8}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:36:29.818+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:37:29.410+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:44:08.120+0700","caller":"handler/product_handler.go:71","msg":"success to get products","count":2}
