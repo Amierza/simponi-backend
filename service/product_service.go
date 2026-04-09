@@ -20,7 +20,6 @@ type (
 		GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, productID *uuid.UUID) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
-		GetProductsByCategoryID(ctx context.Context, categoryID *uuid.UUID, req *response.PaginationRequest) (dto.ProductPaginationResponse, error)
 		UpdateProduct(ctx context.Context, productID *uuid.UUID, req *dto.UpdateProductRequest) (dto.ProductResponse, error)
 		DeleteProductByID(ctx context.Context, productID *uuid.UUID) error
 
@@ -242,31 +241,6 @@ func (ps *productService) GetProductBySKU(ctx context.Context, sku string) (dto.
 	ps.logger.Info("success to get product by SKU", zap.String("sku", sku))
 
 	return mapToProductResponse(*product), nil
-}
-
-func (ps *productService) GetProductsByCategoryID(ctx context.Context, categoryID *uuid.UUID, req *response.PaginationRequest) (dto.ProductPaginationResponse, error) {
-	products, err := ps.productRepo.GetProductsByCategoryID(ctx, nil, categoryID)
-
-	if err != nil {
-		ps.logger.Error("failed to get products by category", zap.String("categoryID", categoryID.String()), zap.Error(err))
-		return dto.ProductPaginationResponse{}, fmt.Errorf("failed to get products by category ID: %w", dto.ErrInternal)
-	}
-
-	ps.logger.Info("success to get products by category ID", zap.String("categoryID", categoryID.String()), zap.Int("count", len(products)))	
-
-	var productList []dto.ProductListResponse
-	for _, p := range products {
-		productList = append(productList, mapToProductListResponse(p))
-	}
-
-	return dto.ProductPaginationResponse{
-		Data: productList,
-		PaginationResponse: response.PaginationResponse{
-			Page:		req.Page,
-			PerPage: 	req.PerPage,
-			Count: 		int64(len(productList)),
-		},
-	}, nil
 }
 
 func (ps *productService) UpdateProduct(ctx context.Context, productID *uuid.UUID, req *dto.UpdateProductRequest) (dto.ProductResponse, error) {

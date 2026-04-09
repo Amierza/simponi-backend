@@ -18,8 +18,6 @@ type (
 		GetProducts(ctx *gin.Context)
 		GetProductStats(ctx *gin.Context)
 		GetProductByID(ctx *gin.Context)
-		GetProductBySKU(ctx *gin.Context)
-		GetProductsByCategoryID(ctx *gin.Context)
 		UpdateProduct(ctx *gin.Context)
 		UpdateStock(ctx *gin.Context)
 		DeleteProductByID(ctx *gin.Context)
@@ -120,64 +118,6 @@ func (ph *productHandler) GetProductByID(ctx *gin.Context) {
 	}
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s product", dto.SUCCESS_GET_DETAIL), result)
-	ctx.JSON(http.StatusOK, res)
-}
-
-func (ph *productHandler) GetProductBySKU(ctx *gin.Context) {
-	sku := ctx.Query("sku")
-
-	if sku == "" {
-		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), "sku query params is required")
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
-	}
-
-	result, err := ph.productService.GetProductBySKU(ctx, sku)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s product", dto.SUCCESS_GET_DETAIL), result)
-	ctx.JSON(http.StatusOK, res)
-}
-
-func (ph *productHandler) GetProductsByCategoryID(ctx *gin.Context) {
-	categoryIDStr := ctx.Param("categoryId")
-	categoryID, err := uuid.Parse(categoryIDStr)
-
-	if err != nil {
-		ph.logger.Error("invalid category ID", zap.String("id", categoryIDStr), zap.Error(err))
-		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_ALL), dto.MESSAGE_FAILED_INVALID_UUID)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
-	}
-
-	var payload response.PaginationRequest
-	if err := ctx.ShouldBindQuery(&payload); err != nil {
-		ph.logger.Error("invalid get products by category query payload", zap.Error(err), zap.Any("payload", payload))
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	result, err := ph.productService.GetProductsByCategoryID(ctx, &categoryID, &payload)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.Response{
-		Status:   true,
-		Messsage: fmt.Sprintf("%s products", dto.SUCCESS_GET_ALL),
-		Data:     result.Data,
-		Meta:     result.PaginationResponse,
-	}
 	ctx.JSON(http.StatusOK, res)
 }
 

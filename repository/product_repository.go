@@ -22,7 +22,6 @@ type (
 		GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) (*entity.Product, bool, error)
 		GetProductBySKU(ctx context.Context, tx *gorm.DB, sku string) (*entity.Product, bool, error)
-		GetProductsByCategoryID(ctx context.Context, tx *gorm.DB, categoryId *uuid.UUID) ([]entity.Product, error)
 		UpdateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
 		DeleteProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) error
 
@@ -111,6 +110,14 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
 		query = query.Where("LOWER(name) LIKE ? OR LOWER(sku) LIKE ? OR LOWER(description) LIKE ?", searchValue, searchValue, searchValue)
+	}
+
+	if req.SKU != "" {
+		query = query.Where("sku = ?", req.SKU)
+	}
+
+	if req.CategoryID != "" {
+		query = query.Where("category_id = ?", req.CategoryID)
 	}
 
 	if err := query.Count(&count).Error; err != nil {
@@ -234,28 +241,6 @@ func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, s
 	}
 
 	return &product, true, nil
-}
-
-func (pr *productRepository) GetProductsByCategoryID(ctx context.Context, tx *gorm.DB, categoryId *uuid.UUID) ([]entity.Product, error) {
-	if tx == nil {
-		tx = pr.db
-	}
-
-	var products []entity.Product
-
-	if err := tx.WithContext(ctx).
-		Model(&entity.Product{}).
-		Preload("Category").
-		Preload("Images").
-		Preload("ExternalProducts").
-		Preload("ExternalProducts.StorePlatform").
-		Preload("ExternalProducts.StorePlatform.Platform").
-		Where("category_id = ?", categoryId).
-		Find(&products).Error; err != nil {
-		return nil, err
-	}
-
-	return products, nil
 }
 
 func (pr *productRepository) UpdateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error) {
