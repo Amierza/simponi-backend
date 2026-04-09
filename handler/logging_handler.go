@@ -36,7 +36,7 @@ func (lh *logHandler) GetLogs(ctx *gin.Context) {
 	var paginationReq response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs", dto.FAILED_GET_LOGS), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -51,22 +51,27 @@ func (lh *logHandler) GetLogs(ctx *gin.Context) {
 	result, err := lh.logService.GetLogs(ctx, paginationReq)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs", dto.FAILED_GET_LOGS), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s logs", dto.SUCCESS_GET_LOGS), result)
+	res := response.Response{
+		Status:   true,
+		Messsage: fmt.Sprintf("%s", dto.SUCCESS_GET_LOGS),
+		Data:     result.Data,
+		Meta:     result.PaginationResponse,
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
 func (lh *logHandler) GetLogsByStoreID(ctx *gin.Context) {
-	storeID := ctx.Query("storeID")
+	storeID := ctx.Param("storeID")
 
 	var paginationReq response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs", dto.FAILED_GET_LOGS), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -81,12 +86,17 @@ func (lh *logHandler) GetLogsByStoreID(ctx *gin.Context) {
 	result, err := lh.logService.GetLogsByStoreID(ctx, storeID, paginationReq)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs by store ID", dto.FAILED_GET_LOGS_BY_STORE_ID), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS_BY_STORE_ID), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s logs by store ID", dto.SUCCESS_GET_LOGS_BY_STORE_ID), result)
+	res := response.Response{
+		Status:   true,
+		Messsage: fmt.Sprintf("%s", dto.SUCCESS_GET_LOGS_BY_STORE_ID),
+		Data:     result.Data,
+		Meta:     result.PaginationResponse,
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -97,7 +107,7 @@ func (lh *logHandler) GetLogsByDateRange(ctx *gin.Context) {
 	var paginationReq response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs", dto.FAILED_GET_LOGS), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -112,12 +122,17 @@ func (lh *logHandler) GetLogsByDateRange(ctx *gin.Context) {
 	result, err := lh.logService.GetLogsByDateRange(ctx, startDate, endDate, paginationReq)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s logs by date range", dto.FAILED_GET_LOGS_BY_DATE_RANGE), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS_BY_DATE_RANGE), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s logs by date range", dto.SUCCESS_GET_LOGS_BY_DATE_RANGE), result)
+	res := response.Response{
+		Status:   true,
+		Messsage: fmt.Sprintf("%s", dto.SUCCESS_GET_LOGS_BY_DATE_RANGE),
+		Data:     result.Data,
+		Meta:     result.PaginationResponse,
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -125,7 +140,7 @@ func (lh *logHandler) CreateLog(ctx *gin.Context) {
 	var req dto.LogRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s log", dto.FAILED_CREATE_LOG), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
@@ -133,11 +148,11 @@ func (lh *logHandler) CreateLog(ctx *gin.Context) {
 	result, err := lh.logService.CreateLog(ctx, req)
 	if err != nil {
 		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s log", dto.FAILED_CREATE_LOG), err.Error())
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s log", dto.SUCCESS_CREATE_LOG), result)
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s", dto.SUCCESS_CREATE_LOG), result)
 	ctx.JSON(http.StatusOK, res)
 }
