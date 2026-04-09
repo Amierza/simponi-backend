@@ -15,8 +15,6 @@ type (
 	ILogHandler interface {
 		CreateLog(ctx *gin.Context)
 		GetLogs(ctx *gin.Context)
-		GetLogsByStoreID(ctx *gin.Context)
-		GetLogsByDateRange(ctx *gin.Context)
 	}
 
 	logHandler struct {
@@ -33,6 +31,16 @@ func NewLogHandler(logService service.ILogService, logger *zap.Logger) *logHandl
 }
 
 func (lh *logHandler) GetLogs(ctx *gin.Context) {
+	storeID := ctx.Query("store_id")
+	startDate := ctx.Query("start_date")
+	if startDate == "" {
+		startDate = ctx.Query("startdate")
+	}
+	endDate := ctx.Query("end_date")
+	if endDate == "" {
+		endDate = ctx.Query("enddate")
+	}
+
 	var paginationReq response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
 		status := mapErrorStatus(err)
@@ -48,7 +56,7 @@ func (lh *logHandler) GetLogs(ctx *gin.Context) {
 		paginationReq.PerPage = 10
 	}
 
-	result, err := lh.logService.GetLogs(ctx, paginationReq)
+	result, err := lh.logService.GetLogs(ctx, storeID, startDate, endDate, paginationReq)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
@@ -65,81 +73,10 @@ func (lh *logHandler) GetLogs(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (lh *logHandler) GetLogsByStoreID(ctx *gin.Context) {
-	storeID := ctx.Param("storeID")
-
-	var paginationReq response.PaginationRequest
-	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	if paginationReq.Page <= 0 {
-		paginationReq.Page = 1
-	}
-	if paginationReq.PerPage <= 0 {
-		paginationReq.PerPage = 10
-	}
-
-	result, err := lh.logService.GetLogsByStoreID(ctx, storeID, paginationReq)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS_BY_STORE_ID), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.Response{
-		Status:   true,
-		Messsage: fmt.Sprintf("%s", dto.SUCCESS_GET_LOGS_BY_STORE_ID),
-		Data:     result.Data,
-		Meta:     result.PaginationResponse,
-	}
-	ctx.JSON(http.StatusOK, res)
-}
-
-func (lh *logHandler) GetLogsByDateRange(ctx *gin.Context) {
-	startDate := ctx.Query("start_date")
-	endDate := ctx.Query("end_date")
-
-	var paginationReq response.PaginationRequest
-	if err := ctx.ShouldBindQuery(&paginationReq); err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	if paginationReq.Page <= 0 {
-		paginationReq.Page = 1
-	}
-	if paginationReq.PerPage <= 0 {
-		paginationReq.PerPage = 10
-	}
-
-	result, err := lh.logService.GetLogsByDateRange(ctx, startDate, endDate, paginationReq)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_GET_LOGS_BY_DATE_RANGE), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.Response{
-		Status:   true,
-		Messsage: fmt.Sprintf("%s", dto.SUCCESS_GET_LOGS_BY_DATE_RANGE),
-		Data:     result.Data,
-		Meta:     result.PaginationResponse,
-	}
-	ctx.JSON(http.StatusOK, res)
-}
-
 func (lh *logHandler) CreateLog(ctx *gin.Context) {
 	var req dto.LogRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		status := mapErrorStatus(err)
+		status := http.StatusBadRequest
 		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
 		ctx.AbortWithStatusJSON(status, res)
 		return

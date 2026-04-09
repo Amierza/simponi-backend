@@ -66,6 +66,11 @@ func main() {
 		logService = service.NewLogService(logRepo, zapLogger, jwt)
 		logHandler = handler.NewLogHandler(logService, zapLogger)
 
+		// Inventory Logging
+		inventoryLogRepo    = repository.NewInventoryLoggingRepository(db)
+		inventoryLogService = service.NewInventoryLoggingService(inventoryLogRepo, zapLogger, jwt)
+		inventoryLogHandler = handler.NewInventoryLoggingHandler(inventoryLogService, zapLogger)
+
 		// Product
 		productRepo    = repository.NewProductRepository(db)
 		productService = service.NewProductService(productRepo, zapLogger, jwt)
@@ -93,6 +98,7 @@ func main() {
 	routes.Auth(server, authHandler)
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
+	routes.InventoryLog(server, inventoryLogHandler, jwt, rolePermissionRepo)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
