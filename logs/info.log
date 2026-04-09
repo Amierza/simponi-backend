@@ -426,4 +426,7 @@
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:36:29.818+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:37:29.410+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}
 {"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:44:08.120+0700","caller":"handler/product_handler.go:71","msg":"success to get products","count":2}
->>>>>>> 1b4a7e5fee3576216a4b53b7c5155fc8df5e94fe
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T22:45:49.223+0700","caller":"handler/product_handler.go:71","msg":"success to get products","count":2}
+{"level":"\u001b[33mWARN\u001b[0m","timestamp":"2026-04-09T23:09:10.283+0700","caller":"handler/auth_handler.go:43","msg":"user not found","email":"michael01@gmail.com"}
+{"level":"\u001b[33mWARN\u001b[0m","timestamp":"2026-04-09T23:09:17.607+0700","caller":"handler/auth_handler.go:43","msg":"user not found","email":"michael01@gmail.com"}
+{"level":"\u001b[34mINFO\u001b[0m","timestamp":"2026-04-09T23:12:01.435+0700","caller":"handler/auth_handler.go:43","msg":"Sign In Success","email":"michael01@gmail.com"}

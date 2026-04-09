@@ -238,13 +238,13 @@
     "method": "DELETE"
   },
   {
-    "id": "inv000001-0ea2-426c-89e7-e25e71c0b88f",
+    "id": "0ea2426c-89e7-426c-b88f-111111111111",
     "name": "CreateInventoryLog",
     "endpoint": "/api/v1/inventory-logs",
     "method": "POST"
   },
   {
-    "id": "inv000002-0ea2-426c-89e7-e25e71c0b88f",
+    "id": "0ea2426c-89e7-426c-b88f-222222222222",
     "name": "GetInventoryLogs",
     "endpoint": "/api/v1/inventory-logs",
     "method": "GET"
