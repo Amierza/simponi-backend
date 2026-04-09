@@ -156,14 +156,6 @@ var (
 	// Parse
 )
 
-// Pagination
-type (
-	LogPaginationResponse struct {
-		Data       []LogResponse               `json:"data"`
-		Pagination response.PaginationResponse `json:"pagination"`
-	}
-)
-
 // Without Pagination
 type (
 	UploadImageResponse struct {
@@ -199,6 +191,14 @@ type (
 		Action    string     `json:"action" example:"Create"`
 		Message   string     `json:"message" example:"Created a new store"`
 		CreatedAt time.Time  `json:"created_at"`
+	}
+	LogPaginationResponse struct {
+		response.PaginationResponse
+		Data []LogResponse `json:"data"`
+	}
+	LogPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Logs []entity.Log
 	}
 )
 

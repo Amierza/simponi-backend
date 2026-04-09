@@ -11,9 +11,9 @@ import (
 func Log(route *gin.Engine, logHandler handler.ILogHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/logs").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/logs", middleware.RBAC(rolePermissionRepo, "CreateLog"), logHandler.CreateLog)
-		routes.GET("/logs", middleware.RBAC(rolePermissionRepo, "GetLogs"), logHandler.GetLogs)
-		routes.GET("/logs/store/:storeID", middleware.RBAC(rolePermissionRepo, "GetLogsByStoreID"), logHandler.GetLogsByStoreID)
-		routes.GET("/logs/date-range", middleware.RBAC(rolePermissionRepo, "GetLogsByDateRange"), logHandler.GetLogsByDateRange)
+		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateLog"), logHandler.CreateLog)
+		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetLogs"), logHandler.GetLogs)
+		routes.GET("/store/:storeID", middleware.RBAC(rolePermissionRepo, "GetLogsByStore"), logHandler.GetLogsByStoreID)
+		routes.GET("/date-range", middleware.RBAC(rolePermissionRepo, "GetLogsByDateRange"), logHandler.GetLogsByDateRange)
 	}
 }
