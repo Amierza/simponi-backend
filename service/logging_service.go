@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -14,9 +17,7 @@ import (
 type (
 	ILogService interface {
 		CreateLog(ctx context.Context, req dto.LogRequest) (*dto.LogResponse, error)
-		GetLogs(ctx context.Context, req response.PaginationRequest) (*dto.LogPaginationResponse, error)
-		GetLogsByStoreID(ctx context.Context, storeID string, req response.PaginationRequest) (*dto.LogPaginationResponse, error)
-		GetLogsByDateRange(ctx context.Context, startDate, endDate string, req response.PaginationRequest) (*dto.LogPaginationResponse, error)
+		GetLogs(ctx context.Context, storeID, startDate, endDate string, req response.PaginationRequest) (*dto.LogPaginationResponse, error)
 	}
 
 	logService struct {
@@ -49,6 +50,10 @@ func mapLogsToResponse(logs []entity.Log) []dto.LogResponse {
 }
 
 func (ls *logService) CreateLog(ctx context.Context, req dto.LogRequest) (*dto.LogResponse, error) {
+	if req.StoreID == nil || strings.TrimSpace(req.Action) == "" || strings.TrimSpace(req.Message) == "" {
+		return nil, dto.ErrBadRequest
+	}
+
 	log, err := ls.logRepo.CreateLog(ctx, nil, &entity.Log{
 		StoreID: req.StoreID,
 		Action:  req.Action,
@@ -56,7 +61,11 @@ func (ls *logService) CreateLog(ctx context.Context, req dto.LogRequest) (*dto.L
 	})
 	if err != nil {
 		ls.logger.Error("failed to create log", zap.Error(err))
-		return nil, err
+		errMsg := strings.ToLower(err.Error())
+		if strings.Contains(errMsg, "violates foreign key constraint") || strings.Contains(errMsg, "sqlstate 23503") {
+			return nil, dto.ErrBadRequest
+		}
+		return nil, dto.ErrCreateLog
 	}
 
 	return &dto.LogResponse{
@@ -68,37 +77,31 @@ func (ls *logService) CreateLog(ctx context.Context, req dto.LogRequest) (*dto.L
 	}, nil
 }
 
-func (ls *logService) GetLogs(ctx context.Context, req response.PaginationRequest) (*dto.LogPaginationResponse, error) {
-	datas, err := ls.logRepo.GetLogs(ctx, nil, &req)
+func (ls *logService) GetLogs(ctx context.Context, storeID, startDate, endDate string, req response.PaginationRequest) (*dto.LogPaginationResponse, error) {
+	if strings.TrimSpace(startDate) != "" {
+		if _, err := time.Parse(time.DateOnly, startDate); err != nil {
+			return nil, fmt.Errorf("%w: start_date must be YYYY-MM-DD", dto.ErrBadRequest)
+		}
+	}
+
+	if strings.TrimSpace(endDate) != "" {
+		if _, err := time.Parse(time.DateOnly, endDate); err != nil {
+			return nil, fmt.Errorf("%w: end_date must be YYYY-MM-DD", dto.ErrBadRequest)
+		}
+	}
+
+	if strings.TrimSpace(startDate) != "" && strings.TrimSpace(endDate) != "" {
+		start, _ := time.Parse(time.DateOnly, startDate)
+		end, _ := time.Parse(time.DateOnly, endDate)
+		if start.After(end) {
+			return nil, fmt.Errorf("%w: start_date must be less than or equal to end_date", dto.ErrBadRequest)
+		}
+	}
+
+	datas, err := ls.logRepo.GetLogs(ctx, nil, strings.TrimSpace(storeID), strings.TrimSpace(startDate), strings.TrimSpace(endDate), &req)
 	if err != nil {
-		ls.logger.Error("failed to get all logs", zap.Error(err))
+		ls.logger.Error("failed to get logs", zap.Error(err))
 		return nil, dto.ErrGetLogs
-	}
-
-	return &dto.LogPaginationResponse{
-		PaginationResponse: datas.PaginationResponse,
-		Data:               mapLogsToResponse(datas.Logs),
-	}, nil
-}
-
-func (ls *logService) GetLogsByStoreID(ctx context.Context, storeID string, req response.PaginationRequest) (*dto.LogPaginationResponse, error) {
-	datas, err := ls.logRepo.GetLogByStoreID(ctx, nil, storeID, &req)
-	if err != nil {
-		ls.logger.Error("failed to get logs by store ID", zap.Error(err))
-		return nil, dto.ErrGetLogsByStoreID
-	}
-
-	return &dto.LogPaginationResponse{
-		PaginationResponse: datas.PaginationResponse,
-		Data:               mapLogsToResponse(datas.Logs),
-	}, nil
-}
-
-func (ls *logService) GetLogsByDateRange(ctx context.Context, startDate, endDate string, req response.PaginationRequest) (*dto.LogPaginationResponse, error) {
-	datas, err := ls.logRepo.GetLogByDateRange(ctx, nil, startDate, endDate, &req)
-	if err != nil {
-		ls.logger.Error("failed to get logs by date range", zap.Error(err))
-		return nil, dto.ErrGetLogsByDateRange
 	}
 
 	return &dto.LogPaginationResponse{

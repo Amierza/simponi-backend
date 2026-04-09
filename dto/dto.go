@@ -45,6 +45,11 @@ const (
 	FAILED_GET_LOGS_BY_STORE_ID   = "failed to get logs by store ID"
 	FAILED_GET_LOGS_BY_DATE_RANGE = "failed to get logs by date range"
 
+	// Inventory Logging Errors
+	FAILED_CREATE_INVENTORY_LOG          = "failed to create inventory log"
+	FAILED_GET_INVENTORY_LOGS            = "failed to get inventory logs"
+	FAILED_GET_INVENTORY_LOGS_BY_PRODUCT = "failed to get inventory logs by product ID"
+
 	// User Errors
 	FAILED_GET_PROFILE = "failed to get profile"
 
@@ -81,6 +86,11 @@ const (
 	SUCCESS_GET_LOGS               = "success to get logs"
 	SUCCESS_GET_LOGS_BY_STORE_ID   = "success to get logs by store ID"
 	SUCCESS_GET_LOGS_BY_DATE_RANGE = "success to get logs by date range"
+
+	// Inventory Logging Success
+	SUCCESS_CREATE_INVENTORY_LOG          = "success to create inventory log"
+	SUCCESS_GET_INVENTORY_LOGS            = "success to get inventory logs"
+	SUCCESS_GET_INVENTORY_LOGS_BY_PRODUCT = "success to get inventory logs by product ID"
 
 	// User Errors
 	SUCCESS_GET_PROFILE = "sucess to get profile"
@@ -138,6 +148,11 @@ var (
 	ErrGetLogsByStoreID   = errors.New("failed to get logs by store ID")
 	ErrGetLogsByDateRange = errors.New("failed to get logs by date range")
 
+	// Inventory Logging
+	ErrCreateInventoryLog          = errors.New("failed to create inventory log")
+	ErrGetInventoryLogs            = errors.New("failed to get inventory logs")
+	ErrGetInventoryLogsByProductID = errors.New("failed to get inventory logs by product ID")
+
 	// User
 	ErrGetUserByEmail = errors.New("failed to get user by email")
 	ErrGetUserByID    = errors.New("failed get user by id")
@@ -178,11 +193,13 @@ type (
 	RefreshTokenResponse struct {
 		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
 	}
+)
 
-	// Log
+// Logging
+type (
 	LogRequest struct {
-		StoreID *uuid.UUID `json:"store_id,omitempty"`
-		Action  string     `json:"action" example:"Create"`
+		StoreID *uuid.UUID `json:"store_id" binding:"required"`
+		Action  string     `json:"action" binding:"required" example:"Create"`
 		Message string     `json:"message" binding:"required" example:"Created a new store"`
 	}
 	LogResponse struct {
@@ -199,6 +216,32 @@ type (
 	LogPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Logs []entity.Log
+	}
+)
+
+// Inventory Log
+type (
+	InventoryLogRequest struct {
+		ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
+		Change    int        `json:"change"` // -1, -2, +10
+		Source    string     `json:"source"` // shopee, tiktok, manual
+		Note      string     `json:"note"`
+	}
+	InventoryLogResponse struct {
+		ID        uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
+		ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
+		Change    int        `json:"change"` // -1, -2, +10
+		Source    string     `json:"source"` // shopee, tiktok, manual
+		Note      string     `json:"note"`
+		CreatedAt time.Time  `json:"created_at"`
+	}
+	InventoryLogPaginationResponse struct {
+		response.PaginationResponse
+		Data []InventoryLogResponse `json:"data"`
+	}
+	InventoryLogPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		InventoryLogs []entity.InventoryLog
 	}
 )
 
@@ -304,7 +347,6 @@ type (
 )
 
 // External Product
-
 type (
 	CreateExternalProductRequest struct {
 		ProductID       *uuid.UUID `json:"product_id" binding:"required"`
