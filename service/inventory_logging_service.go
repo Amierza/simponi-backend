@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
@@ -9,13 +10,16 @@ import (
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
 	"github.com/Amierza/simponi-backend/response"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type (
 	IInventoryLogService interface {
 		CreateInventoryLog(ctx context.Context, req dto.InventoryLogRequest) (*dto.InventoryLogResponse, error)
 		GetInventoryLogs(ctx context.Context, productID string, req response.PaginationRequest) (*dto.InventoryLogPaginationResponse, error)
+		GetInventoryLogByID(ctx context.Context, inventoryLogID string) (*dto.InventoryLogResponse, error)
 	}
 
 	inventoryLogService struct {
@@ -33,19 +37,32 @@ func NewInventoryLoggingService(inventoryLogRepo repository.IInventoryLoggingRep
 	}
 }
 
-func mapInventoryLogsToResponse(inventoryLogs []entity.InventoryLog) []dto.InventoryLogResponse {
-	result := make([]dto.InventoryLogResponse, 0, len(inventoryLogs))
-	for _, log := range inventoryLogs {
-		result = append(result, dto.InventoryLogResponse{
-			ID:        log.ID,
-			ProductID: log.ProductID,
-			Change:    log.Change,
-			Source:    log.Source,
-			Note:      log.Note,
-			CreatedAt: log.CreatedAt,
-		})
+func MapToInventoryLogResponse(il entity.InventoryLog) dto.InventoryLogResponse {
+	var product *dto.ProductResponse
+
+	if il.Product != nil && il.Product.ID != uuid.Nil {
+		product = &dto.ProductResponse{
+			ID:   il.Product.ID,
+			Name: il.Product.Name,
+		}
 	}
-	return result
+
+	return dto.InventoryLogResponse{
+		ID:        il.ID,
+		Product:   product,
+		Change:    il.Change,
+		Source:    il.Source,
+		Note:      il.Note,
+		CreatedAt: il.CreatedAt,
+	}
+}
+
+func MapInventoryLogsToResponse(ils []entity.InventoryLog) []dto.InventoryLogResponse {
+	res := make([]dto.InventoryLogResponse, 0, len(ils))
+	for _, il := range ils {
+		res = append(res, MapToInventoryLogResponse(il))
+	}
+	return res
 }
 
 func (ils *inventoryLogService) CreateInventoryLog(ctx context.Context, req dto.InventoryLogRequest) (*dto.InventoryLogResponse, error) {
@@ -61,19 +78,22 @@ func (ils *inventoryLogService) CreateInventoryLog(ctx context.Context, req dto.
 	if err != nil {
 		ils.logger.Error("Failed to create inventory log", zap.Error(err))
 		errMsg := strings.ToLower(err.Error())
-		if strings.Contains(errMsg, "foreign key constraint") {
+		if strings.Contains(errMsg, "foreign key constraint") ||
+			strings.Contains(errMsg, "violates foreign key constraint") ||
+			strings.Contains(errMsg, "sqlstate 23503") {
 			return nil, dto.ErrBadRequest
 		}
 		return nil, dto.ErrCreateInventoryLog
 	}
-	return &dto.InventoryLogResponse{
-		ID:        log.ID,
-		ProductID: log.ProductID,
-		Change:    log.Change,
-		Source:    log.Source,
-		Note:      log.Note,
-		CreatedAt: log.CreatedAt,
-	}, nil
+
+	logWithProduct, err := ils.inventoryLogRepo.GetInventoryLogByID(ctx, nil, log.ID.String())
+	if err != nil {
+		ils.logger.Error("Failed to reload inventory log", zap.Error(err))
+		return nil, dto.ErrCreateInventoryLog
+	}
+
+	res := MapToInventoryLogResponse(*logWithProduct)
+	return &res, nil
 }
 
 func (ils *inventoryLogService) GetInventoryLogs(ctx context.Context, productID string, req response.PaginationRequest) (*dto.InventoryLogPaginationResponse, error) {
@@ -85,6 +105,26 @@ func (ils *inventoryLogService) GetInventoryLogs(ctx context.Context, productID 
 
 	return &dto.InventoryLogPaginationResponse{
 		PaginationResponse: datas.PaginationResponse,
-		Data:               mapInventoryLogsToResponse(datas.InventoryLogs),
+		Data:               MapInventoryLogsToResponse(datas.InventoryLogs),
 	}, nil
+}
+
+func (ils *inventoryLogService) GetInventoryLogByID(ctx context.Context, inventoryLogID string) (*dto.InventoryLogResponse, error) {
+	if strings.TrimSpace(inventoryLogID) == "" {
+		return nil, dto.ErrBadRequest
+	}
+
+	inventoryLog, err := ils.inventoryLogRepo.GetInventoryLogByID(ctx, nil, inventoryLogID)
+	if err != nil {
+		ils.logger.Error("Failed to get inventory log by ID", zap.String("inventoryLogID", inventoryLogID), zap.Error(err))
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, dto.ErrNotFound
+		}
+
+		return nil, dto.ErrGetInventoryLogs
+	}
+
+	res := MapToInventoryLogResponse(*inventoryLog)
+	return &res, nil
 }

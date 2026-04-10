@@ -90,7 +90,7 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 
 	var products []entity.Product
 	var count int64
-	
+
 	if req.PerPage == 0 {
 		req.PerPage = 10
 	}
@@ -280,7 +280,7 @@ func (pr *productRepository) DeleteProductByID(ctx context.Context, tx *gorm.DB,
 	}
 
 	return tx.WithContext(ctx).
-	Where("id = ?", productID).
-	Delete(&entity.Product{}).
-	Error
+		Where("id = ?", productID).
+		Delete(&entity.Product{}).
+		Error
 }

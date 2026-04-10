@@ -228,12 +228,12 @@ type (
 		Note      string     `json:"note"`
 	}
 	InventoryLogResponse struct {
-		ID        uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
-		ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
-		Change    int        `json:"change"` // -1, -2, +10
-		Source    string     `json:"source"` // shopee, tiktok, manual
-		Note      string     `json:"note"`
-		CreatedAt time.Time  `json:"created_at"`
+		ID        uuid.UUID        `gorm:"type:uuid;primaryKey" json:"id"`
+		Product   *ProductResponse `gorm:"type:uuid" json:"product"`
+		Change    int              `json:"change"` // -1, -2, +10
+		Source    string           `json:"source"` // shopee, tiktok, manual
+		Note      string           `json:"note"`
+		CreatedAt time.Time        `json:"created_at"`
 	}
 	InventoryLogPaginationResponse struct {
 		response.PaginationResponse
