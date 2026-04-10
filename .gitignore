@@ -6,3 +6,5 @@ volumes/
 uploads/
 logs/
 *.log
+logs/
+tmp/
