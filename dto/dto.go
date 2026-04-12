@@ -360,13 +360,14 @@ type (
 	}
 
 	ExternalProductResponse struct {
-		ID          uuid.UUID `json:"id"`
-		ImageURL    string    `json:"image"`
-		ProductName string    `json:"product_name"`
-		Platform    string    `json:"platform"`
-		Price       int64     `json:"price"`
-		CreatedAt   time.Time `json:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at"`
+		ID                uuid.UUID `json:"id"`
+		ImageURL          string    `json:"image"`
+		ProductName       string    `json:"product_name"`
+		Platform          string    `json:"platform"`
+		StorePlatformName string    `json:"store_platform_name"`
+		Price             int64     `json:"price"`
+		CreatedAt         time.Time `json:"created_at"`
+		UpdatedAt         time.Time `json:"updated_at"`
 	}
 
 	ExternalProductPaginationResponse struct {

@@ -105,6 +105,7 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 		Preload("Images").
 		Preload("ExternalProducts").
 		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Store").
 		Preload("ExternalProducts.StorePlatform.Platform")
 
 	if req.Search != "" {
@@ -203,6 +204,7 @@ func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, pr
 		Preload("Images").
 		Preload("ExternalProducts").
 		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Store").
 		Preload("ExternalProducts.StorePlatform.Platform").
 		Preload("Logs").
 		Where("id = ?", productID).
@@ -230,6 +232,7 @@ func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, s
 		Preload("Images").
 		Preload("ExternalProducts").
 		Preload("ExternalProducts.StorePlatform").
+		Preload("ExternalProducts.StorePlatform.Store").
 		Preload("ExternalProducts.StorePlatform.Platform").
 		Where("sku = ?", sku).
 		First(&product).Error
