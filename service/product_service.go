@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -86,18 +87,24 @@ func MapToExternalProductResponse(p entity.Product) []dto.ExternalProductRespons
 
 	for _, ep := range p.ExternalProducts {
 		platformName := ""
+		storePlatformName := ""
 		if ep.StorePlatform.Platform != nil {
 			platformName = ep.StorePlatform.Platform.Name
 		}
 
+		if ep.StorePlatform.Store != nil && ep.StorePlatform.Platform != nil {
+			storePlatformName = strings.TrimSpace(ep.StorePlatform.Store.Name + " - " + ep.StorePlatform.Platform.Name)
+		}
+
 		externalProducts = append(externalProducts, dto.ExternalProductResponse{
-			ID:          ep.ID,
-			ImageURL:    primaryImageURL,
-			ProductName: p.Name,
-			Platform:    platformName,
-			Price:       ep.Price,
-			CreatedAt:   ep.CreatedAt,
-			UpdatedAt:   ep.UpdatedAt,
+			ID:                ep.ID,
+			ImageURL:          primaryImageURL,
+			ProductName:       p.Name,
+			Platform:          platformName,
+			StorePlatformName: storePlatformName,
+			Price:             ep.Price,
+			CreatedAt:         ep.CreatedAt,
+			UpdatedAt:         ep.UpdatedAt,
 		})
 	}
 	return externalProducts

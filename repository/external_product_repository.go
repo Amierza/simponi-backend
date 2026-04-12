@@ -68,6 +68,7 @@ func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, t
 		Preload("Product").
 		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform")
 
 	if req.Search != "" {
@@ -110,6 +111,7 @@ func (epr *externalProductRepository) GetExternalProductByID(ctx context.Context
 		Preload("Product").
 		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform").
 		Where("id = ?", externalProductID).
 		First(&externalProduct).Error
@@ -135,6 +137,7 @@ func (epr *externalProductRepository) GetExternalProductByProductID(ctx context.
 		Preload("Product").
 		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform").
 		Where("product_id = ?", productID).
 		Find(&externalProducts).Error; err != nil {
@@ -156,6 +159,7 @@ func (epr *externalProductRepository) GetExternalProductByStorePlatformID(ctx co
 		Preload("Product").
 		Preload("Product.Images").
 		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform").
 		Where("store_platform_id = ?", storePlatformID).
 		Find(&externalProducts).Error; err != nil {
