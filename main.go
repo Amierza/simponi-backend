@@ -58,7 +58,7 @@ func main() {
 		userHandler = handler.NewUserHandler(userService, zapLogger)
 
 		// Authentication
-		authService = service.NewAuthService(userRepo, zapLogger, jwt)
+		authService = service.NewAuthService(userRepo, permissionRepo, zapLogger, jwt)
 		authHandler = handler.NewAuthHandler(authService, zapLogger)
 
 		// Logging

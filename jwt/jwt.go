@@ -5,19 +5,21 @@ import (
 	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
 type (
 	IJWT interface {
-		GenerateToken(userID, roleID string, duration time.Duration) (string, error)
+		GenerateToken(userID, roleID string, permissions []*entity.Permission, duration time.Duration) (string, error)
 		ValidateToken(tokenString string) (*jwtCustomClaim, error)
 	}
 
 	jwtCustomClaim struct {
-		UserID string `json:"user_id"`
-		RoleID string `json:"role_id"`
+		UserID      string               `json:"user_id"`
+		RoleID      string               `json:"role_id"`
+		Permissions []*entity.Permission `json:"permissions"`
 		jwt.RegisteredClaims
 	}
 
@@ -43,10 +45,11 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *JWT) GenerateToken(userID, roleID string, duration time.Duration) (string, error) {
+func (j *JWT) GenerateToken(userID, roleID string, permissions []*entity.Permission, duration time.Duration) (string, error) {
 	claims := jwtCustomClaim{
-		UserID: userID,
-		RoleID: roleID,
+		UserID:      userID,
+		RoleID:      roleID,
+		Permissions: permissions,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(duration))),
 			Issuer:    j.issuer,

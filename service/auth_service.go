@@ -19,17 +19,19 @@ type (
 	}
 
 	authService struct {
-		userRepo repository.IUserRepository
-		logger   *zap.Logger
-		jwt      jwt.IJWT
+		userRepo       repository.IUserRepository
+		permissionRepo repository.IPermissionRepository
+		logger         *zap.Logger
+		jwt            jwt.IJWT
 	}
 )
 
-func NewAuthService(userRepo repository.IUserRepository, logger *zap.Logger, jwt jwt.IJWT) *authService {
+func NewAuthService(userRepo repository.IUserRepository, permissionRepo repository.IPermissionRepository, logger *zap.Logger, jwt jwt.IJWT) *authService {
 	return &authService{
-		userRepo: userRepo,
-		logger:   logger,
-		jwt:      jwt,
+		userRepo:       userRepo,
+		permissionRepo: permissionRepo,
+		logger:         logger,
+		jwt:            jwt,
 	}
 }
 
@@ -50,13 +52,19 @@ func (as *authService) SignIn(ctx context.Context, req dto.SignInRequest) (dto.S
 		return dto.SignInResponse{}, fmt.Errorf("incorrect password: %w", dto.ErrBadRequest)
 	}
 
-	accessToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), 5*time.Minute)
+	permissions, err := as.permissionRepo.GetPermissionsByRoleID(ctx, nil, user.RoleID)
+	if err != nil {
+		as.logger.Error("failed to get permissions by role id", zap.String("role id", user.RoleID.String()), zap.Error(err))
+		return dto.SignInResponse{}, fmt.Errorf("failed to get permissions by role id: %w", dto.ErrInternal)
+	}
+
+	accessToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), permissions, 5*time.Minute)
 	if err != nil {
 		as.logger.Error("failed to generate access token", zap.String("email", req.Email), zap.Error(err))
 		return dto.SignInResponse{}, fmt.Errorf("failed to generate access token: %w", dto.ErrInternal)
 	}
 
-	refreshToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), 7*24*time.Hour)
+	refreshToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), permissions, 7*24*time.Hour)
 	if err != nil {
 		as.logger.Error("failed to generate refresh token", zap.String("email", req.Email), zap.Error(err))
 		return dto.SignInResponse{}, fmt.Errorf("failed to generate refresh token: %w", dto.ErrInternal)
@@ -79,8 +87,9 @@ func (as *authService) RefreshToken(ctx context.Context, req dto.RefreshTokenReq
 
 	userID := claims.UserID
 	roleID := claims.RoleID
+	permissions := claims.Permissions
 
-	accessToken, err := as.jwt.GenerateToken(userID, roleID, 5*time.Minute)
+	accessToken, err := as.jwt.GenerateToken(userID, roleID, permissions, 5*time.Minute)
 	if err != nil {
 		as.logger.Error("failed to generate token", zap.String("user_id", userID), zap.String("role_id", roleID), zap.Error(err))
 		return dto.RefreshTokenResponse{}, fmt.Errorf("failed to generate token: %w", dto.ErrInternal)
