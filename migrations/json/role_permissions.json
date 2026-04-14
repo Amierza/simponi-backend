@@ -78,6 +78,11 @@
     "permission_id": "7a5e749c-85e2-4678-b235-3cbaec91c8f2"
   },
   {
+    "id": "8c76b7ea-7ab3-4d29-a633-4296f0d3719a",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "e36f027c-9884-436c-8e9b-da9fc7c2c741"
+  },
+  {
     "id": "285864f0-ab7f-4907-86fc-080c479f66fd",
     "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
     "permission_id": "793aaad8-d456-4d1d-9699-867196659bbe"

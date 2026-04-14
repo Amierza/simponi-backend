@@ -18,6 +18,7 @@ func User(route *gin.Engine, userHandler handler.IUserHandler, jwtService jwt.IJ
 		routes.GET("/profile", middleware.RBAC(rolePermissionRepo, "GetProfile"), userHandler.GetProfile)
 
 		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateUser"), userHandler.UpdateUser)
+		routes.PATCH("/:id/status", middleware.RBAC(rolePermissionRepo, "UpdateUserStatus"), userHandler.UpdateUserStatus)
 
 		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteUserByID"), userHandler.DeleteUserByID)
 	}

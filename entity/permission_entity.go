@@ -8,6 +8,7 @@ type Permission struct {
 	Name     string `json:"name"`     // contoh: "CreateProduct"
 	Endpoint string `json:"endpoint"` // contoh: "/products"
 	Method   string `json:"method"`   // GET, POST, PUT, DELETE
+	Module   string `json:"module"`   // contoh: "user, vendor"
 
 	RolePermissions []*RolePermission `gorm:"foreignKey:PermissionID"`
 

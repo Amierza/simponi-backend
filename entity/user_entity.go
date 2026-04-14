@@ -12,6 +12,7 @@ type User struct {
 	Password string    `json:"password"`
 	Name     string    `json:"name"`
 	ImageURL string    `json:"image_url"`
+	Status   string    `json:"status"`
 
 	RoleID *uuid.UUID `gorm:"type:uuid" json:"role_id"`
 	Role   Role       `gorm:"foreignKey:RoleID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role,omitempty"`

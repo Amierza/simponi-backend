@@ -20,6 +20,7 @@ type (
 		GetUserByID(ctx context.Context, userID *uuid.UUID) (*dto.UserResponse, error)
 		GetProfile(ctx context.Context, userID *uuid.UUID) (*dto.UserResponse, error)
 		UpdateUser(ctx context.Context, userID *uuid.UUID, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
+		UpdateUserStatus(ctx context.Context, userID *uuid.UUID, req *dto.UpdateUserStatus) (*dto.UserResponse, error)
 		DeleteUserByID(ctx context.Context, userID *uuid.UUID) error
 	}
 
@@ -47,6 +48,7 @@ func mapToUserResponse(u *entity.User, r *entity.Role) *dto.UserResponse {
 		Name:     u.Name,
 		Email:    u.Email,
 		ImageURL: u.ImageURL,
+		Status:   u.Status,
 		Role: dto.RoleResponse{
 			ID:   r.ID,
 			Name: r.Name,
@@ -150,7 +152,7 @@ func (us *userService) GetUserByID(ctx context.Context, userID *uuid.UUID) (*dto
 	}
 	if !found {
 		us.logger.Warn("user not found", zap.String("userID", userID.String()))
-		return nil, fmt.Errorf("user not found: %v", dto.ErrNotFound)
+		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
 	us.logger.Info("success to get user by id", zap.String("id", userID.String()))
@@ -166,7 +168,7 @@ func (us *userService) GetProfile(ctx context.Context, userID *uuid.UUID) (*dto.
 	}
 	if !found {
 		us.logger.Warn("user not found", zap.String("id", userID.String()))
-		return nil, fmt.Errorf("user not found: %v", dto.ErrNotFound)
+		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
 	return mapToProfileResponse(data, &data.Role), nil
@@ -180,7 +182,7 @@ func (us *userService) UpdateUser(ctx context.Context, userID *uuid.UUID, req *d
 	}
 	if !found {
 		us.logger.Warn("user not found", zap.String("userID", userID.String()))
-		return nil, fmt.Errorf("user not found: %v", dto.ErrNotFound)
+		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
 	// validate email
@@ -229,6 +231,38 @@ func (us *userService) UpdateUser(ctx context.Context, userID *uuid.UUID, req *d
 	return mapToUserResponse(user, &user.Role), nil
 }
 
+func (us *userService) UpdateUserStatus(ctx context.Context, userID *uuid.UUID, req *dto.UpdateUserStatus) (*dto.UserResponse, error) {
+	user, found, err := us.userRepo.GetUserByID(ctx, nil, userID)
+	if err != nil {
+		us.logger.Error("failed to get user by ID", zap.String("userID", userID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to get user ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		us.logger.Warn("user not found", zap.String("userID", userID.String()))
+		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
+	}
+
+	// skip if same status
+	if user.Status == req.Status {
+		return mapToUserResponse(user, &user.Role), nil
+	}
+
+	// validate status
+	if req.Status != "active" && req.Status != "inactive" {
+		us.logger.Warn("invalid status", zap.String("status", req.Status))
+		return nil, fmt.Errorf("invalid status: %w", dto.ErrBadRequest)
+	}
+	user.Status = req.Status
+
+	err = us.userRepo.UpdateUserStatus(ctx, nil, user)
+	if err != nil {
+		us.logger.Error("failed to update user status", zap.String("status", req.Status), zap.Error(err))
+		return nil, fmt.Errorf("failed to update user status: %w", dto.ErrInternal)
+	}
+
+	return mapToUserResponse(user, &user.Role), nil
+}
+
 func (us *userService) DeleteUserByID(ctx context.Context, userID *uuid.UUID) error {
 	_, found, err := us.userRepo.GetUserByID(ctx, nil, userID)
 	if err != nil {
@@ -237,7 +271,7 @@ func (us *userService) DeleteUserByID(ctx context.Context, userID *uuid.UUID) er
 	}
 	if !found {
 		us.logger.Warn("user not found", zap.String("userID", userID.String()))
-		return fmt.Errorf("user not found: %v", dto.ErrNotFound)
+		return fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
 	if err := us.userRepo.DeleteUserByID(ctx, nil, userID); err != nil {

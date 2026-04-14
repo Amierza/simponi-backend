@@ -406,6 +406,7 @@ type (
 		Name     string    `json:"name"`
 		Endpoint string    `json:"endpoint"`
 		Method   string    `json:"method"`
+		Module   string    `json:"module"`
 	}
 	PermissionPaginationResponse struct {
 		response.PaginationResponse
@@ -424,6 +425,7 @@ type (
 		Email    string       `json:"email"`
 		Name     string       `json:"name"`
 		ImageURL string       `json:"image_url"`
+		Status   string       `json:"status"`
 		Role     RoleResponse `json:"role"`
 	}
 	CreateUserRequest struct {
@@ -439,6 +441,9 @@ type (
 		Name     string     `json:"name" binding:"required,min=3,max=100"`
 		ImageURL *string    `json:"image_url,omitempty" binding:"omitempty"`
 		RoleID   *uuid.UUID `json:"role_id"`
+	}
+	UpdateUserStatus struct {
+		Status string `json:"status" binding:"required"`
 	}
 	UserPaginationResponse struct {
 		response.PaginationResponse

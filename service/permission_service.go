@@ -38,6 +38,7 @@ func mapToPermissionResponse(p *entity.Permission) *dto.PermissionResponse {
 		Name:     p.Name,
 		Endpoint: p.Endpoint,
 		Method:   p.Method,
+		Module:   p.Module,
 	}
 }
 

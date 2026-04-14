@@ -18,6 +18,7 @@ type (
 		GetUsers(ctx *gin.Context)
 		GetUserByID(ctx *gin.Context)
 		GetProfile(ctx *gin.Context)
+		UpdateUserStatus(ctx *gin.Context)
 		UpdateUser(ctx *gin.Context)
 		DeleteUserByID(ctx *gin.Context)
 	}
@@ -162,6 +163,37 @@ func (uh *userHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s user", dto.SUCCESS_UPDATE), result)
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (uh *userHandler) UpdateUserStatus(ctx *gin.Context) {
+	userIDStr := ctx.Param("id")
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_UPDATE), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	var payload dto.UpdateUserStatus
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		uh.logger.Error("invalid update user status request payload", zap.Error(err), zap.Any("payload", payload))
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s user status", dto.FAILED_UPDATE), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	result, err := uh.userService.UpdateUserStatus(ctx, &userID, &payload)
+	if err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s user status", dto.FAILED_UPDATE), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s user status", dto.SUCCESS_UPDATE), result)
 	ctx.JSON(http.StatusOK, res)
 }
 

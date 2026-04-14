@@ -25,6 +25,7 @@ type (
 
 		// UPDATE
 		UpdateUser(ctx context.Context, tx *gorm.DB, user *entity.User) error
+		UpdateUserStatus(ctx context.Context, tx *gorm.DB, user *entity.User) error
 
 		// DELETE
 		DeleteUserByID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) error
@@ -146,6 +147,13 @@ func (ur *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user *ent
 	}
 
 	return tx.WithContext(ctx).Model(&entity.User{}).Where("id = ?", user.ID).Updates(user).Error
+}
+func (ur *userRepository) UpdateUserStatus(ctx context.Context, tx *gorm.DB, user *entity.User) error {
+	if tx == nil {
+		tx = ur.db
+	}
+
+	return tx.WithContext(ctx).Model(&entity.User{}).Where("id = ?", user.ID).Update("status", user.Status).Error
 }
 
 // DELETE

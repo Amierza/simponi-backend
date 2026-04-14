@@ -51,6 +51,7 @@ func mapToRoleResponse(r *entity.Role, p []*entity.Permission) *dto.RoleResponse
 			Name:     permission.Name,
 			Endpoint: permission.Endpoint,
 			Method:   permission.Method,
+			Module:   permission.Module,
 		})
 	}
 	return res
