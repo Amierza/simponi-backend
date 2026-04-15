@@ -323,7 +323,6 @@ type (
 		CreatedAt        time.Time                 `json:"created_at"`
 		UpdatedAt        time.Time                 `json:"updated_at"`
 	}
-
 	ProductListResponse struct {
 		ID               uuid.UUID                 `json:"id"`
 		Name             string                    `json:"name"`
@@ -335,7 +334,6 @@ type (
 		Status           string                    `json:"status"` // "Mapped", "Unmapped", "Low Stock", "Out of Stock"
 		CreatedAt        time.Time                 `json:"created_at"`
 	}
-
 	ProductPaginationResponse struct {
 		response.PaginationResponse
 		Data []ProductListResponse `json:"data"`

@@ -42,8 +42,14 @@ func MapToInventoryLogResponse(il entity.InventoryLog) dto.InventoryLogResponse 
 
 	if il.Product != nil && il.Product.ID != uuid.Nil {
 		product = &dto.ProductResponse{
-			ID:   il.Product.ID,
-			Name: il.Product.Name,
+			ID:          il.Product.ID,
+			Name:        il.Product.Name,
+			Description: il.Product.Description,
+			SKU:         il.Product.SKU,
+			Stock:       il.Product.Stock,
+			Category:    MapToProductCategoryResponse(*il.Product),
+			CreatedAt:   il.CreatedAt,
+			UpdatedAt:   il.UpdatedAt,
 		}
 	}
 
