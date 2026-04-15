@@ -62,7 +62,8 @@ func (ilr *inventoryLoggingRepository) GetInventoryLogs(ctx context.Context, tx 
 
 	query := tx.WithContext(ctx).
 		Model(&entity.InventoryLog{}).
-		Preload("Product")
+		Preload("Product").
+		Preload("Product.Category")
 
 	if productID != "" {
 		query = query.Where("product_id = ?", productID)
