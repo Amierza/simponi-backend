@@ -96,7 +96,7 @@ func (pr *permissionRepository) GetPermissions(ctx context.Context, tx *gorm.DB,
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
-		query = query.Where("LOWER(name) LIKE ? OR LOWER(endpoint) LIKE ? OR LOWER(method) LIKE ?", searchValue, searchValue, searchValue)
+		query = query.Where("LOWER(name) LIKE ? OR LOWER(endpoint) LIKE ? OR LOWER(method) LIKE ? OR LOWER(module) LIKE ?", searchValue, searchValue, searchValue, searchValue)
 	}
 
 	if err := query.Count(&count).Error; err != nil {

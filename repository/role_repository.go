@@ -3,8 +3,12 @@ package repository
 import (
 	"context"
 	"errors"
+	"math"
+	"strings"
 
+	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
+	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -19,7 +23,7 @@ type (
 		// READ
 		GetRoleByID(ctx context.Context, tx *gorm.DB, roleID *uuid.UUID) (*entity.Role, bool, error)
 		GetRoleByName(ctx context.Context, tx *gorm.DB, name *string) (*entity.Role, bool, error)
-		GetRoles(ctx context.Context, tx *gorm.DB) ([]*entity.Role, error)
+		GetRoles(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.RolePaginationRepositoryResponse, error)
 
 		// UPDATE
 		UpdateRole(ctx context.Context, tx *gorm.DB, role *entity.Role) error
@@ -98,21 +102,60 @@ func (rr *roleRepository) GetRoleByID(ctx context.Context, tx *gorm.DB, roleID *
 
 	return role, true, nil
 }
-func (rr *roleRepository) GetRoles(ctx context.Context, tx *gorm.DB) ([]*entity.Role, error) {
+func (rr *roleRepository) GetRoles(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.RolePaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = rr.db
 	}
 
 	var roles []*entity.Role
-	if err := tx.WithContext(ctx).
-		Model(&entity.Role{}).
-		Preload("Users").
-		Preload("RolePermissions.Permission").
-		Find(&roles).Error; err != nil {
-		return nil, err
+	var err error
+	var count int64
+
+	if req.PerPage == 0 {
+		req.PerPage = 10
 	}
 
-	return roles, nil
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
+	query := tx.WithContext(ctx).
+		Model(&entity.Role{}).
+		Preload("Users").
+		Preload("RolePermissions.Permission")
+
+	if req.Search != "" {
+		searchValue := "%" + strings.ToLower(req.Search) + "%"
+		query = query.Where(`
+			LOWER(roles.name) LIKE ?
+			OR roles.id IN (
+				SELECT rp.role_id
+				FROM role_permissions rp
+				JOIN permissions p ON p.id = rp.permission_id
+				WHERE LOWER(p.module) LIKE ?
+			)
+		`, searchValue, searchValue)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return dto.RolePaginationRepositoryResponse{}, err
+	}
+
+	if err := query.Order("roles.created_at DESC").Scopes(response.Paginate(req.Page, req.PerPage)).Find(&roles).Error; err != nil {
+		return dto.RolePaginationRepositoryResponse{}, err
+	}
+
+	totalPage := int64(math.Ceil(float64(count) / float64(req.PerPage)))
+
+	return dto.RolePaginationRepositoryResponse{
+		Roles: roles,
+		PaginationResponse: response.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: totalPage,
+			Count:   count,
+		},
+	}, err
 }
 
 // UPDATE

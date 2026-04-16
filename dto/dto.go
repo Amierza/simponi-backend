@@ -395,6 +395,14 @@ type (
 		Name          string       `json:"name" binding:"required"`
 		PermissionIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
 	}
+	RolePaginationResponse struct {
+		response.PaginationResponse
+		Data []*RoleResponse `json:"data"`
+	}
+	RolePaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Roles []*entity.Role
+	}
 )
 
 // Permission

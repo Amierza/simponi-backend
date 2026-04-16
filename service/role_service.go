@@ -8,6 +8,7 @@ import (
 	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
+	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -15,7 +16,7 @@ import (
 type (
 	IRoleService interface {
 		CreateRole(ctx context.Context, req *dto.CreateRoleRequest) (*dto.RoleResponse, error)
-		GetRoles(ctx context.Context) ([]*dto.RoleResponse, error)
+		GetRoles(ctx context.Context, req *response.PaginationRequest) (dto.RolePaginationResponse, error)
 		GetRoleByID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error)
 		UpdateRole(ctx context.Context, roleID *uuid.UUID, req *dto.UpdateRoleRequest) (*dto.RoleResponse, error)
 		DeleteRoleByID(ctx context.Context, roleID *uuid.UUID) error
@@ -110,26 +111,29 @@ func (rs *roleService) CreateRole(ctx context.Context, req *dto.CreateRoleReques
 	return mapToRoleResponse(newRole, permissions), nil
 }
 
-func (rs *roleService) GetRoles(ctx context.Context) ([]*dto.RoleResponse, error) {
-	rawRoles, err := rs.roleRepo.GetRoles(ctx, nil)
+func (rs *roleService) GetRoles(ctx context.Context, req *response.PaginationRequest) (dto.RolePaginationResponse, error) {
+	datas, err := rs.roleRepo.GetRoles(ctx, nil, req)
 	if err != nil {
 		rs.logger.Error("failed to get roles", zap.Error(err))
-		return nil, fmt.Errorf("failed to get roles: %w", dto.ErrInternal)
+		return dto.RolePaginationResponse{}, fmt.Errorf("failed to get roles: %w", dto.ErrInternal)
 	}
-	rs.logger.Info("success to get roles", zap.Int("count", len(rawRoles)))
+	rs.logger.Info("success to get roles", zap.Int64("count", datas.Count))
 
 	var roles []*dto.RoleResponse
-	for _, role := range rawRoles {
+	for _, role := range datas.Roles {
 		rawPermissions, err := rs.permissionRepo.GetPermissionsByRoleID(ctx, nil, &role.ID)
 		if err != nil {
 			rs.logger.Error("failed to get permissions by role id", zap.Error(err))
-			return nil, fmt.Errorf("failed to get permissions by role id: %w", dto.ErrInternal)
+			return dto.RolePaginationResponse{}, fmt.Errorf("failed to get permissions by role id: %w", dto.ErrInternal)
 		}
 
 		roles = append(roles, mapToRoleResponse(role, rawPermissions))
 	}
 
-	return roles, nil
+	return dto.RolePaginationResponse{
+		Data:               roles,
+		PaginationResponse: datas.PaginationResponse,
+	}, nil
 }
 
 func (rs *roleService) GetRoleByID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error) {

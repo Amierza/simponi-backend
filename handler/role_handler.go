@@ -57,7 +57,16 @@ func (rh *roleHandler) CreateRole(ctx *gin.Context) {
 }
 
 func (rh *roleHandler) GetRoles(ctx *gin.Context) {
-	result, err := rh.roleService.GetRoles(ctx)
+	var payload response.PaginationRequest
+	if err := ctx.ShouldBindQuery(&payload); err != nil {
+		rh.logger.Error("invalid get roles query payload", zap.Error(err), zap.Any("payload", payload))
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s roles", dto.FAILED_GET_ALL), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	result, err := rh.roleService.GetRoles(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s roles", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -65,7 +74,12 @@ func (rh *roleHandler) GetRoles(ctx *gin.Context) {
 		return
 	}
 
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s roles", dto.SUCCESS_GET_ALL), result)
+	res := response.Response{
+		Status:   true,
+		Messsage: fmt.Sprintf("%s roles", dto.SUCCESS_GET_ALL),
+		Data:     result.Data,
+		Meta:     result.PaginationResponse,
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
