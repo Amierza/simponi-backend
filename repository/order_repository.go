@@ -14,17 +14,17 @@ import (
 type (
 	IOrderRepository interface {
 		// CREATE
-		CreateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error)
-		CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail *entity.OrderDetail) (*entity.OrderDetail, error)
+		// CreateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error)
+		// CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail *entity.OrderDetail) (*entity.OrderDetail, error)
 
 		// READ
 		GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
 		GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID) (*entity.Order, bool, error)
-		GetOrdersByVendorID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
-		GetOrdersByCustomerID(ctx context.Context, tx *gorm.DB, customerID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
+		// GetOrdersByVendorID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
+		// GetOrdersByCustomerID(ctx context.Context, tx *gorm.DB, customerID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
 
 		// UPDATE
-		UpdateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error)
+		// UpdateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error)
 	}
 
 	OrderRepository struct {
@@ -38,28 +38,28 @@ func NewOrderRepository(db *gorm.DB) *OrderRepository {
 	}
 }
 
-func (or *OrderRepository) CreateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error) {
-	if tx == nil {
-		tx = or.db
-	}
+// func (or *OrderRepository) CreateOrder(ctx context.Context, tx *gorm.DB, order *entity.Order) (*entity.Order, error) {
+// 	if tx == nil {
+// 		tx = or.db
+// 	}
 
-	if err := tx.WithContext(ctx).Create(order).Error; err != nil {
-		return nil, err
-	}
-	return order, nil
+// 	if err := tx.WithContext(ctx).Create(order).Error; err != nil {
+// 		return nil, err
+// 	}
+// 	return order, nil
 
-}
+// }
 
-func (or *OrderRepository) CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail *entity.OrderDetail) (*entity.OrderDetail, error) {
-	if tx == nil {
-		tx = or.db
-	}
+// func (or *OrderRepository) CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail *entity.OrderDetail) (*entity.OrderDetail, error) {
+// 	if tx == nil {
+// 		tx = or.db
+// 	}
 
-	if err := tx.WithContext(ctx).Create(orderDetail).Error; err != nil {
-		return nil, err
-	}
-	return orderDetail, nil
-}
+// 	if err := tx.WithContext(ctx).Create(orderDetail).Error; err != nil {
+// 		return nil, err
+// 	}
+// 	return orderDetail, nil
+// }
 
 func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error) {
 	if tx == nil {
@@ -77,11 +77,11 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 		req.Page = 1
 	}
 
-	query := tx.WithContext(ctx).Model(&entity.Order{}).Preload("OrderDetails").Preload("OrderDetails.Product").Preload("Vendor").Preload("Customer")
+	query := tx.WithContext(ctx).Model(&entity.Order{})
 
 	if req.Search != "" {
 		searchTerm := "%" + req.Search + "%"
-		query = query.Where("id::text ILIKE ? OR vendor_id::text ILIKE ? OR customer_id::text ILIKE ?", searchTerm, searchTerm, searchTerm)
+		query = query.Where("id::text ILIKE ? OR order_number::text ILIKE ? OR buyer_name::text ILIKE ? OR buyer_email::text ILIKE ?", searchTerm, searchTerm, searchTerm, searchTerm)
 	}
 
 	if err := query.Count(&count).Error; err != nil {
