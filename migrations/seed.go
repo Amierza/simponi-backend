@@ -58,5 +58,13 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
+	if err := SeedFromJSON[entity.Order](db, "./migrations/json/orders.json", entity.Order{}, "ID"); err != nil {
+		return err
+	}
+
+	if err := SeedFromJSON[entity.OrderDetail](db, "./migrations/json/order_details.json", entity.OrderDetail{}, "ID"); err != nil {
+		return err
+	}
+
 	return nil
 }
