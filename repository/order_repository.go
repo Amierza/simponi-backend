@@ -77,7 +77,10 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 		req.Page = 1
 	}
 
-	query := tx.WithContext(ctx).Model(&entity.Order{})
+	query := tx.WithContext(ctx).Model(&entity.Order{}).
+		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
+		Preload("StorePlatform.Platform")
 
 	if req.Search != "" {
 		searchTerm := "%" + req.Search + "%"
