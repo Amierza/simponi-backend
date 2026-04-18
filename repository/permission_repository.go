@@ -17,7 +17,8 @@ type (
 	IPermissionRepository interface {
 		// READ
 		GetPermissionByID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error)
-		GetPermissions(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error)
+		GetPermissions(ctx context.Context, tx *gorm.DB) ([]*entity.Permission, error)
+		GetPermissionsWithPagination(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error)
 		GetPermissionsByRoleID(ctx context.Context, tx *gorm.DB, roleID *uuid.UUID) ([]*entity.Permission, error)
 	}
 
@@ -73,7 +74,24 @@ func (pr *permissionRepository) GetPermissionsByRoleID(ctx context.Context, tx *
 
 	return permissions, nil
 }
-func (pr *permissionRepository) GetPermissions(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error) {
+func (pr *permissionRepository) GetPermissions(ctx context.Context, tx *gorm.DB) ([]*entity.Permission, error) {
+	if tx == nil {
+		tx = pr.db
+	}
+
+	var permissions []*entity.Permission
+
+	query := tx.WithContext(ctx).
+		Model(&entity.Permission{}).
+		Preload("RolePermissions")
+
+	if err := query.Order(`"created_at" DESC`).Find(&permissions).Error; err != nil {
+		return nil, err
+	}
+
+	return permissions, nil
+}
+func (pr *permissionRepository) GetPermissionsWithPagination(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = pr.db
 	}
@@ -91,8 +109,7 @@ func (pr *permissionRepository) GetPermissions(ctx context.Context, tx *gorm.DB,
 	}
 
 	query := tx.WithContext(ctx).
-		Model(&entity.Permission{}).
-		Preload("RolePermissions")
+		Model(&entity.Permission{})
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"

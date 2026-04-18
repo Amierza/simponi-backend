@@ -30,6 +30,23 @@ func NewPermissionHandler(permissionService service.IPermissionService, logger *
 }
 
 func (ph *permissionHandler) GetPermissions(ctx *gin.Context) {
+	paginationParam := ctx.DefaultQuery("pagination", "true")
+	usePagination := paginationParam != "false"
+
+	if !usePagination {
+		result, err := ph.permissionService.GetPermissions(ctx)
+		if err != nil {
+			status := mapErrorStatus(err)
+			res := response.BuildResponseFailed(fmt.Sprintf("%s permissions", dto.FAILED_GET_ALL), cleanErrorMessage(err))
+			ctx.AbortWithStatusJSON(status, res)
+			return
+		}
+
+		res := response.BuildResponseSuccess(fmt.Sprintf("%s permissions", dto.SUCCESS_GET_ALL), result)
+		ctx.JSON(http.StatusOK, res)
+		return
+	}
+
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
 		ph.logger.Error("invalid get permissions query payload", zap.Error(err), zap.Any("payload", payload))
@@ -39,7 +56,7 @@ func (ph *permissionHandler) GetPermissions(ctx *gin.Context) {
 		return
 	}
 
-	result, err := ph.permissionService.GetPermissions(ctx, &payload)
+	result, err := ph.permissionService.GetPermissionsWithPagination(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s permissions", dto.FAILED_GET_ALL), cleanErrorMessage(err))

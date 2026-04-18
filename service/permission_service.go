@@ -14,7 +14,8 @@ import (
 
 type (
 	IPermissionService interface {
-		GetPermissions(ctx context.Context, req *response.PaginationRequest) (dto.PermissionPaginationResponse, error)
+		GetPermissions(ctx context.Context) ([]*dto.PermissionResponse, error)
+		GetPermissionsWithPagination(ctx context.Context, req *response.PaginationRequest) (dto.PermissionPaginationResponse, error)
 	}
 
 	permissionService struct {
@@ -42,8 +43,24 @@ func mapToPermissionResponse(p *entity.Permission) *dto.PermissionResponse {
 	}
 }
 
-func (ps *permissionService) GetPermissions(ctx context.Context, req *response.PaginationRequest) (dto.PermissionPaginationResponse, error) {
-	datas, err := ps.permissionRepo.GetPermissions(ctx, nil, req)
+func (ps *permissionService) GetPermissions(ctx context.Context) ([]*dto.PermissionResponse, error) {
+	datas, err := ps.permissionRepo.GetPermissions(ctx, nil)
+	if err != nil {
+		ps.logger.Error("failed to get permissions", zap.Error(err))
+		return nil, fmt.Errorf("failed to get permissions: %w", dto.ErrInternal)
+	}
+
+	ps.logger.Info("success to get permissions", zap.Int("count", len(datas)))
+
+	var permissions []*dto.PermissionResponse
+	for _, permission := range datas {
+		permissions = append(permissions, mapToPermissionResponse(permission))
+	}
+
+	return permissions, nil
+}
+func (ps *permissionService) GetPermissionsWithPagination(ctx context.Context, req *response.PaginationRequest) (dto.PermissionPaginationResponse, error) {
+	datas, err := ps.permissionRepo.GetPermissionsWithPagination(ctx, nil, req)
 	if err != nil {
 		ps.logger.Error("failed to get permissions", zap.Error(err))
 		return dto.PermissionPaginationResponse{}, fmt.Errorf("failed to get permissions: %w", dto.ErrInternal)
