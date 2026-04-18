@@ -15,6 +15,9 @@ type Order struct {
 	StoreID *uuid.UUID `gorm:"type:uuid" json:"store_id,omitempty"`
 	Store   *Store     `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 
+	StorePlatformID *uuid.UUID     `gorm:"type:uuid" json:"store_platform_id,omitempty"`
+	StorePlatform   *StorePlatform `gorm:"foreignKey:StorePlatformID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
 	// Buyer Snapshot
 	BuyerName  string
 	BuyerPhone string

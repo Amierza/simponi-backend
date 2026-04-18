@@ -292,8 +292,9 @@ type (
 	OrderResponse struct {
 		ID               uuid.UUID             `json:"id"`
 		ExternalOrderID  string                `json:"external_order_id" example:"1234567890"`
-		Ordernumber      string                `json:"ordernumber" example:"ORD-20230901-001"`
+		Ordernumber      string                `json:"order_number" example:"ORD-20230901-001"`
 		StoreID          *uuid.UUID            `json:"store_id,omitempty"`
+		Platform         string                `json:"platform,omitempty"`
 		BuyerName        string                `json:"buyer_name" example:"John Doe"`
 		BuyerEmail       string                `json:"buyer_email" example:"rizkyardiansyah@gmail.com"`
 		BuyerPhone       string                `json:"buyer_phone" example:"+1234567890"`

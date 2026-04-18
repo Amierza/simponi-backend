@@ -56,6 +56,7 @@ func (os *OrderService) GetOrders(ctx context.Context, req response.PaginationRe
 			ShippingAddress:  data.ShippingAddress,
 			ShippingCity:     data.ShippingCity,
 			ShippingProvince: data.ShippingProvince,
+			Platform:         data.StorePlatform.Platform.Name,
 			ShippingPostal:   data.ShippingPostal,
 			ShippingMethod:   data.ShippingMethod,
 			TrackingNumber:   data.TrackingNumber,
