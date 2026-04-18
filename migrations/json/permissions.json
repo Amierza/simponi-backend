@@ -166,6 +166,19 @@
   },
 
   {
+    "id": "abcdef01-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetOrders",
+    "endpoint": "/api/v1/orders",
+    "method": "GET"
+  },
+  {
+    "id": "abcdef02-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetOrderByID",
+    "endpoint": "/api/v1/orders/:id",
+    "method": "GET"
+  },
+
+  {
     "id": "87654321-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateVendor",
     "endpoint": "/api/v1/vendors",

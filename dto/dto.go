@@ -287,6 +287,65 @@ type (
 )
 
 type (
+
+	// Order
+	OrderResponse struct {
+		ID               uuid.UUID             `json:"id"`
+		ExternalOrderID  string                `json:"external_order_id" example:"1234567890"`
+		Ordernumber      string                `json:"ordernumber" example:"ORD-20230901-001"`
+		StoreID          *uuid.UUID            `json:"store_id,omitempty"`
+		BuyerName        string                `json:"buyer_name" example:"John Doe"`
+		BuyerEmail       string                `json:"buyer_email" example:"rizkyardiansyah@gmail.com"`
+		BuyerPhone       string                `json:"buyer_phone" example:"+1234567890"`
+		ReceipentName    string                `json:"receipent_name" example:"Jane Doe"`
+		ReceipentPhone   string                `json:"receipent_phone" example:"+0987654321"`
+		ShippingAddress  string                `json:"shipping_address" example:"123 Main St, Anytown, USA"`
+		ShippingCity     string                `json:"shipping_city" example:"Anytown"`
+		ShippingProvince string                `json:"shipping_province" example:"Anystate"`
+		ShippingPostal   string                `json:"shipping_postal" example:"12345"`
+		ShippingMethod   string                `json:"shipping_method" example:"JNE Regular"`
+		TrackingNumber   string                `json:"tracking_number" example:"JNE1234567890"`
+		SubtotalAmount   int64                 `json:"subtotal_amount" example:"100000"`
+		ShippingFee      int64                 `json:"shipping_fee" example:"15000"`
+		MarketplaceFee   int64                 `json:"marketplace_fee" example:"5000"`
+		DiscountAmount   int64                 `json:"discount_amount" example:"10000"`
+		TaxAmount        int64                 `json:"tax_amount" example:"10000"`
+		TotalAmount      int64                 `json:"total_amount" example:"105000"`
+		NetAmount        int64                 `json:"net_amount" example:"90000"`
+		OrderStatus      string                `json:"order_status" example:"PENDING"`
+		PaymentStatus    string                `json:"payment_status" example:"UNPAID"`
+		PaymentMethod    string                `json:"payment_method" example:"Credit Card"`
+		OrderedAt        *time.Time            `json:"ordered_at,omitempty" example:"2023-09-01T12:00:00Z"`
+		PaidAt           *time.Time            `json:"paid_at,omitempty" example:"2023-09-01T12:30:00Z"`
+		ShippedAt        *time.Time            `json:"shipped_at,omitempty" example:"2023-09-02T08:00:00Z"`
+		CompletedAt      *time.Time            `json:"completed_at,omitempty" example:"2023-09-05T17:00:00Z"`
+		CancelledAt      *time.Time            `json:"cancelled_at,omitempty" example:"2023-09-03T10:00:00Z"`
+		OrderDetails     []OrderDetailResponse `json:"order_details,omitempty"`
+		CreatedAt        time.Time             `json:"created_at"`
+	}
+
+	OrderDetailResponse struct {
+		ID                uuid.UUID  `json:"id"`
+		OrderID           *uuid.UUID `json:"order_id,omitempty"`
+		ExternalProductID *uuid.UUID `json:"external_product_id,omitempty"`
+		Quantity          int        `json:"quantity" example:"2"`
+
+		Order           *OrderResponse           `json:"order,omitempty"`
+		ExternalProduct *ExternalProductResponse `json:"external_product,omitempty"`
+	}
+
+	OrderPaginationResponse struct {
+		response.PaginationResponse
+		Data []OrderResponse `json:"data"`
+	}
+
+	OrderPaginationRepositoryResponse struct {
+		Orders []entity.Order `json:"orders"`
+		response.PaginationResponse
+	}
+)
+
+type (
 	CreateProductRequest struct {
 		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
 		Description string     `json:"description,omitempty" example:"A very nice hat"`
