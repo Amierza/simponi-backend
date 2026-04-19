@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -51,16 +52,27 @@ func mapToVendorResponse(v *entity.Vendor) *dto.VendorResponse {
 }
 
 func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendorRequest) (*dto.VendorResponse, error) {
-	// check if email already exists
+	// ✅ FIX: check duplicate name
+	existingByName, err := vs.vendorRepo.GetVendorByName(ctx, nil, req.Name)
+	if err != nil {
+		vs.logger.Error("failed to check vendor name", zap.String("name", req.Name), zap.Error(err))
+		return nil, fmt.Errorf("failed to check vendor name: %w", dto.ErrInternal)
+	}
+	if existingByName != nil {
+		vs.logger.Warn("vendor name already exists", zap.String("name", req.Name))
+		return nil, fmt.Errorf("vendor with name '%s' already exists: %w", req.Name, dto.ErrAlreadyExists)
+	}
+
+	// check duplicate email
 	if req.Email != "" {
 		_, found, err := vs.vendorRepo.GetVendorByEmail(ctx, nil, req.Email)
 		if err != nil {
 			vs.logger.Error("failed to get vendor by email", zap.String("email", req.Email), zap.Error(err))
-			return nil, fmt.Errorf("failed to get vendor by email: %w", dto.ErrInternal)
+			return nil, fmt.Errorf("failed to check vendor email: %w", dto.ErrInternal)
 		}
 		if found {
 			vs.logger.Warn("vendor email already exists", zap.String("email", req.Email))
-			return nil, fmt.Errorf("vendor already exists: %w", dto.ErrAlreadyExists)
+			return nil, fmt.Errorf("vendor with email '%s' already exists: %w", req.Email, dto.ErrAlreadyExists)
 		}
 	}
 
@@ -74,11 +86,11 @@ func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendor
 	_, found, err := vs.vendorRepo.GetVendorByPhoneNumber(ctx, nil, phoneNumber)
 	if err != nil {
 		vs.logger.Error("failed to get vendor by phone number", zap.String("phone_number", phoneNumber), zap.Error(err))
-		return nil, fmt.Errorf("failed to get vendor by phone number: %w", dto.ErrInternal)
+		return nil, fmt.Errorf("failed to check vendor phone number: %w", dto.ErrInternal)
 	}
 	if found {
-		vs.logger.Warn("vendor already exists", zap.String("phone_number", phoneNumber))
-		return nil, fmt.Errorf("vendor already exists: %w", dto.ErrAlreadyExists)
+		vs.logger.Warn("vendor phone number already exists", zap.String("phone_number", phoneNumber))
+		return nil, fmt.Errorf("vendor with phone number '%s' already exists: %w", phoneNumber, dto.ErrAlreadyExists)
 	}
 
 	newID := uuid.New()
@@ -150,24 +162,37 @@ func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, 
 		return nil, fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
 	}
 
-	// validate email
+	// ✅ FIX: check duplicate name, skip jika nama tidak berubah
+	if !strings.EqualFold(vendor.Name, req.Name) {
+		existingByName, err := vs.vendorRepo.GetVendorByName(ctx, nil, req.Name)
+		if err != nil {
+			vs.logger.Error("failed to check vendor name", zap.String("name", req.Name), zap.Error(err))
+			return nil, fmt.Errorf("failed to check vendor name: %w", dto.ErrInternal)
+		}
+		if existingByName != nil {
+			vs.logger.Warn("vendor name already exists", zap.String("name", req.Name))
+			return nil, fmt.Errorf("vendor with name '%s' already exists: %w", req.Name, dto.ErrAlreadyExists)
+		}
+	}
+	vendor.Name = req.Name
+
+	// validate email — skip jika email tidak berubah
 	if req.Email != nil {
 		if vendor.Email != *req.Email {
 			_, found, err = vs.vendorRepo.GetVendorByEmail(ctx, nil, *req.Email)
 			if err != nil {
 				vs.logger.Error("failed to get vendor by email", zap.String("email", *req.Email), zap.Error(err))
-				return nil, fmt.Errorf("failed to get vendor by email: %w", dto.ErrInternal)
+				return nil, fmt.Errorf("failed to check vendor email: %w", dto.ErrInternal)
 			}
-
 			if found {
 				vs.logger.Warn("vendor email already exists", zap.String("email", *req.Email))
-				return nil, fmt.Errorf("vendor email already exists: %w", dto.ErrAlreadyExists)
+				return nil, fmt.Errorf("vendor with email '%s' already exists: %w", *req.Email, dto.ErrAlreadyExists)
 			}
 		}
 		vendor.Email = *req.Email
 	}
 
-	// validate & normalize phone number
+	// validate & normalize phone number — skip jika phone tidak berubah
 	phoneNumber, err := helper.NormalizePhoneNumber(req.PhoneNumber)
 	if err != nil {
 		vs.logger.Error("invalid phone number", zap.String("phone_number", req.PhoneNumber), zap.Error(err))
@@ -177,11 +202,11 @@ func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, 
 		_, found, err = vs.vendorRepo.GetVendorByPhoneNumber(ctx, nil, phoneNumber)
 		if err != nil {
 			vs.logger.Error("failed to get vendor by phone number", zap.String("phone_number", phoneNumber), zap.Error(err))
-			return nil, fmt.Errorf("failed to get vendor by phone number: %w", dto.ErrInternal)
+			return nil, fmt.Errorf("failed to check vendor phone number: %w", dto.ErrInternal)
 		}
 		if found {
 			vs.logger.Warn("vendor phone number already exists", zap.String("phone_number", phoneNumber))
-			return nil, fmt.Errorf("vendor phone number already exists: %w", dto.ErrAlreadyExists)
+			return nil, fmt.Errorf("vendor with phone number '%s' already exists: %w", phoneNumber, dto.ErrAlreadyExists)
 		}
 		vendor.PhoneNumber = phoneNumber
 	}
@@ -195,7 +220,6 @@ func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, 
 	if req.Description != nil {
 		vendor.Description = *req.Description
 	}
-	vendor.Name = req.Name
 
 	err = vs.vendorRepo.UpdateVendor(ctx, nil, vendor)
 	if err != nil {
