@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/helper"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
@@ -35,6 +36,14 @@ func NewAuthService(userRepo repository.IUserRepository, permissionRepo reposito
 	}
 }
 
+func mapPermissions(perms []*entity.Permission) []string {
+	var result []string
+	for _, p := range perms {
+		result = append(result, p.Name)
+	}
+	return result
+}
+
 func (as *authService) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error) {
 	user, found, err := as.userRepo.GetUserByEmail(ctx, nil, &req.Email)
 	if err != nil {
@@ -58,13 +67,13 @@ func (as *authService) SignIn(ctx context.Context, req dto.SignInRequest) (dto.S
 		return dto.SignInResponse{}, fmt.Errorf("failed to get permissions by role id: %w", dto.ErrInternal)
 	}
 
-	accessToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), permissions, 5*time.Minute)
+	accessToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), mapPermissions(permissions), 5*time.Minute)
 	if err != nil {
 		as.logger.Error("failed to generate access token", zap.String("email", req.Email), zap.Error(err))
 		return dto.SignInResponse{}, fmt.Errorf("failed to generate access token: %w", dto.ErrInternal)
 	}
 
-	refreshToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), permissions, 7*24*time.Hour)
+	refreshToken, err := as.jwt.GenerateToken(user.ID.String(), user.RoleID.String(), mapPermissions(permissions), 7*24*time.Hour)
 	if err != nil {
 		as.logger.Error("failed to generate refresh token", zap.String("email", req.Email), zap.Error(err))
 		return dto.SignInResponse{}, fmt.Errorf("failed to generate refresh token: %w", dto.ErrInternal)

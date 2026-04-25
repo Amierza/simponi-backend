@@ -136,8 +136,7 @@ var (
 	ErrAlreadyExists = errors.New("already exists")
 	ErrInternal      = errors.New("error internal")
 	ErrUnauthorized  = errors.New("unauthorized")
-
-	// Input
+	ErrForbidden     = errors.New("forbidden")
 
 	// Authentication
 	ErrIncorrectPassword = errors.New("credential incorrect")
@@ -191,6 +190,9 @@ type (
 		RefreshToken string `json:"refresh_token" binding:"required" example:"<refresh_token_here>"`
 	}
 	RefreshTokenResponse struct {
+		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
+	}
+	ImpersonateResponse struct {
 		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
 	}
 )
