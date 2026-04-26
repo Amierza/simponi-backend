@@ -57,6 +57,10 @@ func main() {
 		userService = service.NewUserService(userRepo, roleRepo, zapLogger, jwt)
 		userHandler = handler.NewUserHandler(userService, zapLogger)
 
+		// Impersonate
+		impersonateService = service.NewImpersonateService(userRepo, permissionRepo, zapLogger, jwt)
+		impersonateHandler = handler.NewImpersonateHandler(impersonateService, zapLogger)
+
 		// Authentication
 		authService = service.NewAuthService(userRepo, permissionRepo, zapLogger, jwt)
 		authHandler = handler.NewAuthHandler(authService, zapLogger)
@@ -102,6 +106,7 @@ func main() {
 	routes.Upload(server, uploadHandler, jwt)
 	routes.Auth(server, authHandler)
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
+	routes.Impersonate(server, impersonateHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
 	routes.InventoryLog(server, inventoryLogHandler, jwt, rolePermissionRepo)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)

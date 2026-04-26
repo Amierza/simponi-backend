@@ -35,8 +35,16 @@ func Authentication(jwtService jwt.IJWT) gin.HandlerFunc {
 			return
 		}
 
+		// 🔥 SET SEMUA YANG DIBUTUHKAN
 		ctx.Set("user_id", claims.UserID)
 		ctx.Set("role_id", claims.RoleID)
+
+		// 🔥 INI YANG PENTING
+		ctx.Set("claims", claims)
+
+		// optional (biar gampang akses)
+		ctx.Set("permissions", claims.Permissions)
+		ctx.Set("is_impersonating", claims.IsImpersonating)
 
 		ctx.Next()
 	}

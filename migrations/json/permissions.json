@@ -20,6 +20,13 @@
     "method": "GET",
     "module": "permission"
   },
+  {
+    "id": "dad8b9f0-dbad-4895-af7b-367cae2ba00c",
+    "name": "StartImpersonate",
+    "endpoint": "/api/v1/impersonate",
+    "method": "POST",
+    "module": "impersonate"
+  },
 
   {
     "id": "328359e3-7abc-45b4-8fa6-a07b3e0990f5",
