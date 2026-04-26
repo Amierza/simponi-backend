@@ -37,6 +37,9 @@ func Authentication(jwtService jwt.IJWT) gin.HandlerFunc {
 
 		ctx.Set("user_id", claims.UserID)
 		ctx.Set("role_id", claims.RoleID)
+		ctx.Set("claims", claims)
+		ctx.Set("permissions", claims.Permissions)
+		ctx.Set("is_impersonating", claims.IsImpersonating)
 
 		ctx.Next()
 	}
