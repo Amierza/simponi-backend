@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/Amierza/simponi-backend/dto"
@@ -63,7 +62,6 @@ func (oh *orderHandler) GetOrders(ctx *gin.Context) {
 func (oh *orderHandler) GetOrderByID(ctx *gin.Context) {
 	orderIDStr := ctx.Param("id")
 	orderID, err := uuid.Parse(orderIDStr)
-	log.Println(orderID)
 	if err != nil {
 		oh.logger.Error("invalid order ID format", zap.String("order_id", orderIDStr), zap.Error(err))
 		status := mapErrorStatus(err)

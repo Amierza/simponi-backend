@@ -110,8 +110,23 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 }
 
 func (or *OrderRepository) GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID) (*entity.Order, bool, error) {
+	if tx == nil {
+		tx = or.db
+	}
+
 	var order entity.Order
-	if err := tx.WithContext(ctx).First(&order, "id = ?", orderID).Error; err != nil {
+	if err := tx.WithContext(ctx).
+		Preload("StorePlatform").
+		Preload("StorePlatform.Store").
+		Preload("StorePlatform.Platform").
+		Preload("OrderDetails").
+		Preload("OrderDetails.ExternalProduct").
+		Preload("OrderDetails.ExternalProduct.Product").
+		Preload("OrderDetails.ExternalProduct.Product.Images").
+		Preload("OrderDetails.ExternalProduct.StorePlatform").
+		Preload("OrderDetails.ExternalProduct.StorePlatform.Store").
+		Preload("OrderDetails.ExternalProduct.StorePlatform.Platform").
+		First(&order, "id = ?", orderID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, false, nil
 		}

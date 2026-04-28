@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
 	"github.com/Amierza/simponi-backend/response"
@@ -24,6 +26,57 @@ type (
 		jwtService jwt.IJWT
 	}
 )
+
+func mapOrderDetailResponse(orderDetails []*entity.OrderDetail) []dto.OrderDetailResponse {
+	orderDetailResponses := make([]dto.OrderDetailResponse, 0, len(orderDetails))
+
+	for _, orderDetail := range orderDetails {
+		orderDetailResponse := dto.OrderDetailResponse{
+			ID:                orderDetail.ID,
+			OrderID:           orderDetail.OrderID,
+			ExternalProductID: orderDetail.ExternalProductID,
+			Quantity:          orderDetail.Quantity,
+		}
+
+		if orderDetail.ExternalProduct != nil {
+			externalProduct := orderDetail.ExternalProduct
+			imageURL := ""
+			productName := ""
+			platformName := ""
+			storePlatformName := ""
+
+			if externalProduct.Product != nil {
+				productName = externalProduct.Product.Name
+				if len(externalProduct.Product.Images) > 0 {
+					imageURL = externalProduct.Product.Images[0].ImageURL
+				}
+			}
+
+			if externalProduct.StorePlatform.Platform != nil {
+				platformName = externalProduct.StorePlatform.Platform.Name
+			}
+
+			if externalProduct.StorePlatform.Store != nil && externalProduct.StorePlatform.Platform != nil {
+				storePlatformName = strings.TrimSpace(externalProduct.StorePlatform.Store.Name + " - " + externalProduct.StorePlatform.Platform.Name)
+			}
+
+			orderDetailResponse.ExternalProduct = &dto.ExternalProductResponse{
+				ID:                externalProduct.ID,
+				ImageURL:          imageURL,
+				ProductName:       productName,
+				Platform:          platformName,
+				StorePlatformName: storePlatformName,
+				Price:             externalProduct.Price,
+				CreatedAt:         externalProduct.CreatedAt,
+				UpdatedAt:         externalProduct.UpdatedAt,
+			}
+		}
+
+		orderDetailResponses = append(orderDetailResponses, orderDetailResponse)
+	}
+
+	return orderDetailResponses
+}
 
 func NewOrderService(orderRepo repository.IOrderRepository, logger *zap.Logger, jwtService jwt.IJWT) *OrderService {
 	return &OrderService{
@@ -107,11 +160,17 @@ func (os *OrderService) GetOrderByID(ctx context.Context, orderID *uuid.UUID) (d
 
 	os.logger.Info("success to get order by ID", zap.String("order_id", orderID.String()))
 
+	platform := ""
+	if order.StorePlatform != nil && order.StorePlatform.Platform != nil {
+		platform = order.StorePlatform.Platform.Name
+	}
+
 	return dto.OrderResponse{
 		ID:               order.ID,
 		ExternalOrderID:  order.ExternalOrderID,
 		Ordernumber:      order.OrderNumber,
 		StoreID:          order.StoreID,
+		Platform:         platform,
 		BuyerName:        order.BuyerName,
 		BuyerPhone:       order.BuyerPhone,
 		BuyerEmail:       order.BuyerEmail,
@@ -140,7 +199,7 @@ func (os *OrderService) GetOrderByID(ctx context.Context, orderID *uuid.UUID) (d
 		CancelledAt:      order.CancelledAt,
 		CreatedAt:        order.CreatedAt,
 
-		OrderDetails: []dto.OrderDetailResponse{},
+		OrderDetails: mapOrderDetailResponse(order.OrderDetails),
 	}, nil
 
 }
