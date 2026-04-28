@@ -115,6 +115,42 @@
   },
 
   {
+    "id": "a1f2c3d4-9b12-4a6e-8c21-1e9a7b2c3d45",
+    "name": "CreateStore",
+    "endpoint": "/api/v1/stores",
+    "method": "POST",
+    "module": "store"
+  },
+  {
+    "id": "b2e3d4f5-8c23-4b7f-9d32-2f8b6c3d4e56",
+    "name": "GetStores",
+    "endpoint": "/api/v1/stores",
+    "method": "GET",
+    "module": "store"
+  },
+  {
+    "id": "c3f4e5a6-7d34-4c8a-ae43-3a7c5d4e5f67",
+    "name": "GetStoreByID",
+    "endpoint": "/api/v1/stores/:id",
+    "method": "GET",
+    "module": "store"
+  },
+  {
+    "id": "d4a5b6c7-6e45-4d9b-bf54-4b6d4e5f6a78",
+    "name": "UpdateStore",
+    "endpoint": "/api/v1/stores/:id",
+    "method": "PUT",
+    "module": "store"
+  },
+  {
+    "id": "e5b6c7d8-5f56-4eac-c065-5c5e6f7a8b89",
+    "name": "DeleteStoreByID",
+    "endpoint": "/api/v1/stores/:id",
+    "method": "DELETE",
+    "module": "store"
+  },
+
+  {
     "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateLog",
     "endpoint": "/api/v1/logs/logs",

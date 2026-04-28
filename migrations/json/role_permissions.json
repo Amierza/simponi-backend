@@ -337,5 +337,30 @@
     "id": "ac100012-0ea2-426c-89e7-e25e71c0b88f",
     "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
     "permission_id": "0ea2426c-89e7-426c-b88f-222222222222"
+  },
+  {
+    "id": "f1a2b3c4-1111-4a6e-8c21-aaaabbbb0001",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "a1f2c3d4-9b12-4a6e-8c21-1e9a7b2c3d45"
+  },
+  {
+    "id": "f2b3c4d5-2222-4b7f-9d32-bbbbcccc0002",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "b2e3d4f5-8c23-4b7f-9d32-2f8b6c3d4e56"
+  },
+  {
+    "id": "f3c4d5e6-3333-4c8a-ae43-ccccdddd0003",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "c3f4e5a6-7d34-4c8a-ae43-3a7c5d4e5f67"
+  },
+  {
+    "id": "f4d5e6a7-4444-4d9b-bf54-ddddeeee0004",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "d4a5b6c7-6e45-4d9b-bf54-4b6d4e5f6a78"
+  },
+  {
+    "id": "f5e6a7b8-5555-4eac-c065-eeeeffff0005",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "e5b6c7d8-5f56-4eac-c065-5c5e6f7a8b89"
   }
 ]

@@ -98,6 +98,11 @@ func main() {
 		vendorRepo    = repository.NewVendorRepository(db)
 		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
 		vendorHandler = handler.NewVendorHandler(vendorService, zapLogger)
+
+		// Store
+		storeRepo    = repository.NewStoreRepository(db)
+		storeService = service.NewStoreService(storeRepo, zapLogger, jwt)
+		storeHandler = handler.NewStoreHandler(storeService, zapLogger)
 	)
 
 	server := gin.Default()
@@ -115,6 +120,7 @@ func main() {
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
 	routes.Permission(server, permissionHandler, jwt, rolePermissionRepo)
 	routes.Role(server, roleHandler, jwt, rolePermissionRepo)
+	routes.Store(server, storeHandler, jwt, rolePermissionRepo)
 
 	server.Static("/uploads", "./uploads")
 

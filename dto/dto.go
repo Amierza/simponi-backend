@@ -562,3 +562,36 @@ type (
 		Vendors []*entity.Vendor
 	}
 )
+
+// Store
+type (
+	StoreResponse struct {
+		ID          uuid.UUID `json:"id"`
+		Name        string    `json:"name"`
+		Description string    `json:"description"`
+		ImageURL    string    `json:"image_url"`
+		IsActive    bool      `json:"is_active"`
+		// User        UserResponse `json:"user"` // karena nanti akan diubah
+	}
+	CreateStoreRequest struct {
+		Name        string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL    string     `json:"image_url,omitempty"`
+		Description string     `json:"description,omitempty"`
+		UserID      *uuid.UUID `json:"-"`
+	}
+	UpdateStoreRequest struct {
+		ID          uuid.UUID `json:"-"`
+		Name        string    `json:"name" binding:"required,min=3,max=100"`
+		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
+		Description *string   `json:"description,omitempty" binding:"omitempty"`
+		IsActive    *bool     `json:"is_active,omitempty" binding:"omitempty"`
+	}
+	StorePaginationResponse struct {
+		response.PaginationResponse
+		Data []*StoreResponse `json:"data"`
+	}
+	StorePaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Stores []*entity.Store
+	}
+)
