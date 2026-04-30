@@ -188,18 +188,18 @@ func (rs *roleService) UpdateRoleByRoleID(ctx context.Context, roleID *uuid.UUID
 	}
 
 	err = rs.tx.Run(ctx, func(tx *gorm.DB) error {
-		err = rs.roleRepo.UpdateRoleByRoleID(ctx, nil, role)
+		err = rs.roleRepo.UpdateRoleByRoleID(ctx, tx, role)
 		if err != nil {
 			rs.logger.Error("failed to update role", zap.String("id", roleID.String()), zap.Error(err))
 			return fmt.Errorf("failed to update role: %w", dto.ErrInternal)
 		}
 
-		if err := rs.rolePermissionRepo.DeleteRolePermissionsByRoleID(ctx, nil, &role.ID); err != nil {
+		if err := rs.rolePermissionRepo.DeleteRolePermissionsByRoleID(ctx, tx, &role.ID); err != nil {
 			return fmt.Errorf("failed to delete role permissions by role id: %w", dto.ErrInternal)
 		}
 
 		for _, permission := range permissions {
-			_, err := rs.rolePermissionRepo.CreateRolePermission(ctx, nil, &entity.RolePermission{
+			_, err := rs.rolePermissionRepo.CreateRolePermission(ctx, tx, &entity.RolePermission{
 				ID:           uuid.New(),
 				RoleID:       &role.ID,
 				PermissionID: &permission.ID,

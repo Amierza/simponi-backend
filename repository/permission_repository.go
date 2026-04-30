@@ -72,7 +72,7 @@ func (pr *permissionRepository) GetPermissionsByRoleID(ctx context.Context, tx *
 		Table("permissions p").
 		Select("p.*").
 		Joins("JOIN role_permissions rp ON rp.permission_id = p.id").
-		Where("rp.role_id = ?", *roleID).
+		Where("rp.role_id = ? AND rp.deleted_at IS NULL", *roleID).
 		Find(&permissions).Error
 	if err != nil {
 		return nil, err
