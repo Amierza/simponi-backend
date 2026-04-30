@@ -251,6 +251,15 @@ type (
 
 // Product
 type (
+	// Product Pagination
+	ProductPaginationRequest struct {
+		Search		string	`form:"search"`
+		Page		int		`form:"page"`
+		PerPage		int		`form:"per_page"`
+		SKU			string	`form:"sku"`
+		CategoryID	string	`form:"category_id"`
+	}
+
 	// Product Category
 	ProductCategoryRequest struct {
 		Name string `json:"name" binding:"required" example:"Electronics"`
