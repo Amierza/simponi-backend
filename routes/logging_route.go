@@ -11,7 +11,6 @@ import (
 func Log(route *gin.Engine, logHandler handler.ILogHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/logs").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateLog"), logHandler.CreateLog)
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetLogs"), logHandler.GetLogs)
 	}
 }

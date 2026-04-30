@@ -321,25 +321,10 @@
   {
     "id": "55555555-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetLogs",
-    "endpoint": "/api/v1/logs/logs",
+    "endpoint": "/api/v1/logs",
     "method": "GET",
     "module": "log"
   },
-  {
-    "id": "66666666-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetLogsByStore",
-    "endpoint": "/api/v1/logs/logs/store/:storeID",
-    "method": "GET",
-    "module": "log"
-  },
-  {
-    "id": "77777777-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetLogsByDateRange",
-    "endpoint": "/api/v1/logs/logs/date-range",
-    "method": "GET",
-    "module": "log"
-  },
-
   {
     "id": "0ea2426c-89e7-426c-b88f-222222222222",
     "name": "GetInventoryLogs",
