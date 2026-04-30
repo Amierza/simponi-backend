@@ -18,8 +18,7 @@ type (
 		CreateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
 		CreateProductImage(ctx context.Context, tx *gorm.DB, productImage *entity.ProductImage) (*entity.ProductImage, error)
 		AttachProductImageToProduct(ctx context.Context, tx *gorm.DB, imageID *uuid.UUID, productID *uuid.UUID) error
-		GetProducts(ctx context.Context, tx *gorm.DB, req *dto.ProductPaginationRequest) (dto.ProductPaginationRepositoryResponse, error)
-		GetProductCategory(ctx context.Context, tx *gorm.DB) ([]entity.ProductCategory, error)
+		GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error)
 		GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) (*entity.Product, bool, error)
 		GetProductBySKU(ctx context.Context, tx *gorm.DB, sku string) (*entity.Product, bool, error)
@@ -84,7 +83,7 @@ func (pr *productRepository) AttachProductImageToProduct(ctx context.Context, tx
 	return nil
 }
 
-func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *dto.ProductPaginationRequest) (dto.ProductPaginationRepositoryResponse, error) {
+func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = pr.db
 	}
@@ -141,21 +140,6 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 			Count:   count,
 		},
 	}, nil
-}
-
-func (pr *productRepository) GetProductCategory(ctx context.Context, tx *gorm.DB) ([]entity.ProductCategory, error) {
-	if tx == nil {
-		tx = pr.db
-	}
-
-	var categories []entity.ProductCategory
-
-	if err := tx.WithContext(ctx).
-		Model(&entity.ProductCategory{}).
-		Find(&categories).Error; err != nil {
-			return nil, err
-		}
-	return categories, nil
 }
 
 func (pr *productRepository) GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error) {

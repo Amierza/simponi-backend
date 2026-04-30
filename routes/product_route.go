@@ -12,7 +12,6 @@ func Product(route *gin.Engine, productHandler handler.IProductHandler, jwtServi
 	routes := route.Group("/api/v1/products").Use(middleware.Authentication(jwtService))
 	{
 		routes.GET("/stats", middleware.RBAC(rolePermissionRepo, "GetProductStats"), productHandler.GetProductStats)
-		routes.GET("/category", middleware.RBAC(rolePermissionRepo, "GetProductCategory"), productHandler.GetProductCategory)
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateProduct"), productHandler.CreateProduct)
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetProducts"), productHandler.GetProducts)
 		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetProductByID"), productHandler.GetProductByID)
