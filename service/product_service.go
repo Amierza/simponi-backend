@@ -9,6 +9,7 @@ import (
 	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
+	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -16,8 +17,7 @@ import (
 type (
 	IProductService interface {
 		CreateProduct(ctx context.Context, req *dto.CreateProductRequest) (dto.ProductResponse, error)
-		GetProducts(ctx context.Context, req *dto.ProductPaginationRequest) (dto.ProductPaginationResponse, error)
-		GetProductCategory(ctx context.Context) ([]dto.ProductCategoryResponse, error)
+		GetProducts(ctx context.Context, req *response.PaginationRequest) (dto.ProductPaginationResponse, error)
 		GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error)
 		GetProductByID(ctx context.Context, productID *uuid.UUID) (dto.ProductResponse, error)
 		GetProductBySKU(ctx context.Context, sku string) (dto.ProductResponse, error)
@@ -181,7 +181,7 @@ func (ps *productService) CreateProduct(ctx context.Context, req *dto.CreateProd
 	return MapToProductResponse(*newProduct), nil
 }
 
-func (ps *productService) GetProducts(ctx context.Context, req *dto.ProductPaginationRequest) (dto.ProductPaginationResponse, error) {
+func (ps *productService) GetProducts(ctx context.Context, req *response.PaginationRequest) (dto.ProductPaginationResponse, error) {
 	datas, err := ps.productRepo.GetProducts(ctx, nil, req)
 
 	if err != nil {
@@ -201,27 +201,6 @@ func (ps *productService) GetProducts(ctx context.Context, req *dto.ProductPagin
 		PaginationResponse: datas.PaginationResponse,
 	}, nil
 }
-
-func (ps *productService) GetProductCategory(ctx context.Context) ([]dto.ProductCategoryResponse, error) {
-	categories, err := ps.productRepo.GetProductCategory(ctx, nil)
-	if err != nil {
-		ps.logger.Error("failed to get product categories", zap.Error(err))
-		return nil, fmt.Errorf("failed to get product stats: %w", dto.ErrInternal)
-	}
-	
-	var categoryResponses []dto.ProductCategoryResponse
-	for _, category := range categories {
-        categoryResponses = append(categoryResponses, dto.ProductCategoryResponse{
-            ID:   category.ID,
-            Name: category.Name,
-        })
-    }
-
-	ps.logger.Info("success to get product categories", zap.Int("count", len(categoryResponses)))
-
-	return categoryResponses, nil
-}
-
 
 func (ps *productService) GetProductStats(ctx context.Context) (dto.ProductStatsResponse, error) {
 	stats, err := ps.productRepo.GetProductStats(ctx, nil)
