@@ -29,6 +29,19 @@ func NewUploadHandler(uploadService service.IUploadService, logger *zap.Logger) 
 	}
 }
 
+// Upload godoc
+//
+//	@Summary		Upload file(s)
+//	@Description	Upload single or multiple images using multipart/form-data (key: files)
+//	@Tags			Uploads
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			files	formData	file	true	"Upload file(s)"
+//	@Success		200		{object}	dto.UploadSuccessSingleResponse
+//	@Success		200		{object}	dto.UploadSuccessMultipleResponse
+//	@Failure		400		{object}	dto.ErrorResponse
+//	@Router			/uploads [post]
 func (uh *uploadHandler) Upload(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil || form.File == nil {

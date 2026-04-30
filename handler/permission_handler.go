@@ -29,6 +29,25 @@ func NewPermissionHandler(permissionService service.IPermissionService, logger *
 	}
 }
 
+// GetPermissions godoc
+//
+//	@Summary		Get list of permissions
+//	@Description	Get all permissions or paginated permissions (Requires permission: GetPermissions)
+//	@Description	Set query param `pagination=false` to disable pagination
+//	@Tags			Permissions
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			pagination	query		string									false	"Enable pagination (true/false), default: true"
+//	@Param			page		query		int										false	"Page number (if pagination=true)"
+//	@Param			limit		query		int										false	"Items per page (if pagination=true)"
+//	@Success		200			{object}	dto.PermissionPaginationResponseWrapper	"Success (with pagination)"
+//	@Success		200			{object}	dto.PermissionResponseWrapper			"Success (without pagination)"
+//	@Failure		400			{object}	dto.ErrorResponse						"Bad Request"
+//	@Failure		401			{object}	dto.ErrorResponse						"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse						"Forbidden"
+//	@Failure		500			{object}	dto.ErrorResponse						"Internal Server Error"
+//	@Router			/permissions [get]
 func (ph *permissionHandler) GetPermissions(ctx *gin.Context) {
 	paginationParam := ctx.DefaultQuery("pagination", "true")
 	usePagination := paginationParam != "false"

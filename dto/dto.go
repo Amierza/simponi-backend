@@ -194,6 +194,8 @@ type (
 	RefreshTokenResponse struct {
 		AccessToken string `json:"access_token" binding:"required" example:"<new_access_token_here>"`
 	}
+
+	// Impersonate
 	ImpersonateResponse struct {
 		AccessToken string `json:"access_token" example:"<new_access_token_here>"`
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Amierza/simponi-backend/cmd"
 	"github.com/Amierza/simponi-backend/config/database"
+	_ "github.com/Amierza/simponi-backend/docs"
 	"github.com/Amierza/simponi-backend/handler"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/logger"
@@ -14,8 +15,75 @@ import (
 	"github.com/Amierza/simponi-backend/routes"
 	"github.com/Amierza/simponi-backend/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+//	@title			Simponi Backend API
+//	@version		1.0
+//	@description	REST API for Simponi - multi-store inventory and omnichannel management system.
+//	@description	This API supports store management, product management, external product integration, vendor management, and role-based access control (RBAC).
+
+//	@termsOfService	https://simponi.app/terms/
+
+//	@contact.name	Simponi Support
+//	@contact.email	support@simponi.app
+
+//	@license.name	MIT
+//	@license.url	https://opensource.org/licenses/MIT
+
+//	@host		localhost:8080
+//	@BasePath	/api/v1
+
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Use JWT token with format: Bearer <your_token>
+
+//	@tag.name			Auth
+//	@tag.description	Authentication (signin, refresh token) and token management
+
+//	@tag.name			Users
+//	@tag.description	User management and profile operations
+
+//	@tag.name			Roles
+//	@tag.description	Role management and RBAC configuration
+
+//	@tag.name			Permissions
+//	@tag.description	Permission management for access control
+
+//	@tag.name			Stores
+//	@tag.description	Store management and store-related operations
+
+//	@tag.name			Store Users
+//	@tag.description	Manage users within a store (membership & access)
+
+//	@tag.name			Products
+//	@tag.description	Product and inventory management
+
+//	@tag.name			External Products
+//	@tag.description	External product integration (Shopee, Tokopedia, etc.)
+
+//	@tag.name			Vendors
+//	@tag.description	Vendor and supplier management
+
+//	@tag.name			Orders
+//	@tag.description	Order and transaction management
+
+//	@tag.name			Logs
+//	@tag.description	System activity logs
+
+//	@tag.name			Inventory Logs
+//	@tag.description	Inventory movement and stock change logs
+
+//	@tag.name			Uploads
+//	@tag.description	File upload and asset management
+
+//	@tag.name			Impersonate
+//	@tag.description	Admin impersonation for debugging and support
+
+// @externalDocs.description	OpenAPI Specification
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	db := database.SetUpPostgreSQLConnection()
 	defer database.ClosePostgreSQLConnection(db)
@@ -136,6 +204,8 @@ func main() {
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
 	routes.InventoryLog(server, inventoryLogHandler, jwt, rolePermissionRepo)
+	// swagger endpoint
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server.Static("/uploads", "./uploads")
 

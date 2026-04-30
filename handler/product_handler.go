@@ -36,6 +36,23 @@ func NewProductHandler(productService service.IProductService, logger *zap.Logge
 	}
 }
 
+// CreateProduct godoc
+//
+//	@Summary		Create product
+//	@Description	Create a new product inside a store (Requires permission: CreateProduct)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Param			payload		body		dto.CreateProductRequest	true	"Create product request"
+//	@Success		201			{object}	dto.ProductResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid input / UUID"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		409			{object}	dto.ErrorResponse			"Conflict (SKU duplicate)"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id}/products [post]
 func (ph *productHandler) CreateProduct(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -68,6 +85,23 @@ func (ph *productHandler) CreateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+// GetProducts godoc
+//
+//	@Summary		Get products in store
+//	@Description	Get paginated products in a store (Requires permission: GetProducts)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Param			page		query		int							false	"Page number"
+//	@Param			limit		query		int							false	"Items per page"
+//	@Success		200			{object}	dto.ProductsResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id}/products [get]
 func (ph *productHandler) GetProducts(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -104,6 +138,21 @@ func (ph *productHandler) GetProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetProductStats godoc
+//
+//	@Summary		Get product statistics
+//	@Description	Get aggregated product statistics in a store (Requires permission: GetProductStats)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Success		200			{object}	dto.ProductStatsResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id}/products/stats [get]
 func (ph *productHandler) GetProductStats(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -126,6 +175,23 @@ func (ph *productHandler) GetProductStats(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetProductByStoreIDAndProductID godoc
+//
+//	@Summary		Get product detail
+//	@Description	Get product detail by store ID and product ID (Requires permission: GetProductByStoreIDAndProductID)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Param			product_id	path		string						true	"Product ID (UUID)"
+//	@Success		200			{object}	dto.ProductResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse			"Product not found"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id} [get]
 func (ph *productHandler) GetProductByStoreIDAndProductID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -157,6 +223,24 @@ func (ph *productHandler) GetProductByStoreIDAndProductID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateProductByStoreIDAndProductID godoc
+//
+//	@Summary		Update product
+//	@Description	Update product information (Requires permission: UpdateProductByStoreIDAndProductID)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Param			product_id	path		string						true	"Product ID (UUID)"
+//	@Param			payload		body		dto.UpdateProductRequest	true	"Update product request"
+//	@Success		200			{object}	dto.ProductResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid input"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse			"Product not found"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id} [put]
 func (ph *productHandler) UpdateProductByStoreIDAndProductID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -199,6 +283,24 @@ func (ph *productHandler) UpdateProductByStoreIDAndProductID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateStockByStoreIDAndProductID godoc
+//
+//	@Summary		Update product stock
+//	@Description	Update product stock with source tracking (Requires permission: UpdateStockByStoreIDAndProductID)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			product_id	path		string							true	"Product ID (UUID)"
+//	@Param			payload		body		dto.UpdateStockRequest			true	"Stock update request"
+//	@Success		200			{object}	dto.ProductEmptyResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid input"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Product not found"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id}/stock [patch]
 func (ph *productHandler) UpdateStockByStoreIDAndProductID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -240,6 +342,23 @@ func (ph *productHandler) UpdateStockByStoreIDAndProductID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// DeleteProductByStoreIDAndProductID godoc
+//
+//	@Summary		Delete product
+//	@Description	Delete product by ID (Requires permission: DeleteProductByStoreIDAndProductID)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			product_id	path		string							true	"Product ID (UUID)"
+//	@Success		200			{object}	dto.ProductEmptyResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Product not found"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id} [delete]
 func (ph *productHandler) DeleteProductByStoreIDAndProductID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)

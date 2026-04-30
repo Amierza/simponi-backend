@@ -34,6 +34,22 @@ func NewRoleHandler(roleService service.IRoleService, logger *zap.Logger) *roleH
 	}
 }
 
+// CreateRole godoc
+//
+//	@Summary		Create new role
+//	@Description	Create a new role with permissions (Requires permission: CreateRole)
+//	@Tags			Roles
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.CreateRoleRequest	true	"Create role request"
+//	@Success		201		{object}	dto.RoleResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		409		{object}	dto.ErrorResponse		"Conflict - Role already exists"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/roles [post]
 func (rh *roleHandler) CreateRole(ctx *gin.Context) {
 	var payload dto.CreateRoleRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -56,6 +72,22 @@ func (rh *roleHandler) CreateRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+// GetRoles godoc
+//
+//	@Summary		Get list of roles
+//	@Description	Get paginated roles (Requires permission: GetRoles)
+//	@Tags			Roles
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int							false	"Page number"
+//	@Param			limit	query		int							false	"Items per page"
+//	@Success		200		{object}	dto.RolesResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse			"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		500		{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/roles [get]
 func (rh *roleHandler) GetRoles(ctx *gin.Context) {
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
@@ -83,6 +115,22 @@ func (rh *roleHandler) GetRoles(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetRoleByRoleID godoc
+//
+//	@Summary		Get role by ID
+//	@Description	Get role detail with permissions (Requires permission: GetRoleByRoleID)
+//	@Tags			Roles
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			role_id	path		string					true	"Role ID (UUID)"
+//	@Success		200		{object}	dto.RoleResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Invalid UUID"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		404		{object}	dto.ErrorResponse		"Role not found"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/roles/{role_id} [get]
 func (rh *roleHandler) GetRoleByRoleID(ctx *gin.Context) {
 	roleIDStr := ctx.Param("role_id")
 	roleID, err := uuid.Parse(roleIDStr)
@@ -105,8 +153,25 @@ func (rh *roleHandler) GetRoleByRoleID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateRoleByRoleID godoc
+//
+//	@Summary		Update role
+//	@Description	Update role and its permissions (Requires permission: UpdateRoleByRoleID)
+//	@Tags			Roles
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			role_id	path		string					true	"Role ID (UUID)"
+//	@Param			payload	body		dto.UpdateRoleRequest	true	"Update role request"
+//	@Success		200		{object}	dto.RoleResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Invalid input"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		404		{object}	dto.ErrorResponse		"Role not found"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/roles/{role_id} [put]
 func (rh *roleHandler) UpdateRoleByRoleID(ctx *gin.Context) {
-	roleIDStr := ctx.Param("id")
+	roleIDStr := ctx.Param("role_id")
 	roleID, err := uuid.Parse(roleIDStr)
 	if err != nil {
 		rh.logger.Error("invalid role ID", zap.String("id", roleIDStr), zap.Error(err))
@@ -136,8 +201,23 @@ func (rh *roleHandler) UpdateRoleByRoleID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// DeleteRoleByRoleID godoc
+//
+//	@Summary		Delete role
+//	@Description	Delete role by ID (Requires permission: DeleteRoleByRoleID)
+//	@Tags			Roles
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	dto.RoleEmptyResponseWrapper	"Success"
+//	@Failure		400	{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401	{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403	{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404	{object}	dto.ErrorResponse				"Role not found"
+//	@Failure		500	{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/roles/{role_id} [delete]
 func (rh *roleHandler) DeleteRoleByRoleID(ctx *gin.Context) {
-	roleIDStr := ctx.Param("id")
+	roleIDStr := ctx.Param("role_id")
 	roleID, err := uuid.Parse(roleIDStr)
 	if err != nil {
 		rh.logger.Error("invalid role ID", zap.String("id", roleIDStr), zap.Error(err))

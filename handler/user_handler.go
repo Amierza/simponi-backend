@@ -36,6 +36,22 @@ func NewUserHandler(userService service.IUserService, logger *zap.Logger) *userH
 	}
 }
 
+// CreateUser godoc
+//
+//	@Summary		Create new user
+//	@Description	Create a new user (Requires permission: CreateUser)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.CreateUserRequest	true	"Create user request"
+//	@Success		201		{object}	dto.UserResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden - Insufficient permission"
+//	@Failure		409		{object}	dto.ErrorResponse		"Conflict - User already exists"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/users [post]
 func (uh *userHandler) CreateUser(ctx *gin.Context) {
 	var payload dto.CreateUserRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -58,6 +74,22 @@ func (uh *userHandler) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+// GetUsers godoc
+//
+//	@Summary		Get list of users
+//	@Description	Get paginated users (Requires permission: GetUsers)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int							false	"Page number"
+//	@Param			limit	query		int							false	"Items per page"
+//	@Success		200		{object}	dto.UsersResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse			"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		500		{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/users [get]
 func (uh *userHandler) GetUsers(ctx *gin.Context) {
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
@@ -85,6 +117,22 @@ func (uh *userHandler) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetUserByUserID godoc
+//
+//	@Summary		Get user by ID
+//	@Description	Get user detail by user ID (Requires permission: GetUserByUserID)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	path		string					true	"User ID (UUID)"
+//	@Success		200		{object}	dto.UserResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Invalid UUID"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		404		{object}	dto.ErrorResponse		"User not found"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/users/{user_id} [get]
 func (uh *userHandler) GetUserByUserID(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -107,6 +155,19 @@ func (uh *userHandler) GetUserByUserID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetUserProfile godoc
+//
+//	@Summary		Get current user profile
+//	@Description	Get authenticated user profile (Requires permission: GetUserProfile)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	dto.UserResponseWrapper	"Success"
+//	@Failure		401	{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403	{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		500	{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/users/profile [get]
 func (uh *userHandler) GetUserProfile(ctx *gin.Context) {
 	result, err := uh.userService.GetUserProfile(ctx)
 	if err != nil {
@@ -120,6 +181,23 @@ func (uh *userHandler) GetUserProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateUserByUserID godoc
+//
+//	@Summary		Update user
+//	@Description	Update user data by ID (Requires permission: UpdateUserByUserID)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	path		string					true	"User ID (UUID)"
+//	@Param			payload	body		dto.UpdateUserRequest	true	"Update user request"
+//	@Success		200		{object}	dto.UserResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Invalid input"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		404		{object}	dto.ErrorResponse		"User not found"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/users/{user_id} [put]
 func (uh *userHandler) UpdateUserByUserID(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -152,6 +230,23 @@ func (uh *userHandler) UpdateUserByUserID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateUserStatusByUserID godoc
+//
+//	@Summary		Update user status
+//	@Description	Update user status (active/inactive) (Requires permission: UpdateUserStatusByUserID)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	path		string					true	"User ID (UUID)"
+//	@Param			payload	body		dto.UpdateUserStatus	true	"Update status request"
+//	@Success		200		{object}	dto.UserResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse		"Invalid input"
+//	@Failure		401		{object}	dto.ErrorResponse		"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse		"Forbidden"
+//	@Failure		404		{object}	dto.ErrorResponse		"User not found"
+//	@Failure		500		{object}	dto.ErrorResponse		"Internal Server Error"
+//	@Router			/users/{user_id}/status [patch]
 func (uh *userHandler) UpdateUserStatusByUserID(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -184,6 +279,21 @@ func (uh *userHandler) UpdateUserStatusByUserID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// DeleteUserByUserID godoc
+//
+//	@Summary		Delete user
+//	@Description	Delete user by ID (Requires permission: DeleteUserByUserID)
+//	@Tags			Users
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	dto.UserEmptyResponseWrapper	"Success"
+//	@Failure		400	{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401	{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403	{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404	{object}	dto.ErrorResponse				"User not found"
+//	@Failure		500	{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/users/{user_id} [delete]
 func (uh *userHandler) DeleteUserByUserID(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)

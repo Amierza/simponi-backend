@@ -34,6 +34,22 @@ func NewStoreHandler(storeService service.IStoreService, logger *zap.Logger) *st
 	}
 }
 
+// CreateStore godoc
+//
+//	@Summary		Create new store
+//	@Description	Create a new store and assign platform (Requires permission: CreateStore)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.CreateStoreRequest		true	"Create store request"
+//	@Success		201		{object}	dto.StoreResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse			"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		409		{object}	dto.ErrorResponse			"Conflict"
+//	@Failure		500		{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores [post]
 func (sh *storeHandler) CreateStore(ctx *gin.Context) {
 	var payload dto.CreateStoreRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -56,6 +72,22 @@ func (sh *storeHandler) CreateStore(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+// GetStores godoc
+//
+//	@Summary		Get list of stores
+//	@Description	Get paginated stores (Requires permission: GetStores)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int							false	"Page number"
+//	@Param			limit	query		int							false	"Items per page"
+//	@Success		200		{object}	dto.StoresResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse			"Bad Request"
+//	@Failure		401		{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403		{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		500		{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores [get]
 func (sh *storeHandler) GetStores(ctx *gin.Context) {
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
@@ -83,6 +115,22 @@ func (sh *storeHandler) GetStores(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetStoreByStoreID godoc
+//
+//	@Summary		Get store by ID
+//	@Description	Get store detail with platforms (Requires permission: GetStoreByStoreID)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Success		200			{object}	dto.StoreResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse			"Store not found"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id} [get]
 func (sh *storeHandler) GetStoreByStoreID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -105,6 +153,23 @@ func (sh *storeHandler) GetStoreByStoreID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateStoreByStoreID godoc
+//
+//	@Summary		Update store
+//	@Description	Update store information (Requires permission: UpdateStoreByStoreID)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Param			payload		body		dto.UpdateStoreRequest		true	"Update store request"
+//	@Success		200			{object}	dto.StoreResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid input"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse			"Store not found"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id} [put]
 func (sh *storeHandler) UpdateStoreByStoreID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -137,6 +202,21 @@ func (sh *storeHandler) UpdateStoreByStoreID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// DeleteStoreByStoreID godoc
+//
+//	@Summary		Delete store
+//	@Description	Delete store by ID (Requires permission: DeleteStoreByStoreID)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	dto.StoreEmptyResponseWrapper	"Success"
+//	@Failure		400	{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401	{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403	{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404	{object}	dto.ErrorResponse				"Store not found"
+//	@Failure		500	{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id} [delete]
 func (sh *storeHandler) DeleteStoreByStoreID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)

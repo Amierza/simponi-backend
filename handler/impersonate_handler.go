@@ -29,6 +29,19 @@ func NewImpersonateHandler(impersonateService service.IImpersonateService, logge
 	}
 }
 
+// StartImpersonate godoc
+//
+//	@Summary		Start impersonation
+//	@Description	Admin impersonates another user and receives a new access token
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			user_id	path		string	true	"User ID"
+//	@Success		200		{object}	dto.ImpersonateSuccessResponse
+//	@Failure		400		{object}	dto.ErrorResponse
+//	@Failure		401		{object}	dto.ErrorResponse
+//	@Router			/impersonate/{user_id} [post]
 func (ih *impersonateHandler) StartImpersonate(ctx *gin.Context) {
 	targetUserID := ctx.Param("user_id")
 
@@ -57,6 +70,18 @@ func (ih *impersonateHandler) StartImpersonate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// StopImpersonate godoc
+//
+//	@Summary		Stop impersonation
+//	@Description	Stop impersonation and return to original admin user
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	dto.ImpersonateSuccessResponse
+//	@Failure		400	{object}	dto.ErrorResponse
+//	@Failure		401	{object}	dto.ErrorResponse
+//	@Router			/impersonate/stop [post]
 func (ih *impersonateHandler) StopImpersonate(ctx *gin.Context) {
 	claimsRaw, exists := ctx.Get("claims")
 	if !exists {

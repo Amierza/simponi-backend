@@ -35,6 +35,19 @@ func NewExternalProductHandler(externalProductService service.IExternalProductSe
 	}
 }
 
+// CreateExternalProduct godoc
+//
+//	@Summary		Create external product
+//	@Description	Create a new external product for a store
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id	path		string								true	"Store ID"
+//	@Param			request		body		dto.CreateExternalProductRequest	true	"Request Body"
+//	@Success		201			{object}	dto.ExternalProductCreateSuccessResponse
+//	@Failure		400			{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products [post]
 func (eph *externalProductHandler) CreateExternalProduct(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -67,6 +80,20 @@ func (eph *externalProductHandler) CreateExternalProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
+// GetExternalProducts godoc
+//
+//	@Summary		Get external products
+//	@Description	Get list of external products by store
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id	path		string	true	"Store ID"
+//	@Param			page		query		int		false	"Page"
+//	@Param			limit		query		int		false	"Limit"
+//	@Success		200			{object}	dto.ExternalProductsSuccessResponse
+//	@Failure		400			{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products [get]
 func (eph *externalProductHandler) GetExternalProducts(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -103,6 +130,19 @@ func (eph *externalProductHandler) GetExternalProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetExternalProductByStoreIDAndExprodID godoc
+//
+//	@Summary		Get external product detail
+//	@Description	Get detail of external product by ID
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id			path		string	true	"Store ID"
+//	@Param			external_product_id	path		string	true	"External Product ID"
+//	@Success		200					{object}	dto.ExternalProductSuccessResponse
+//	@Failure		400					{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products/{external_product_id} [get]
 func (eph *externalProductHandler) GetExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -134,6 +174,19 @@ func (eph *externalProductHandler) GetExternalProductByStoreIDAndExprodID(ctx *g
 	ctx.JSON(http.StatusOK, res)
 }
 
+// GetExternalProductsByStoreIDAndStorePlatformID godoc
+//
+//	@Summary		Get external products by platform
+//	@Description	Get external products filtered by store platform
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id			path		string	true	"Store ID"
+//	@Param			store_platform_id	path		string	true	"Store Platform ID"
+//	@Success		200					{object}	dto.ExternalProductsSuccessResponse
+//	@Failure		400					{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products/store-platform/{store_platform_id} [get]
 func (eph *externalProductHandler) GetExternalProductsByStoreIDAndStorePlatformID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -165,6 +218,20 @@ func (eph *externalProductHandler) GetExternalProductsByStoreIDAndStorePlatformI
 	ctx.JSON(http.StatusOK, res)
 }
 
+// UpdateExternalProductByStoreIDAndExprodID godoc
+//
+//	@Summary		Update external product
+//	@Description	Update external product price
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id			path		string								true	"Store ID"
+//	@Param			external_product_id	path		string								true	"External Product ID"
+//	@Param			request				body		dto.UpdateExternalProductRequest	true	"Request Body"
+//	@Success		200					{object}	dto.ExternalProductUpdateSuccessResponse
+//	@Failure		400					{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products/{external_product_id} [put]
 func (eph *externalProductHandler) UpdateExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -207,6 +274,19 @@ func (eph *externalProductHandler) UpdateExternalProductByStoreIDAndExprodID(ctx
 	ctx.JSON(http.StatusOK, res)
 }
 
+// DeleteExternalProductByStoreIDAndExprodID godoc
+//
+//	@Summary		Delete external product
+//	@Description	Delete external product by ID
+//	@Tags			External Products
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			store_id			path		string	true	"Store ID"
+//	@Param			external_product_id	path		string	true	"External Product ID"
+//	@Success		200					{object}	dto.ExternalProductDeleteSuccessResponse
+//	@Failure		400					{object}	dto.ErrorResponse
+//	@Router			/stores/{store_id}/external-products/{external_product_id} [delete]
 func (eph *externalProductHandler) DeleteExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)

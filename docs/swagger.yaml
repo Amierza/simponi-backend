@@ -1,0 +1,2465 @@
+basePath: /api/v1
+definitions:
+  dto.CreateExternalProductRequest:
+    properties:
+      platform_id:
+        type: string
+      price:
+        minimum: 0
+        type: integer
+      product_id:
+        type: string
+    required:
+    - platform_id
+    - price
+    - product_id
+    type: object
+  dto.CreateProductRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        example: A very nice hat
+        type: string
+      image_id:
+        type: string
+      name:
+        example: Refined Bronze Hat
+        maxLength: 100
+        minLength: 3
+        type: string
+      sku:
+        example: L1L-448
+        type: string
+      stock:
+        example: 100
+        minimum: 0
+        type: integer
+    required:
+    - name
+    - sku
+    - stock
+    type: object
+  dto.CreateRoleRequest:
+    properties:
+      name:
+        type: string
+      permission_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    - permission_ids
+    type: object
+  dto.CreateStoreRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      platform_id:
+        type: string
+    required:
+    - name
+    - platform_id
+    type: object
+  dto.CreateStoreUsersRequest:
+    properties:
+      user_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - user_ids
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      password:
+        maxLength: 8
+        minLength: 5
+        type: string
+      role_id:
+        type: string
+    required:
+    - name
+    - password
+    type: object
+  dto.CustomUserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        example: invalid request
+        type: string
+      message:
+        example: failed request
+        type: string
+      status:
+        example: false
+        type: boolean
+    type: object
+  dto.ExternalProductCreateSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ExternalProductResponse'
+      message:
+        example: success create external product
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ExternalProductDeleteSuccessResponse:
+    properties:
+      message:
+        example: success delete external product
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ExternalProductResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      platform:
+        type: string
+      price:
+        type: integer
+      product_name:
+        type: string
+      store_platform_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.ExternalProductSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ExternalProductResponse'
+      message:
+        example: success get external product
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ExternalProductUpdateSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ExternalProductResponse'
+      message:
+        example: success update external product
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ExternalProductsSuccessResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ExternalProductResponse'
+        type: array
+      message:
+        example: success get external products
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ImpersonateResponse:
+    properties:
+      access_token:
+        example: <new_access_token_here>
+        type: string
+    type: object
+  dto.ImpersonateSuccessResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ImpersonateResponse'
+      message:
+        example: success impersonate
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.PermissionPaginationResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.PermissionResponse'
+        type: array
+      message:
+        example: success get permissions
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.PermissionResponse:
+    properties:
+      endpoint:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+      module:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.PermissionResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.PermissionResponse'
+        type: array
+      message:
+        example: success get permissions
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.PlatformResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.ProductCategoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        example: Electronics
+        type: string
+    type: object
+  dto.ProductEmptyResponseWrapper:
+    properties:
+      message:
+        example: success
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ProductImageResponse:
+    properties:
+      id:
+        type: string
+      image_url:
+        example: https://example.com/image.jpg
+        type: string
+    type: object
+  dto.ProductListResponse:
+    properties:
+      category:
+        $ref: '#/definitions/dto.ProductCategoryResponse'
+      created_at:
+        type: string
+      external_products:
+        items:
+          $ref: '#/definitions/dto.ExternalProductResponse'
+        type: array
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/dto.ProductImageResponse'
+        type: array
+      name:
+        type: string
+      sku:
+        type: string
+      status:
+        description: '"Mapped", "Unmapped", "Low Stock", "Out of Stock"'
+        type: string
+      stock:
+        type: integer
+      store:
+        $ref: '#/definitions/dto.ProductStoreResponse'
+    type: object
+  dto.ProductResponse:
+    properties:
+      category:
+        $ref: '#/definitions/dto.ProductCategoryResponse'
+      created_at:
+        type: string
+      description:
+        type: string
+      external_products:
+        items:
+          $ref: '#/definitions/dto.ExternalProductResponse'
+        type: array
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/dto.ProductImageResponse'
+        type: array
+      name:
+        example: Refined Bronze Hat
+        type: string
+      sku:
+        example: L1L-448
+        type: string
+      stock:
+        example: 100
+        type: integer
+      store:
+        $ref: '#/definitions/dto.ProductStoreResponse'
+      updated_at:
+        type: string
+    type: object
+  dto.ProductResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ProductResponse'
+      message:
+        example: success get product
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ProductStatsResponse:
+    properties:
+      low_stock:
+        type: integer
+      out_of_stock:
+        type: integer
+      stock_units:
+        type: integer
+      total_products:
+        type: integer
+      total_skus:
+        type: integer
+      unsynced:
+        type: integer
+    type: object
+  dto.ProductStatsResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.ProductStatsResponse'
+      message:
+        example: success get product stats
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.ProductStoreResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.ProductsResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ProductListResponse'
+        type: array
+      message:
+        example: success get products
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        example: <refresh_token_here>
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RefreshTokenResponse:
+    properties:
+      access_token:
+        example: <new_access_token_here>
+        type: string
+    required:
+    - access_token
+    type: object
+  dto.RefreshTokenResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.RefreshTokenResponse'
+      message:
+        example: success refresh token
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.RoleEmptyResponseWrapper:
+    properties:
+      message:
+        example: success delete role
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.RoleResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/dto.PermissionResponse'
+        type: array
+    type: object
+  dto.RoleResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.RoleResponse'
+      message:
+        example: success get role
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.RolesResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.RoleResponse'
+        type: array
+      message:
+        example: success get roles
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.SignInRequest:
+    properties:
+      email:
+        example: admin@mail.com
+        type: string
+      password:
+        example: secret123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.SignInResponse:
+    properties:
+      access_token:
+        example: <access_token_here>
+        type: string
+      refresh_token:
+        example: <refresh_token_here>
+        type: string
+    type: object
+  dto.SignInResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.SignInResponse'
+      message:
+        example: success signin
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoreEmptyResponseWrapper:
+    properties:
+      message:
+        example: success delete store
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoreResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      platforms:
+        items:
+          $ref: '#/definitions/dto.PlatformResponse'
+        type: array
+    type: object
+  dto.StoreResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.StoreResponse'
+      message:
+        example: success get store
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoreUserEmptyResponseWrapper:
+    properties:
+      message:
+        example: success delete store user
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoreUserResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.CustomUserResponse'
+      message:
+        example: success get store user
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoreUsersResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.CustomUserResponse'
+        type: array
+      message:
+        example: success get store users
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.StoresResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.StoreResponse'
+        type: array
+      message:
+        example: success get stores
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.UpdateExternalProductRequest:
+    properties:
+      price:
+        minimum: 0
+        type: integer
+    required:
+    - price
+    type: object
+  dto.UpdateProductRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        example: A very nice hat
+        type: string
+      name:
+        example: Refined Bronze Hat
+        type: string
+      sku:
+        example: L1L-448
+        type: string
+      stock:
+        example: 100
+        type: integer
+    type: object
+  dto.UpdateRoleRequest:
+    properties:
+      name:
+        type: string
+      permission_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    - permission_ids
+    type: object
+  dto.UpdateStockRequest:
+    properties:
+      change:
+        example: -1
+        type: integer
+      note:
+        example: 'Order #12345'
+        type: string
+      source:
+        example: shopee
+        type: string
+    required:
+    - change
+    - source
+    type: object
+  dto.UpdateStoreRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      role_id:
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateUserStatus:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  dto.UploadImageResponse:
+    properties:
+      image_id:
+        type: string
+      image_url:
+        type: string
+    type: object
+  dto.UploadSuccessMultipleResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.UploadImageResponse'
+        type: array
+      message:
+        example: success upload files
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.UploadSuccessSingleResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UploadImageResponse'
+      message:
+        example: success upload file
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.UserEmptyResponseWrapper:
+    properties:
+      message:
+        example: success delete user
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/dto.RoleResponse'
+      status:
+        type: string
+    type: object
+  dto.UserResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UserResponse'
+      message:
+        example: success get user
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.UsersResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.UserResponse'
+        type: array
+      message:
+        example: success get users
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+externalDocs:
+  description: OpenAPI Specification
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@simponi.app
+    name: Simponi Support
+  description: |-
+    REST API for Simponi - multi-store inventory and omnichannel management system.
+    This API supports store management, product management, external product integration, vendor management, and role-based access control (RBAC).
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://simponi.app/terms/
+  title: Simponi Backend API
+  version: "1.0"
+paths:
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Generate new access token using valid refresh token (no Bearer
+        token required)
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RefreshTokenResponseWrapper'
+        "400":
+          description: Bad Request - Invalid payload
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid refresh token
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Auth
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user using email and password to obtain access token
+        and refresh token
+      parameters:
+      - description: Sign in request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.SignInResponseWrapper'
+        "400":
+          description: Bad Request - Invalid payload
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Sign in user
+      tags:
+      - Auth
+  /impersonate/{user_id}:
+    post:
+      consumes:
+      - application/json
+      description: Admin impersonates another user and receives a new access token
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ImpersonateSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Start impersonation
+      tags:
+      - Auth
+  /impersonate/stop:
+    post:
+      consumes:
+      - application/json
+      description: Stop impersonation and return to original admin user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ImpersonateSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Stop impersonation
+      tags:
+      - Auth
+  /permissions:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all permissions or paginated permissions (Requires permission: GetPermissions)
+        Set query param `pagination=false` to disable pagination
+      parameters:
+      - description: 'Enable pagination (true/false), default: true'
+        in: query
+        name: pagination
+        type: string
+      - description: Page number (if pagination=true)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (if pagination=true)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (without pagination)
+          schema:
+            $ref: '#/definitions/dto.PermissionResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of permissions
+      tags:
+      - Permissions
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated roles (Requires permission: GetRoles)'
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RolesResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of roles
+      tags:
+      - Roles
+    post:
+      consumes:
+      - application/json
+      description: 'Create a new role with permissions (Requires permission: CreateRole)'
+      parameters:
+      - description: Create role request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RoleResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict - Role already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create new role
+      tags:
+      - Roles
+  /roles/{role_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete role by ID (Requires permission: DeleteRoleByRoleID)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RoleEmptyResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Role not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete role
+      tags:
+      - Roles
+    get:
+      consumes:
+      - application/json
+      description: 'Get role detail with permissions (Requires permission: GetRoleByRoleID)'
+      parameters:
+      - description: Role ID (UUID)
+        in: path
+        name: role_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RoleResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Role not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get role by ID
+      tags:
+      - Roles
+    put:
+      consumes:
+      - application/json
+      description: 'Update role and its permissions (Requires permission: UpdateRoleByRoleID)'
+      parameters:
+      - description: Role ID (UUID)
+        in: path
+        name: role_id
+        required: true
+        type: string
+      - description: Update role request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.RoleResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Role not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update role
+      tags:
+      - Roles
+  /stores:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated stores (Requires permission: GetStores)'
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoresResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of stores
+      tags:
+      - Stores
+    post:
+      consumes:
+      - application/json
+      description: 'Create a new store and assign platform (Requires permission: CreateStore)'
+      parameters:
+      - description: Create store request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateStoreRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create new store
+      tags:
+      - Stores
+  /stores/{store_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete store by ID (Requires permission: DeleteStoreByStoreID)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreEmptyResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete store
+      tags:
+      - Stores
+    get:
+      consumes:
+      - application/json
+      description: 'Get store detail with platforms (Requires permission: GetStoreByStoreID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get store by ID
+      tags:
+      - Stores
+    put:
+      consumes:
+      - application/json
+      description: 'Update store information (Requires permission: UpdateStoreByStoreID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Update store request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStoreRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update store
+      tags:
+      - Stores
+  /stores/{store_id}/external-products:
+    get:
+      consumes:
+      - application/json
+      description: Get list of external products by store
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ExternalProductsSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get external products
+      tags:
+      - External Products
+    post:
+      consumes:
+      - application/json
+      description: Create a new external product for a store
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateExternalProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ExternalProductCreateSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create external product
+      tags:
+      - External Products
+  /stores/{store_id}/external-products/{external_product_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete external product by ID
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: External Product ID
+        in: path
+        name: external_product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ExternalProductDeleteSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete external product
+      tags:
+      - External Products
+    get:
+      consumes:
+      - application/json
+      description: Get detail of external product by ID
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: External Product ID
+        in: path
+        name: external_product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ExternalProductSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get external product detail
+      tags:
+      - External Products
+    put:
+      consumes:
+      - application/json
+      description: Update external product price
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: External Product ID
+        in: path
+        name: external_product_id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateExternalProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ExternalProductUpdateSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update external product
+      tags:
+      - External Products
+  /stores/{store_id}/external-products/store-platform/{store_platform_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get external products filtered by store platform
+      parameters:
+      - description: Store ID
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Store Platform ID
+        in: path
+        name: store_platform_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ExternalProductsSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get external products by platform
+      tags:
+      - External Products
+  /stores/{store_id}/products:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated products in a store (Requires permission: GetProducts)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductsResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get products in store
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: 'Create a new product inside a store (Requires permission: CreateProduct)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Create product request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductResponseWrapper'
+        "400":
+          description: Invalid input / UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict (SKU duplicate)
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create product
+      tags:
+      - Products
+  /stores/{store_id}/products/{product_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete product by ID (Requires permission: DeleteProductByStoreIDAndProductID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductEmptyResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete product
+      tags:
+      - Products
+    get:
+      consumes:
+      - application/json
+      description: 'Get product detail by store ID and product ID (Requires permission:
+        GetProductByStoreIDAndProductID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get product detail
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: 'Update product information (Requires permission: UpdateProductByStoreIDAndProductID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Update product request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update product
+      tags:
+      - Products
+  /stores/{store_id}/products/{product_id}/stock:
+    patch:
+      consumes:
+      - application/json
+      description: 'Update product stock with source tracking (Requires permission:
+        UpdateStockByStoreIDAndProductID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Stock update request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductEmptyResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update product stock
+      tags:
+      - Products
+  /stores/{store_id}/products/stats:
+    get:
+      consumes:
+      - application/json
+      description: 'Get aggregated product statistics in a store (Requires permission:
+        GetProductStats)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.ProductStatsResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get product statistics
+      tags:
+      - Products
+  /stores/{store_id}/users:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated users assigned to a store (Requires permission:
+        GetStoreUsers)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreUsersResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get users in a store
+      tags:
+      - Store Users
+    post:
+      consumes:
+      - application/json
+      description: 'Assign multiple users to a store (Requires permission: CreateStoreUsers)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: List of user IDs
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateStoreUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreUserEmptyResponseWrapper'
+        "400":
+          description: Invalid input / UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store/User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Assign users to store
+      tags:
+      - Store Users
+  /stores/{store_id}/users/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Remove a user from a store (Requires permission: DeleteStoreUserByStoreIDAndUserID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: User ID (UUID)
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreUserEmptyResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store/User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove user from store
+      tags:
+      - Store Users
+    get:
+      consumes:
+      - application/json
+      description: 'Get detail of a specific user within a store (Requires permission:
+        GetStoreUserByStoreIDAndUserID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: User ID (UUID)
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreUserResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store/User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get specific user in a store
+      tags:
+      - Store Users
+  /uploads:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Upload single or multiple images using multipart/form-data (key:
+        files)'
+      parameters:
+      - description: Upload file(s)
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UploadSuccessMultipleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload file(s)
+      tags:
+      - Uploads
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated users (Requires permission: GetUsers)'
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UsersResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get list of users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: 'Create a new user (Requires permission: CreateUser)'
+      parameters:
+      - description: Create user request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden - Insufficient permission
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict - User already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create new user
+      tags:
+      - Users
+  /users/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete user by ID (Requires permission: DeleteUserByUserID)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserEmptyResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: 'Get user detail by user ID (Requires permission: GetUserByUserID)'
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: 'Update user data by ID (Requires permission: UpdateUserByUserID)'
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Update user request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - Users
+  /users/{user_id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: 'Update user status (active/inactive) (Requires permission: UpdateUserStatusByUserID)'
+      parameters:
+      - description: User ID (UUID)
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Update status request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserStatus'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserResponseWrapper'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user status
+      tags:
+      - Users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: 'Get authenticated user profile (Requires permission: GetUserProfile)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.UserResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: 'Use JWT token with format: Bearer <your_token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Authentication (signin, refresh token) and token management
+  name: Auth
+- description: User management and profile operations
+  name: Users
+- description: Role management and RBAC configuration
+  name: Roles
+- description: Permission management for access control
+  name: Permissions
+- description: Store management and store-related operations
+  name: Stores
+- description: Manage users within a store (membership & access)
+  name: Store Users
+- description: Product and inventory management
+  name: Products
+- description: External product integration (Shopee, Tokopedia, etc.)
+  name: External Products
+- description: Vendor and supplier management
+  name: Vendors
+- description: Order and transaction management
+  name: Orders
+- description: System activity logs
+  name: Logs
+- description: Inventory movement and stock change logs
+  name: Inventory Logs
+- description: File upload and asset management
+  name: Uploads
+- description: Admin impersonation for debugging and support
+  name: Impersonate
