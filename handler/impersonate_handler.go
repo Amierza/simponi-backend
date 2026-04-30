@@ -33,7 +33,7 @@ func NewImpersonateHandler(impersonateService service.IImpersonateService, logge
 //
 //	@Summary		Start impersonation
 //	@Description	Admin impersonates another user and receives a new access token
-//	@Tags			Auth
+//	@Tags			Impersonate
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerAuth
@@ -74,7 +74,7 @@ func (ih *impersonateHandler) StartImpersonate(ctx *gin.Context) {
 //
 //	@Summary		Stop impersonation
 //	@Description	Stop impersonation and return to original admin user
-//	@Tags			Auth
+//	@Tags			Impersonate
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerAuth

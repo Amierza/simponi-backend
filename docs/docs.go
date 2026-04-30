@@ -142,7 +142,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Impersonate"
                 ],
                 "summary": "Stop impersonation",
                 "responses": {
@@ -182,7 +182,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Impersonate"
                 ],
                 "summary": "Start impersonation",
                 "parameters": [

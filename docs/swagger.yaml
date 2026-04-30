@@ -877,7 +877,7 @@ paths:
       - BearerAuth: []
       summary: Start impersonation
       tags:
-      - Auth
+      - Impersonate
   /impersonate/stop:
     post:
       consumes:
@@ -902,7 +902,7 @@ paths:
       - BearerAuth: []
       summary: Stop impersonation
       tags:
-      - Auth
+      - Impersonate
   /permissions:
     get:
       consumes:

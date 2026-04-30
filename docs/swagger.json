@@ -136,7 +136,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Impersonate"
                 ],
                 "summary": "Stop impersonation",
                 "responses": {
@@ -176,7 +176,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Impersonate"
                 ],
                 "summary": "Start impersonation",
                 "parameters": [
