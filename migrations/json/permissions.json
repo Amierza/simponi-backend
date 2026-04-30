@@ -67,7 +67,7 @@
   },
   {
     "id": "4286a4d0-96e5-4b82-84e2-a9775e597e7a",
-    "name": "GetUserByuserID",
+    "name": "GetUserByUserID",
     "endpoint": "/api/v1/users/:user_id",
     "method": "GET",
     "module": "user"
@@ -319,13 +319,6 @@
   },
 
   {
-    "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "CreateLog",
-    "endpoint": "/api/v1/logs/logs",
-    "method": "POST",
-    "module": "log"
-  },
-  {
     "id": "55555555-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetLogs",
     "endpoint": "/api/v1/logs/logs",
@@ -347,13 +340,6 @@
     "module": "log"
   },
 
-  {
-    "id": "0ea2426c-89e7-426c-b88f-111111111111",
-    "name": "CreateInventoryLog",
-    "endpoint": "/api/v1/inventory-logs",
-    "method": "POST",
-    "module": "inventory_log"
-  },
   {
     "id": "0ea2426c-89e7-426c-b88f-222222222222",
     "name": "GetInventoryLogs",
