@@ -156,6 +156,11 @@ func main() {
 		storeService = service.NewStoreService(tx, storeRepo, storeUserRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		storeHandler = handler.NewStoreHandler(storeService, zapLogger)
 
+		// Product Categories
+		productCategoriesRepo    = repository.NewProductCategoriesRepository(db)
+		productCategoriesService = service.NewProductCategoriesService(productCategoriesRepo, zapLogger, jwt)
+		productCategoriesHandler = handler.NewProductCategoriesHandler(productCategoriesService, zapLogger)
+		
 		// Product
 		productRepo    = repository.NewProductRepository(db)
 		productService = service.NewProductService(productRepo, storeRepo, zapLogger, jwt)
@@ -198,6 +203,7 @@ func main() {
 	routes.Auth(server, authHandler)
 	routes.StoreUser(server, storeUserHandler, jwt, rolePermissionRepo)
 	routes.Store(server, storeHandler, jwt, rolePermissionRepo)
+	routes.ProductCategories(server, productCategoriesHandler, jwt)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
 	routes.Order(server, orderHandler, jwt, rolePermissionRepo)
