@@ -16,9 +16,9 @@ type (
 	IStoreHandler interface {
 		CreateStore(ctx *gin.Context)
 		GetStores(ctx *gin.Context)
-		GetStoreByID(ctx *gin.Context)
-		UpdateStore(ctx *gin.Context)
-		DeleteStoreByID(ctx *gin.Context)
+		GetStoreByStoreID(ctx *gin.Context)
+		UpdateStoreByStoreID(ctx *gin.Context)
+		DeleteStoreByStoreID(ctx *gin.Context)
 	}
 
 	storeHandler struct {
@@ -34,17 +34,17 @@ func NewStoreHandler(storeService service.IStoreService, logger *zap.Logger) *st
 	}
 }
 
-func (vh *storeHandler) CreateStore(ctx *gin.Context) {
+func (sh *storeHandler) CreateStore(ctx *gin.Context) {
 	var payload dto.CreateStoreRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
-		vh.logger.Error("invalid create store request payload", zap.Error(err), zap.Any("payload", payload))
+		sh.logger.Error("invalid create store request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_CREATE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	result, err := vh.storeService.CreateStore(ctx, &payload)
+	result, err := sh.storeService.CreateStore(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_CREATE), cleanErrorMessage(err))
@@ -56,17 +56,17 @@ func (vh *storeHandler) CreateStore(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
-func (vh *storeHandler) GetStores(ctx *gin.Context) {
+func (sh *storeHandler) GetStores(ctx *gin.Context) {
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
-		vh.logger.Error("invalid get stores query payload", zap.Error(err), zap.Any("payload", payload))
+		sh.logger.Error("invalid get stores query payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s stores", dto.FAILED_GET_ALL), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	result, err := vh.storeService.GetStores(ctx, &payload)
+	result, err := sh.storeService.GetStores(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s stores", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -83,17 +83,17 @@ func (vh *storeHandler) GetStores(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (vh *storeHandler) GetStoreByID(ctx *gin.Context) {
-	storeIDStr := ctx.Param("id")
+func (sh *storeHandler) GetStoreByStoreID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		vh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		sh.logger.Error("invalid store ID", zap.String("store_id", storeIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	result, err := vh.storeService.GetStoreByID(ctx, &storeID)
+	result, err := sh.storeService.GetStoreByStoreID(ctx, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
@@ -105,26 +105,27 @@ func (vh *storeHandler) GetStoreByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (vh *storeHandler) UpdateStore(ctx *gin.Context) {
-	storeIDStr := ctx.Param("id")
+func (sh *storeHandler) UpdateStoreByStoreID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		vh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		sh.logger.Error("invalid store ID", zap.String("store_id", storeIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_UPDATE), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
 	var payload dto.UpdateStoreRequest
+	payload.ID = storeID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		vh.logger.Error("invalid update store request payload", zap.Error(err), zap.Any("payload", payload))
+		sh.logger.Error("invalid update store request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_UPDATE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)
 		return
 	}
 
-	result, err := vh.storeService.UpdateStore(ctx, &storeID, &payload)
+	result, err := sh.storeService.UpdateStoreByStoreID(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -136,17 +137,17 @@ func (vh *storeHandler) UpdateStore(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (vh *storeHandler) DeleteStoreByID(ctx *gin.Context) {
-	storeIDStr := ctx.Param("id")
+func (sh *storeHandler) DeleteStoreByStoreID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		vh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		sh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_DELETE), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	if err := vh.storeService.DeleteStoreByID(ctx, &storeID); err != nil {
+	if err := sh.storeService.DeleteStoreByStoreID(ctx, &storeID); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s store", dto.FAILED_DELETE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)

@@ -21,6 +21,7 @@ func Rollback(db *gorm.DB) error {
 		&entity.StorePlatform{},
 		&entity.Log{},
 		&entity.StoreCredential{},
+		&entity.StoreUser{},
 		&entity.Store{},
 		&entity.Platform{},
 

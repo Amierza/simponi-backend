@@ -16,11 +16,11 @@ type (
 	IUserHandler interface {
 		CreateUser(ctx *gin.Context)
 		GetUsers(ctx *gin.Context)
-		GetUserByID(ctx *gin.Context)
-		GetProfile(ctx *gin.Context)
-		UpdateUserStatus(ctx *gin.Context)
-		UpdateUser(ctx *gin.Context)
-		DeleteUserByID(ctx *gin.Context)
+		GetUserByUserID(ctx *gin.Context)
+		GetUserProfile(ctx *gin.Context)
+		UpdateUserStatusByUserID(ctx *gin.Context)
+		UpdateUserByUserID(ctx *gin.Context)
+		DeleteUserByUserID(ctx *gin.Context)
 	}
 
 	userHandler struct {
@@ -85,8 +85,8 @@ func (uh *userHandler) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (uh *userHandler) GetUserByID(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
+func (uh *userHandler) GetUserByUserID(ctx *gin.Context) {
+	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
@@ -95,7 +95,7 @@ func (uh *userHandler) GetUserByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.GetUserByID(ctx, &userID)
+	result, err := uh.userService.GetUserByUserID(ctx, &userID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
@@ -107,23 +107,8 @@ func (uh *userHandler) GetUserByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (uh *userHandler) GetProfile(ctx *gin.Context) {
-	userIDAny, exists := ctx.Get("user_id")
-	if !exists {
-		res := response.BuildResponseFailed(dto.UNAUTHORIZED, dto.UNAUTHORIZED)
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
-		return
-	}
-	userIDStr := userIDAny.(string)
-	userID, err := uuid.Parse(userIDStr)
-	if err != nil {
-		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
-		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
-	}
-
-	result, err := uh.userService.GetProfile(ctx, &userID)
+func (uh *userHandler) GetUserProfile(ctx *gin.Context) {
+	result, err := uh.userService.GetUserProfile(ctx)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_GET_PROFILE), cleanErrorMessage(err))
@@ -135,8 +120,8 @@ func (uh *userHandler) GetProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (uh *userHandler) UpdateUser(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
+func (uh *userHandler) UpdateUserByUserID(ctx *gin.Context) {
+	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
@@ -146,6 +131,7 @@ func (uh *userHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	var payload dto.UpdateUserRequest
+	payload.ID = userID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		uh.logger.Error("invalid update user request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -154,7 +140,7 @@ func (uh *userHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.UpdateUser(ctx, &userID, &payload)
+	result, err := uh.userService.UpdateUserByUserID(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -166,8 +152,8 @@ func (uh *userHandler) UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (uh *userHandler) UpdateUserStatus(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
+func (uh *userHandler) UpdateUserStatusByUserID(ctx *gin.Context) {
+	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
@@ -177,6 +163,7 @@ func (uh *userHandler) UpdateUserStatus(ctx *gin.Context) {
 	}
 
 	var payload dto.UpdateUserStatus
+	payload.ID = userID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		uh.logger.Error("invalid update user status request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -185,7 +172,7 @@ func (uh *userHandler) UpdateUserStatus(ctx *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.UpdateUserStatus(ctx, &userID, &payload)
+	result, err := uh.userService.UpdateUserStatusByUserID(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s user status", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -197,8 +184,8 @@ func (uh *userHandler) UpdateUserStatus(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (uh *userHandler) DeleteUserByID(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
+func (uh *userHandler) DeleteUserByUserID(ctx *gin.Context) {
+	userIDStr := ctx.Param("user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		uh.logger.Error("invalid user ID", zap.String("id", userIDStr), zap.Error(err))
@@ -207,7 +194,7 @@ func (uh *userHandler) DeleteUserByID(ctx *gin.Context) {
 		return
 	}
 
-	if err := uh.userService.DeleteUserByID(ctx, &userID); err != nil {
+	if err := uh.userService.DeleteUserByUserID(ctx, &userID); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s user", dto.FAILED_DELETE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)

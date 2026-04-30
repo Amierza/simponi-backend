@@ -17,7 +17,7 @@ type User struct {
 	RoleID *uuid.UUID `gorm:"type:uuid" json:"role_id"`
 	Role   Role       `gorm:"foreignKey:RoleID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"role,omitempty"`
 
-	Stores []*Store `gorm:"foreignKey:UserID"`
+	Stores []*StoreUser `gorm:"foreignKey:UserID"`
 
 	TimeStamp
 }

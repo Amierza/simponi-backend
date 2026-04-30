@@ -14,10 +14,10 @@ func Store(route *gin.Engine, storeHandler handler.IStoreHandler, jwtService jwt
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateStore"), storeHandler.CreateStore)
 
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetStores"), storeHandler.GetStores)
-		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetStoreByID"), storeHandler.GetStoreByID)
+		routes.GET("/:store_id", middleware.RBAC(rolePermissionRepo, "GetStoreByStoreID"), storeHandler.GetStoreByStoreID)
 
-		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateStore"), storeHandler.UpdateStore)
+		routes.PUT("/:store_id", middleware.RBAC(rolePermissionRepo, "UpdateStoreByStoreID"), storeHandler.UpdateStoreByStoreID)
 
-		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteStoreByID"), storeHandler.DeleteStoreByID)
+		routes.DELETE("/:store_id", middleware.RBAC(rolePermissionRepo, "DeleteStoreByStoreID"), storeHandler.DeleteStoreByStoreID)
 	}
 }

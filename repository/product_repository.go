@@ -18,14 +18,13 @@ type (
 		CreateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
 		CreateProductImage(ctx context.Context, tx *gorm.DB, productImage *entity.ProductImage) (*entity.ProductImage, error)
 		AttachProductImageToProduct(ctx context.Context, tx *gorm.DB, imageID *uuid.UUID, productID *uuid.UUID) error
-		GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error)
-		GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error)
-		GetProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) (*entity.Product, bool, error)
-		GetProductBySKU(ctx context.Context, tx *gorm.DB, sku string) (*entity.Product, bool, error)
-		UpdateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
-		DeleteProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) error
-
-		UpdateStock(ctx context.Context, tx *gorm.DB, productID *uuid.UUID, change int) error
+		GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductPaginationRepositoryResponse, error)
+		GetProductStats(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (dto.ProductStatsResponse, error)
+		GetProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID) (*entity.Product, bool, error)
+		GetProductBySKUAndStoreID(ctx context.Context, tx *gorm.DB, sku string, storeID *uuid.UUID) (*entity.Product, bool, error)
+		UpdateProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error)
+		UpdateStockByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID, change int) error
+		DeleteProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID) error
 	}
 
 	productRepository struct {
@@ -83,7 +82,7 @@ func (pr *productRepository) AttachProductImageToProduct(ctx context.Context, tx
 	return nil
 }
 
-func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ProductPaginationRepositoryResponse, error) {
+func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = pr.db
 	}
@@ -101,6 +100,8 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 
 	query := tx.WithContext(ctx).
 		Model(&entity.Product{}).
+		Where("store_id = ?", storeID).
+		Preload("Store").
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
@@ -113,13 +114,13 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 		query = query.Where("LOWER(name) LIKE ? OR LOWER(sku) LIKE ? OR LOWER(description) LIKE ?", searchValue, searchValue, searchValue)
 	}
 
-	if req.SKU != "" {
-		query = query.Where("sku = ?", req.SKU)
-	}
+	// if req.SKU != "" {
+	// 	query = query.Where("sku = ?", req.SKU)
+	// }
 
-	if req.CategoryID != "" {
-		query = query.Where("category_id = ?", req.CategoryID)
-	}
+	// if req.CategoryID != "" {
+	// 	query = query.Where("category_id = ?", req.CategoryID)
+	// }
 
 	if err := query.Count(&count).Error; err != nil {
 		return dto.ProductPaginationRepositoryResponse{}, err
@@ -142,43 +143,42 @@ func (pr *productRepository) GetProducts(ctx context.Context, tx *gorm.DB, req *
 	}, nil
 }
 
-func (pr *productRepository) GetProductStats(ctx context.Context, tx *gorm.DB) (dto.ProductStatsResponse, error) {
+func (pr *productRepository) GetProductStats(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (dto.ProductStatsResponse, error) {
 	if tx == nil {
 		tx = pr.db
 	}
 
 	var stats dto.ProductStatsResponse
 
-	if err := tx.WithContext(ctx).
+	baseQuery := tx.WithContext(ctx).
 		Model(&entity.Product{}).
+		Where("store_id = ?", *storeID)
+
+	if err := baseQuery.
 		Count(&stats.TotalProducts).Error; err != nil {
 		return dto.ProductStatsResponse{}, err
 	}
 	stats.TotalSKUs = stats.TotalProducts
 
-	if err := tx.WithContext(ctx).
-		Model(&entity.Product{}).
+	if err := baseQuery.
 		Select("COALESCE(SUM(stock), 0)").
 		Scan(&stats.StockUnits).Error; err != nil {
 		return dto.ProductStatsResponse{}, err
 	}
 
-	if err := tx.WithContext(ctx).
-		Model(&entity.Product{}).
+	if err := baseQuery.
 		Where("stock > 0 AND stock <= 10").
 		Count(&stats.LowStock).Error; err != nil {
 		return dto.ProductStatsResponse{}, err
 	}
 
-	if err := tx.WithContext(ctx).
-		Model(&entity.Product{}).
+	if err := baseQuery.
 		Where("stock = 0").
 		Count(&stats.OutOfStock).Error; err != nil {
 		return dto.ProductStatsResponse{}, err
 	}
 
-	if err := tx.WithContext(ctx).
-		Model(&entity.Product{}).
+	if err := baseQuery.
 		Where("id NOT IN (?)",
 			tx.Model(&entity.ExternalProduct{}).
 				Select("DISTINCT product_id").
@@ -191,7 +191,7 @@ func (pr *productRepository) GetProductStats(ctx context.Context, tx *gorm.DB) (
 	return stats, nil
 }
 
-func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) (*entity.Product, bool, error) {
+func (pr *productRepository) GetProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID) (*entity.Product, bool, error) {
 	if tx == nil {
 		tx = pr.db
 	}
@@ -200,6 +200,7 @@ func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, pr
 
 	err := tx.WithContext(ctx).
 		Model(&entity.Product{}).
+		Preload("Store").
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
@@ -207,6 +208,7 @@ func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, pr
 		Preload("ExternalProducts.StorePlatform.Store").
 		Preload("ExternalProducts.StorePlatform.Platform").
 		Preload("Logs").
+		Where("store_id = ?", storeID).
 		Where("id = ?", productID).
 		First(&product).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -219,7 +221,7 @@ func (pr *productRepository) GetProductByID(ctx context.Context, tx *gorm.DB, pr
 	return &product, true, nil
 }
 
-func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, sku string) (*entity.Product, bool, error) {
+func (pr *productRepository) GetProductBySKUAndStoreID(ctx context.Context, tx *gorm.DB, sku string, storeID *uuid.UUID) (*entity.Product, bool, error) {
 	if tx == nil {
 		tx = pr.db
 	}
@@ -228,12 +230,14 @@ func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, s
 
 	err := tx.WithContext(ctx).
 		Model(&entity.Product{}).
+		Preload("Store").
 		Preload("Category").
 		Preload("Images").
 		Preload("ExternalProducts").
 		Preload("ExternalProducts.StorePlatform").
 		Preload("ExternalProducts.StorePlatform.Store").
 		Preload("ExternalProducts.StorePlatform.Platform").
+		Where("store_id = ?", storeID).
 		Where("sku = ?", sku).
 		First(&product).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -246,12 +250,13 @@ func (pr *productRepository) GetProductBySKU(ctx context.Context, tx *gorm.DB, s
 	return &product, true, nil
 }
 
-func (pr *productRepository) UpdateProduct(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error) {
+func (pr *productRepository) UpdateProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, product *entity.Product) (*entity.Product, error) {
 	if tx == nil {
 		tx = pr.db
 	}
 
 	if err := tx.WithContext(ctx).
+		Where("store_id = ?", product.StoreID).
 		Where("id = ?", product.ID).
 		Updates(product).
 		Error; err != nil {
@@ -261,13 +266,14 @@ func (pr *productRepository) UpdateProduct(ctx context.Context, tx *gorm.DB, pro
 	return product, nil
 }
 
-func (pr *productRepository) UpdateStock(ctx context.Context, tx *gorm.DB, productID *uuid.UUID, change int) error {
+func (pr *productRepository) UpdateStockByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID, change int) error {
 	if tx == nil {
 		tx = pr.db
 	}
 
 	if err := tx.WithContext(ctx).
 		Model(&entity.Product{}).
+		Where("store_id = ?", productID).
 		Where("id = ?", productID).
 		UpdateColumn("stock", gorm.Expr("stock + ?", change)).
 		Error; err != nil {
@@ -277,12 +283,13 @@ func (pr *productRepository) UpdateStock(ctx context.Context, tx *gorm.DB, produ
 	return nil
 }
 
-func (pr *productRepository) DeleteProductByID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) error {
+func (pr *productRepository) DeleteProductByStoreIDAndProductID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, productID *uuid.UUID) error {
 	if tx == nil {
 		tx = pr.db
 	}
 
 	return tx.WithContext(ctx).
+		Where("store_id = ?", storeID).
 		Where("id = ?", productID).
 		Delete(&entity.Product{}).
 		Error

@@ -1,31 +1,18 @@
 [
   {
     "id": "11111111-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "Signin",
-    "endpoint": "/api/v1/auth/signin",
+    "name": "Upload",
+    "endpoint": "/api/v1/uploads",
     "method": "POST",
-    "module": "authentication"
+    "module": "upload"
   },
-  {
-    "id": "22222222-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "RefreshToken",
-    "endpoint": "/api/v1/auth/refresh-token",
-    "method": "POST",
-    "module": "authentication"
-  },
+
   {
     "id": "23ab5085-924c-4c7f-9038-2bc213f99d10",
     "name": "GetPermissions",
     "endpoint": "/api/v1/permissions",
     "method": "GET",
     "module": "permission"
-  },
-  {
-    "id": "dad8b9f0-dbad-4895-af7b-367cae2ba00c",
-    "name": "StartImpersonate",
-    "endpoint": "/api/v1/impersonate",
-    "method": "POST",
-    "module": "impersonate"
   },
 
   {
@@ -44,22 +31,22 @@
   },
   {
     "id": "eaf90d01-2db3-476b-b8fa-85b9ce510a41",
-    "name": "GetRoleByID",
-    "endpoint": "/api/v1/roles/:id",
+    "name": "GetRoleByRoleID",
+    "endpoint": "/api/v1/roles/:role_id",
     "method": "GET",
     "module": "role"
   },
   {
     "id": "39baf21f-9746-4f21-9eb6-e0ff3a0bd4cb",
-    "name": "UpdateRole",
-    "endpoint": "/api/v1/roles/:id",
+    "name": "UpdateRoleByRoleID",
+    "endpoint": "/api/v1/roles/:role_id",
     "method": "PUT",
     "module": "role"
   },
   {
     "id": "5bad4700-1a2d-4788-9327-7db99b6d6ba5",
-    "name": "DeleteRoleByID",
-    "endpoint": "/api/v1/roles/:id",
+    "name": "DeleteRoleByRoleID",
+    "endpoint": "/api/v1/roles/:role_id",
     "method": "DELETE",
     "module": "role"
   },
@@ -80,38 +67,75 @@
   },
   {
     "id": "4286a4d0-96e5-4b82-84e2-a9775e597e7a",
-    "name": "GetUserByID",
-    "endpoint": "/api/v1/users/:id",
+    "name": "GetUserByuserID",
+    "endpoint": "/api/v1/users/:user_id",
     "method": "GET",
     "module": "user"
   },
   {
     "id": "33333333-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProfile",
+    "name": "GetUserProfile",
     "endpoint": "/api/v1/users/profile",
     "method": "GET",
     "module": "user"
   },
   {
     "id": "7a5e749c-85e2-4678-b235-3cbaec91c8f2",
-    "name": "UpdateUser",
-    "endpoint": "/api/v1/users/:id",
+    "name": "UpdateUserByUserID",
+    "endpoint": "/api/v1/users/:user_id",
     "method": "PUT",
     "module": "user"
   },
   {
     "id": "e36f027c-9884-436c-8e9b-da9fc7c2c741",
-    "name": "UpdateUserStatus",
-    "endpoint": "/api/v1/users/:id/status",
+    "name": "UpdateUserStatusByUserID",
+    "endpoint": "/api/v1/users/:user_id/status",
     "method": "PATCH",
     "module": "user"
   },
   {
     "id": "793aaad8-d456-4d1d-9699-867196659bbe",
-    "name": "DeleteUserByID",
-    "endpoint": "/api/v1/users/:id",
+    "name": "DeleteUserByUserID",
+    "endpoint": "/api/v1/users/:user_id",
     "method": "DELETE",
     "module": "user"
+  },
+
+  {
+    "id": "dad8b9f0-dbad-4895-af7b-367cae2ba00c",
+    "name": "StartImpersonate",
+    "endpoint": "/api/v1/impersonate",
+    "method": "POST",
+    "module": "impersonate"
+  },
+
+  {
+    "id": "65b751c3-ff7e-4af9-8a2d-c1248902f4cb",
+    "name": "CreateStoreUsers",
+    "endpoint": "/api/v1/stores",
+    "method": "POST",
+    "module": "store_user"
+  },
+  {
+    "id": "fa192ecf-56dc-4999-a9c2-9c5e4d21d0be",
+    "name": "GetStoreUsers",
+    "endpoint": "/api/v1/stores",
+    "method": "GET",
+    "module": "store_user"
+  },
+  {
+    "id": "fcb06ae3-a4f9-4199-ba07-6dd34bb457e5",
+    "name": "GetStoreUserByStoreIDAndUserID",
+    "endpoint": "/api/v1/stores/:id",
+    "method": "GET",
+    "module": "store_user"
+  },
+  {
+    "id": "1324c818-0220-4ce7-a2a1-f1337a56a411",
+    "name": "DeleteStoreUserByStoreIDAndUserID",
+    "endpoint": "/api/v1/stores/:id",
+    "method": "DELETE",
+    "module": "store_user"
   },
 
   {
@@ -130,129 +154,117 @@
   },
   {
     "id": "c3f4e5a6-7d34-4c8a-ae43-3a7c5d4e5f67",
-    "name": "GetStoreByID",
-    "endpoint": "/api/v1/stores/:id",
+    "name": "GetStoreByStoreID",
+    "endpoint": "/api/v1/stores/:store_id",
     "method": "GET",
     "module": "store"
   },
   {
     "id": "d4a5b6c7-6e45-4d9b-bf54-4b6d4e5f6a78",
-    "name": "UpdateStore",
-    "endpoint": "/api/v1/stores/:id",
+    "name": "UpdateStoreByStoreID",
+    "endpoint": "/api/v1/stores/:store_id",
     "method": "PUT",
     "module": "store"
   },
   {
     "id": "e5b6c7d8-5f56-4eac-c065-5c5e6f7a8b89",
-    "name": "DeleteStoreByID",
-    "endpoint": "/api/v1/stores/:id",
+    "name": "DeleteStoreByStoreID",
+    "endpoint": "/api/v1/stores/:store_id",
     "method": "DELETE",
     "module": "store"
   },
 
   {
-    "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "CreateLog",
-    "endpoint": "/api/v1/logs/logs",
-    "method": "POST",
-    "module": "log"
-  },
-  {
-    "id": "55555555-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetLogs",
-    "endpoint": "/api/v1/logs/logs",
-    "method": "GET",
-    "module": "log"
-  },
-  {
-    "id": "66666666-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetLogsByStore",
-    "endpoint": "/api/v1/logs/logs/store/:storeID",
-    "method": "GET",
-    "module": "log"
-  },
-  {
-    "id": "77777777-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetLogsByDateRange",
-    "endpoint": "/api/v1/logs/logs/date-range",
-    "method": "GET",
-    "module": "log"
-  },
-  {
-    "id": "88888888-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProductStats",
-    "endpoint": "/api/v1/products/stats",
-    "method": "GET",
-    "module": "product"
-  },
-  {
     "id": "99999999-0ea2-426c-89e7-e25e71c0b88f",
     "name": "CreateProduct",
-    "endpoint": "/api/v1/products/",
+    "endpoint": "/api/v1/stores/:store_id/products/",
     "method": "POST",
     "module": "product"
   },
   {
     "id": "aaaaaaaa-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetProducts",
-    "endpoint": "/api/v1/products/",
+    "endpoint": "/api/v1/stores/:store_id/products/",
+    "method": "GET",
+    "module": "product"
+  },
+  {
+    "id": "88888888-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductStats",
+    "endpoint": "/api/v1/stores/:store_id/products/stats",
     "method": "GET",
     "module": "product"
   },
   {
     "id": "bbbbbbbb-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProductByID",
-    "endpoint": "/api/v1/products/:id",
-    "method": "GET",
-    "module": "product"
-  },
-  {
-    "id": "cccccccc-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProductBySKU",
-    "endpoint": "/api/v1/products/sku",
-    "method": "GET",
-    "module": "product"
-  },
-  {
-    "id": "dddddddd-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetProductsByCategoryID",
-    "endpoint": "/api/v1/products/category/:categoryId",
+    "name": "GetProductByStoreIDAndProductID",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id",
     "method": "GET",
     "module": "product"
   },
   {
     "id": "eeeeeeee-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "UpdateProduct",
-    "endpoint": "/api/v1/products/:id",
+    "name": "UpdateProductByStoreIDAndProductID",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id",
     "method": "PUT",
     "module": "product"
   },
   {
     "id": "ffffffff-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "UpdateStock",
-    "endpoint": "/api/v1/products/:id/stock",
+    "name": "UpdateStockByStoreIDAndProductID",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id/stock",
     "method": "PATCH",
     "module": "product"
   },
   {
     "id": "12345678-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "DeleteProductByID",
-    "endpoint": "/api/v1/products/:id",
+    "name": "DeleteProductByStoreIDAndProductID",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id",
     "method": "DELETE",
     "module": "product"
   },
 
   {
-    "id": "abcdef01-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetOrders",
-    "endpoint": "/api/v1/orders",
-    "method": "GET"
+    "id": "ab000001-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateExternalProduct",
+    "endpoint": "/api/v1/stores/:store_id/external-products/",
+    "method": "POST",
+    "module": "external_product"
   },
   {
-    "id": "abcdef02-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetOrderByID",
-    "endpoint": "/api/v1/orders/:id",
-    "method": "GET"
+    "id": "ab000002-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProducts",
+    "endpoint": "/api/v1/stores/:store_id/external-products/",
+    "method": "GET",
+    "module": "external_product"
+  },
+  {
+    "id": "ab000003-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProductByStoreIDAndExprodID",
+    "endpoint": "/api/v1/stores/:store_id/external-products/:external_product_id",
+    "method": "GET",
+    "module": "external_product"
+  },
+  {
+    "id": "ab000005-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetExternalProductsByStoreIDAndStorePlatformID",
+    "endpoint": "/api/v1/stores/:store_id/external-products/store-platform/:store_platform_id",
+    "method": "GET",
+    "module": "external_product"
+  },
+  {
+    "id": "ab000006-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "UpdateExternalProductByStoreIDAndExprodID",
+    "endpoint": "/api/v1/stores/:store_id/external-products/:external_product_id",
+    "method": "PUT",
+    "module": "external_product"
+  },
+  {
+    "id": "ab000007-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "DeleteExternalProductByStoreIDAndExprodID",
+    "endpoint": "/api/v1/stores/:store_id/external-products/:external_product_id",
+    "method": "DELETE",
+    "module": "external_product"
   },
 
   {
@@ -290,55 +302,51 @@
     "method": "DELETE",
     "module": "vendor"
   },
+
   {
-    "id": "ab000001-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "CreateExternalProduct",
-    "endpoint": "/api/v1/external-products/",
+    "id": "abcdef01-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetOrders",
+    "endpoint": "/api/v1/orders",
+    "method": "GET",
+    "module": "order"
+  },
+  {
+    "id": "abcdef02-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetOrderByID",
+    "endpoint": "/api/v1/orders/:id",
+    "method": "GET",
+    "module": "order"
+  },
+
+  {
+    "id": "44444444-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateLog",
+    "endpoint": "/api/v1/logs/logs",
     "method": "POST",
-    "module": "external_product"
+    "module": "log"
   },
   {
-    "id": "ab000002-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetExternalProducts",
-    "endpoint": "/api/v1/external-products/",
+    "id": "55555555-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogs",
+    "endpoint": "/api/v1/logs/logs",
     "method": "GET",
-    "module": "external_product"
+    "module": "log"
   },
   {
-    "id": "ab000003-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetExternalProductByID",
-    "endpoint": "/api/v1/external-products/:id",
+    "id": "66666666-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogsByStore",
+    "endpoint": "/api/v1/logs/logs/store/:storeID",
     "method": "GET",
-    "module": "external_product"
+    "module": "log"
   },
   {
-    "id": "ab000004-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetExternalProductsByProductID",
-    "endpoint": "/api/v1/external-products/product/:productId",
+    "id": "77777777-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetLogsByDateRange",
+    "endpoint": "/api/v1/logs/logs/date-range",
     "method": "GET",
-    "module": "external_product"
+    "module": "log"
   },
-  {
-    "id": "ab000005-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "GetExternalProductsByStorePlatformID",
-    "endpoint": "/api/v1/external-products/store-platform/:storePlatformId",
-    "method": "GET",
-    "module": "external_product"
-  },
-  {
-    "id": "ab000006-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "UpdateExternalProduct",
-    "endpoint": "/api/v1/external-products/:id",
-    "method": "PUT",
-    "module": "external_product"
-  },
-  {
-    "id": "ab000007-0ea2-426c-89e7-e25e71c0b88f",
-    "name": "DeleteExternalProductByID",
-    "endpoint": "/api/v1/external-products/:id",
-    "method": "DELETE",
-    "module": "external_product"
-  },
+
   {
     "id": "0ea2426c-89e7-426c-b88f-111111111111",
     "name": "CreateInventoryLog",

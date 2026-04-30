@@ -52,7 +52,7 @@ func (is *impersonateService) StartImpersonate(ctx context.Context, adminID, tar
 	}
 
 	// ambil admin
-	admin, found, err := is.userRepo.GetUserByID(ctx, nil, &adminUUID)
+	admin, found, err := is.userRepo.GetUserByUserID(ctx, nil, &adminUUID)
 	if err != nil {
 		is.logger.Error("failed to get admin", zap.Error(err))
 		return nil, fmt.Errorf("failed to get admin: %w", dto.ErrInternal)
@@ -73,7 +73,7 @@ func (is *impersonateService) StartImpersonate(ctx context.Context, adminID, tar
 		return nil, fmt.Errorf("invalid target user id: %w", dto.ErrBadRequest)
 	}
 
-	targetUser, found, err := is.userRepo.GetUserByID(ctx, nil, &targetUUID)
+	targetUser, found, err := is.userRepo.GetUserByUserID(ctx, nil, &targetUUID)
 	if err != nil {
 		is.logger.Error("failed to get target user", zap.Error(err))
 		return nil, fmt.Errorf("failed to get target user: %w", dto.ErrInternal)
@@ -132,7 +132,7 @@ func (is *impersonateService) StopImpersonate(ctx context.Context, claims *jwt.C
 	}
 
 	// ambil user asli
-	user, found, err := is.userRepo.GetUserByID(ctx, nil, &originalUUID)
+	user, found, err := is.userRepo.GetUserByUserID(ctx, nil, &originalUUID)
 	if err != nil {
 		is.logger.Error("failed to get original user", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user: %w", dto.ErrInternal)

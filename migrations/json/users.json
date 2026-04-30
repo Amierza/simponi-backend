@@ -7,6 +7,7 @@
     "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
     "status": "active"
   },
+
   {
     "id": "9b6f1b48-fc88-43f0-b28e-56718efcf139",
     "name": "Jessica",
@@ -20,7 +21,7 @@
     "name": "Raymond",
     "email": "raymond33@gmail.com",
     "password": "hunter2pass",
-    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
     "status": "active"
   },
   {
@@ -35,7 +36,7 @@
     "id": "0de18934-1760-4e28-9f91-e390a12fd50e",
     "name": "Samuel",
     "email": "samuel88@gmail.com",
-    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
     "password": "samspassword",
     "status": "active"
   },
@@ -51,7 +52,7 @@
     "id": "f942df91-f6be-44cd-968c-0ed9056a9e19",
     "name": "Thomas",
     "email": "thomas12@gmail.com",
-    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
     "password": "thomaspass",
     "status": "inactive"
   },

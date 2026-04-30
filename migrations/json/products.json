@@ -5,6 +5,7 @@
     "description": "True wireless earbuds with active noise cancellation and 30hr battery life.",
     "sku": "ELC-WEP-001",
     "stock": 150,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000001",
     "created_at": "2024-01-05T08:00:00Z",
     "updated_at": "2024-01-05T08:00:00Z"
@@ -15,6 +16,7 @@
     "description": "Premium slim fit chino pants, wrinkle-resistant fabric.",
     "sku": "FSH-SCP-002",
     "stock": 8,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000002",
     "created_at": "2024-01-06T08:00:00Z",
     "updated_at": "2024-01-06T08:00:00Z"
@@ -25,6 +27,7 @@
     "description": "20% Vitamin C brightening serum with hyaluronic acid.",
     "sku": "HLT-VCS-003",
     "stock": 0,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000003",
     "created_at": "2024-01-07T08:00:00Z",
     "updated_at": "2024-01-07T08:00:00Z"
@@ -35,6 +38,7 @@
     "description": "Set of 4 handcrafted ceramic mugs, microwave and dishwasher safe.",
     "sku": "HOM-CCM-004",
     "stock": 60,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000004",
     "created_at": "2024-01-08T08:00:00Z",
     "updated_at": "2024-01-08T00:00:00Z"
@@ -45,6 +49,7 @@
     "description": "Tenkeyless mechanical keyboard with Cherry MX switches, RGB backlit.",
     "sku": "ELC-MKT-005",
     "stock": 25,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000001",
     "created_at": "2024-01-09T08:00:00Z",
     "updated_at": "2024-01-09T08:00:00Z"
@@ -55,6 +60,7 @@
     "description": "Breathable oversized linen shirt, available in multiple colors.",
     "sku": "FSH-OLS-006",
     "stock": 5,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000002",
     "created_at": "2024-01-10T08:00:00Z",
     "updated_at": "2024-01-10T08:00:00Z"
@@ -65,6 +71,7 @@
     "description": "Anti-aging retinol night cream with peptide complex.",
     "sku": "HLT-RNC-007",
     "stock": 40,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000003",
     "created_at": "2024-01-11T08:00:00Z",
     "updated_at": "2024-01-11T08:00:00Z"
@@ -75,6 +82,7 @@
     "description": "Large bamboo cutting board with juice groove, eco-friendly.",
     "sku": "HOM-BCB-008",
     "stock": 90,
+    "store_id": "e2b2c3d4-0007-4000-8000-000000000001",
     "category_id": "a1b2c3d4-0001-4000-8000-000000000004",
     "created_at": "2024-01-12T08:00:00Z",
     "updated_at": "2024-01-12T08:00:00Z"

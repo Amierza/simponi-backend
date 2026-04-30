@@ -14,10 +14,10 @@ func Role(route *gin.Engine, roleHandler handler.IRoleHandler, jwtService jwt.IJ
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateRole"), roleHandler.CreateRole)
 
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetRoles"), roleHandler.GetRoles)
-		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetRoleByID"), roleHandler.GetRoleByID)
+		routes.GET("/:role_id", middleware.RBAC(rolePermissionRepo, "GetRoleByRoleID"), roleHandler.GetRoleByRoleID)
 
-		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateRole"), roleHandler.UpdateRole)
+		routes.PUT("/:role_id", middleware.RBAC(rolePermissionRepo, "UpdateRoleByRoleID"), roleHandler.UpdateRoleByRoleID)
 
-		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteRoleByID"), roleHandler.DeleteRoleByID)
+		routes.DELETE("/:role_id", middleware.RBAC(rolePermissionRepo, "DeleteRoleByRoleID"), roleHandler.DeleteRoleByRoleID)
 	}
 }

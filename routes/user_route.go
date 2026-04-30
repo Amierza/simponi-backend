@@ -14,12 +14,12 @@ func User(route *gin.Engine, userHandler handler.IUserHandler, jwtService jwt.IJ
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateUser"), userHandler.CreateUser)
 
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetUsers"), userHandler.GetUsers)
-		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetUserByID"), userHandler.GetUserByID)
-		routes.GET("/profile", middleware.RBAC(rolePermissionRepo, "GetProfile"), userHandler.GetProfile)
+		routes.GET("/:user_id", middleware.RBAC(rolePermissionRepo, "GetUserByUserID"), userHandler.GetUserByUserID)
+		routes.GET("/profile", middleware.RBAC(rolePermissionRepo, "GetUserProfile"), userHandler.GetUserProfile)
 
-		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateUser"), userHandler.UpdateUser)
-		routes.PATCH("/:id/status", middleware.RBAC(rolePermissionRepo, "UpdateUserStatus"), userHandler.UpdateUserStatus)
+		routes.PUT("/:user_id", middleware.RBAC(rolePermissionRepo, "UpdateUserByUserID"), userHandler.UpdateUserByUserID)
+		routes.PATCH("/:user_id/status", middleware.RBAC(rolePermissionRepo, "UpdateUserStatusByUserID"), userHandler.UpdateUserStatusByUserID)
 
-		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteUserByID"), userHandler.DeleteUserByID)
+		routes.DELETE("/:user_id", middleware.RBAC(rolePermissionRepo, "DeleteUserByUserID"), userHandler.DeleteUserByUserID)
 	}
 }

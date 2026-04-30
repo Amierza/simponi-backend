@@ -20,15 +20,15 @@ type (
 
 		// GET
 		GetUsers(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.UserPaginationRepositoryResponse, error)
-		GetUserByID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) (*entity.User, bool, error)
+		GetUserByUserID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) (*entity.User, bool, error)
 		GetUserByEmail(ctx context.Context, tx *gorm.DB, email *string) (*entity.User, bool, error)
 
 		// UPDATE
-		UpdateUser(ctx context.Context, tx *gorm.DB, user *entity.User) error
-		UpdateUserStatus(ctx context.Context, tx *gorm.DB, user *entity.User) error
+		UpdateUserByUserID(ctx context.Context, tx *gorm.DB, user *entity.User) error
+		UpdateUserStatusByUserID(ctx context.Context, tx *gorm.DB, user *entity.User) error
 
 		// DELETE
-		DeleteUserByID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) error
+		DeleteUserByUserID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) error
 	}
 
 	userRepository struct {
@@ -99,7 +99,7 @@ func (ur *userRepository) GetUsers(ctx context.Context, tx *gorm.DB, req *respon
 		},
 	}, err
 }
-func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) (*entity.User, bool, error) {
+func (ur *userRepository) GetUserByUserID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) (*entity.User, bool, error) {
 	if tx == nil {
 		tx = ur.db
 	}
@@ -109,7 +109,7 @@ func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id *uuid
 		Preload("Role").
 		Preload("Role.RolePermissions.Permission").
 		Preload("Stores").
-		Where("id = ?", id).
+		Where("id = ?", userID).
 		Take(user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -128,7 +128,8 @@ func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email
 	user := new(entity.User)
 	err := tx.WithContext(ctx).
 		Preload("Role").
-		Preload("Stores").Where("email = ?", email).
+		Preload("Stores").
+		Where("email = ?", email).
 		Take(user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -141,14 +142,14 @@ func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email
 }
 
 // UPDATE
-func (ur *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user *entity.User) error {
+func (ur *userRepository) UpdateUserByUserID(ctx context.Context, tx *gorm.DB, user *entity.User) error {
 	if tx == nil {
 		tx = ur.db
 	}
 
 	return tx.WithContext(ctx).Model(&entity.User{}).Where("id = ?", user.ID).Updates(user).Error
 }
-func (ur *userRepository) UpdateUserStatus(ctx context.Context, tx *gorm.DB, user *entity.User) error {
+func (ur *userRepository) UpdateUserStatusByUserID(ctx context.Context, tx *gorm.DB, user *entity.User) error {
 	if tx == nil {
 		tx = ur.db
 	}
@@ -157,7 +158,7 @@ func (ur *userRepository) UpdateUserStatus(ctx context.Context, tx *gorm.DB, use
 }
 
 // DELETE
-func (ur *userRepository) DeleteUserByID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) error {
+func (ur *userRepository) DeleteUserByUserID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) error {
 	if tx == nil {
 		tx = ur.db
 	}

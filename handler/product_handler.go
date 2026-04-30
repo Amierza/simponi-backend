@@ -17,10 +17,10 @@ type (
 		CreateProduct(ctx *gin.Context)
 		GetProducts(ctx *gin.Context)
 		GetProductStats(ctx *gin.Context)
-		GetProductByID(ctx *gin.Context)
-		UpdateProduct(ctx *gin.Context)
-		UpdateStock(ctx *gin.Context)
-		DeleteProductByID(ctx *gin.Context)
+		GetProductByStoreIDAndProductID(ctx *gin.Context)
+		UpdateProductByStoreIDAndProductID(ctx *gin.Context)
+		UpdateStockByStoreIDAndProductID(ctx *gin.Context)
+		DeleteProductByStoreIDAndProductID(ctx *gin.Context)
 	}
 
 	productHandler struct {
@@ -37,7 +37,17 @@ func NewProductHandler(productService service.IProductService, logger *zap.Logge
 }
 
 func (ph *productHandler) CreateProduct(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
 	var payload dto.CreateProductRequest
+	payload.StoreID = &storeID
 	if err := ctx.ShouldBindBodyWithJSON(&payload); err != nil {
 		ph.logger.Error("invalid create product request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -59,6 +69,15 @@ func (ph *productHandler) CreateProduct(ctx *gin.Context) {
 }
 
 func (ph *productHandler) GetProducts(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
 		ph.logger.Error("invalid get products query payload", zap.Error(err), zap.Any("payload", payload))
@@ -68,7 +87,7 @@ func (ph *productHandler) GetProducts(ctx *gin.Context) {
 		return
 	}
 
-	result, err := ph.productService.GetProducts(ctx, &payload)
+	result, err := ph.productService.GetProducts(ctx, &payload, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -86,7 +105,16 @@ func (ph *productHandler) GetProducts(ctx *gin.Context) {
 }
 
 func (ph *productHandler) GetProductStats(ctx *gin.Context) {
-	result, err := ph.productService.GetProductStats(ctx)
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	result, err := ph.productService.GetProductStats(ctx, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product stats", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -98,10 +126,18 @@ func (ph *productHandler) GetProductStats(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (ph *productHandler) GetProductByID(ctx *gin.Context) {
-	productIDStr := ctx.Param("id")
-	productID, err := uuid.Parse(productIDStr)
+func (ph *productHandler) GetProductByStoreIDAndProductID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
 
+	productIDStr := ctx.Param("product_id")
+	productID, err := uuid.Parse(productIDStr)
 	if err != nil {
 		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
@@ -109,7 +145,7 @@ func (ph *productHandler) GetProductByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := ph.productService.GetProductByID(ctx, &productID)
+	result, err := ph.productService.GetProductByStoreIDAndProductID(ctx, &storeID, &productID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
@@ -121,8 +157,17 @@ func (ph *productHandler) GetProductByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (ph *productHandler) UpdateProduct(ctx *gin.Context) {
-	productIDStr := ctx.Param("id")
+func (ph *productHandler) UpdateProductByStoreIDAndProductID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	productIDStr := ctx.Param("product_id")
 	productID, err := uuid.Parse(productIDStr)
 	if err != nil {
 		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
@@ -132,6 +177,8 @@ func (ph *productHandler) UpdateProduct(ctx *gin.Context) {
 	}
 
 	var payload dto.UpdateProductRequest
+	payload.StoreID = &storeID
+	payload.ID = productID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ph.logger.Error("invalid update product request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -140,7 +187,7 @@ func (ph *productHandler) UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	result, err := ph.productService.UpdateProduct(ctx, &productID, &payload)
+	result, err := ph.productService.UpdateProductByStoreIDAndProductID(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -152,8 +199,17 @@ func (ph *productHandler) UpdateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (ph *productHandler) UpdateStock(ctx *gin.Context) {
-	productIDStr := ctx.Param("id")
+func (ph *productHandler) UpdateStockByStoreIDAndProductID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	productIDStr := ctx.Param("product_id")
 	productID, err := uuid.Parse(productIDStr)
 	if err != nil {
 		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
@@ -163,6 +219,8 @@ func (ph *productHandler) UpdateStock(ctx *gin.Context) {
 	}
 
 	var payload dto.UpdateStockRequest
+	payload.StoreID = &storeID
+	payload.ID = productID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ph.logger.Error("invalid update stock request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -171,7 +229,7 @@ func (ph *productHandler) UpdateStock(ctx *gin.Context) {
 		return
 	}
 
-	if err := ph.productService.UpdateStock(ctx, &productID, &payload); err != nil {
+	if err := ph.productService.UpdateStockByStoreIDAndProductID(ctx, &payload); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_UPDATE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)
@@ -182,8 +240,17 @@ func (ph *productHandler) UpdateStock(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (ph *productHandler) DeleteProductByID(ctx *gin.Context) {
-	productIDStr := ctx.Param("id")
+func (ph *productHandler) DeleteProductByStoreIDAndProductID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	productIDStr := ctx.Param("product_id")
 	productID, err := uuid.Parse(productIDStr)
 	if err != nil {
 		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
@@ -192,7 +259,7 @@ func (ph *productHandler) DeleteProductByID(ctx *gin.Context) {
 		return
 	}
 
-	if err := ph.productService.DeleteProductByID(ctx, &productID); err != nil {
+	if err := ph.productService.DeleteProductByStoreIDAndProductID(ctx, &storeID, &productID); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_DELETE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)

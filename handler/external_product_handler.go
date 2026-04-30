@@ -16,11 +16,10 @@ type (
 	IExternalProductHandler interface {
 		CreateExternalProduct(ctx *gin.Context)
 		GetExternalProducts(ctx *gin.Context)
-		GetExternalProductByID(ctx *gin.Context)
-		GetExternalProductsByProductID(ctx *gin.Context)
-		GetExternalProductsByStorePlatformID(ctx *gin.Context)
-		UpdateExternalProduct(ctx *gin.Context)
-		DeleteExternalProductByID(ctx *gin.Context)
+		GetExternalProductByStoreIDAndExprodID(ctx *gin.Context)
+		GetExternalProductsByStoreIDAndStorePlatformID(ctx *gin.Context)
+		UpdateExternalProductByStoreIDAndExprodID(ctx *gin.Context)
+		DeleteExternalProductByStoreIDAndExprodID(ctx *gin.Context)
 	}
 
 	externalProductHandler struct {
@@ -37,7 +36,17 @@ func NewExternalProductHandler(externalProductService service.IExternalProductSe
 }
 
 func (eph *externalProductHandler) CreateExternalProduct(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
 	var payload dto.CreateExternalProductRequest
+	payload.StoreID = &storeID
 	if err := ctx.ShouldBind(&payload); err != nil {
 		eph.logger.Error("invalid create external product request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -59,6 +68,15 @@ func (eph *externalProductHandler) CreateExternalProduct(ctx *gin.Context) {
 }
 
 func (eph *externalProductHandler) GetExternalProducts(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
 		eph.logger.Error("invalid get external products query payload", zap.Error(err), zap.Any("payload", payload))
@@ -68,7 +86,7 @@ func (eph *externalProductHandler) GetExternalProducts(ctx *gin.Context) {
 		return
 	}
 
-	result, err := eph.externalProductService.GetExternalProducts(ctx, &payload)
+	result, err := eph.externalProductService.GetExternalProducts(ctx, &payload, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -85,17 +103,26 @@ func (eph *externalProductHandler) GetExternalProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (eph *externalProductHandler) GetExternalProductByID(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := uuid.Parse(idStr)
+func (eph *externalProductHandler) GetExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		eph.logger.Error("invalid external product ID", zap.String("id", idStr), zap.Error(err))
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	externalProductIDStr := ctx.Param("external_product_id")
+	externalProductID, err := uuid.Parse(externalProductIDStr)
+	if err != nil {
+		eph.logger.Error("invalid external product ID", zap.String("id", externalProductIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	result, err := eph.externalProductService.GetExternalProductByID(ctx, &id)
+	result, err := eph.externalProductService.GetExternalProductByStoreIDAndExprodID(ctx, &storeID, &externalProductID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
@@ -107,39 +134,26 @@ func (eph *externalProductHandler) GetExternalProductByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (eph *externalProductHandler) GetExternalProductsByProductID(ctx *gin.Context) {
-	productIDStr := ctx.Param("productId")
-	productID, err := uuid.Parse(productIDStr)
+func (eph *externalProductHandler) GetExternalProductsByStoreIDAndStorePlatformID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		eph.logger.Error("invalid product ID", zap.String("productId", productIDStr), zap.Error(err))
-		res := response.BuildResponseFailed(fmt.Sprintf("%s external products", dto.FAILED_GET_ALL), dto.MESSAGE_FAILED_INVALID_UUID)
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	result, err := eph.externalProductService.GetExternalProductsByProductID(ctx, &productID)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s external products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s external products", dto.SUCCESS_GET_ALL), result)
-	ctx.JSON(http.StatusOK, res)
-}
-
-func (eph *externalProductHandler) GetExternalProductsByStorePlatformID(ctx *gin.Context) {
-	storePlatformIDStr := ctx.Param("storePlatformId")
+	storePlatformIDStr := ctx.Param("store_platform_id")
 	storePlatformID, err := uuid.Parse(storePlatformIDStr)
 	if err != nil {
-		eph.logger.Error("invalid store platform ID", zap.String("storePlatformId", storePlatformIDStr), zap.Error(err))
+		eph.logger.Error("invalid store platform ID", zap.String("store_platform_id", storePlatformIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external products", dto.FAILED_GET_ALL), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	result, err := eph.externalProductService.GetExternalProductsByStorePlatformID(ctx, &storePlatformID)
+	result, err := eph.externalProductService.GetExternalProductsByStoreIDAndStorePlatformID(ctx, &storeID, &storePlatformID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external products", dto.FAILED_GET_ALL), cleanErrorMessage(err))
@@ -151,17 +165,28 @@ func (eph *externalProductHandler) GetExternalProductsByStorePlatformID(ctx *gin
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (eph *externalProductHandler) UpdateExternalProduct(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := uuid.Parse(idStr)
+func (eph *externalProductHandler) UpdateExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		eph.logger.Error("invalid external product ID", zap.String("id", idStr), zap.Error(err))
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	externalProductIDString := ctx.Param("external_product_id")
+	externalProductID, err := uuid.Parse(externalProductIDString)
+	if err != nil {
+		eph.logger.Error("invalid external product ID", zap.String("id", externalProductIDString), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_UPDATE), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
 	var payload dto.UpdateExternalProductRequest
+	payload.StoreID = &storeID
+	payload.ID = externalProductID
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		eph.logger.Error("invalid update external product request payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -170,7 +195,7 @@ func (eph *externalProductHandler) UpdateExternalProduct(ctx *gin.Context) {
 		return
 	}
 
-	result, err := eph.externalProductService.UpdateExternalProduct(ctx, &id, &payload)
+	result, err := eph.externalProductService.UpdateExternalProductByStoreIDAndExprodID(ctx, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -182,17 +207,26 @@ func (eph *externalProductHandler) UpdateExternalProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (eph *externalProductHandler) DeleteExternalProductByID(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := uuid.Parse(idStr)
+func (eph *externalProductHandler) DeleteExternalProductByStoreIDAndExprodID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
-		eph.logger.Error("invalid external product ID", zap.String("id", idStr), zap.Error(err))
+		eph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	externalProductIDStr := ctx.Param("external_product_id")
+	externalProductID, err := uuid.Parse(externalProductIDStr)
+	if err != nil {
+		eph.logger.Error("invalid external product ID", zap.String("id", externalProductIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_DELETE), dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
-	if err := eph.externalProductService.DeleteExternalProductByID(ctx, &id); err != nil {
+	if err := eph.externalProductService.DeleteExternalProductByStoreIDAndExprodID(ctx, &storeID, &externalProductID); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s external product", dto.FAILED_DELETE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)

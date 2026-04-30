@@ -9,7 +9,7 @@ import (
 type StorePlatform struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 
-	StoreID *uuid.UUID `gorm:"type:uuid"`
+	StoreID *uuid.UUID `gorm:"type:uuid" json:"store_id"`
 	Store   *Store     `gorm:"foreignKey:StoreID;references:ID;constraint:OnDelete:CASCADE;"`
 
 	PlatformID *uuid.UUID `gorm:"type:uuid" json:"platform_id"`
@@ -25,6 +25,6 @@ type StorePlatform struct {
 
 	TimeStamp
 
-	// 🔥 1 store 1 platform
+	// 1 store 1 platform
 	_ struct{} `gorm:"uniqueIndex:idx_store_platform,unique"`
 }

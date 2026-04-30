@@ -15,8 +15,10 @@ import (
 
 type (
 	IPermissionRepository interface {
+		RunInTransaction(ctx context.Context, fn func(txRepo IPermissionRepository) error) error
+
 		// READ
-		GetPermissionByID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error)
+		GetPermissionByPermissionID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error)
 		GetPermissions(ctx context.Context, tx *gorm.DB) ([]*entity.Permission, error)
 		GetPermissionsWithPagination(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.PermissionPaginationRepositoryResponse, error)
 		GetPermissionsByRoleID(ctx context.Context, tx *gorm.DB, roleID *uuid.UUID) ([]*entity.Permission, error)
@@ -33,8 +35,15 @@ func NewPermissionRepository(db *gorm.DB) *permissionRepository {
 	}
 }
 
+func (pr *permissionRepository) RunInTransaction(ctx context.Context, fn func(txRepo IPermissionRepository) error) error {
+	return pr.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		txRepo := &permissionRepository{db: tx}
+		return fn(txRepo)
+	})
+}
+
 // READ
-func (pr *permissionRepository) GetPermissionByID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error) {
+func (pr *permissionRepository) GetPermissionByPermissionID(ctx context.Context, tx *gorm.DB, permissionID *uuid.UUID) (*entity.Permission, bool, error) {
 	if tx == nil {
 		tx = pr.db
 	}

@@ -16,9 +16,9 @@ type (
 	IRoleHandler interface {
 		CreateRole(ctx *gin.Context)
 		GetRoles(ctx *gin.Context)
-		GetRoleByID(ctx *gin.Context)
-		UpdateRole(ctx *gin.Context)
-		DeleteRoleByID(ctx *gin.Context)
+		GetRoleByRoleID(ctx *gin.Context)
+		UpdateRoleByRoleID(ctx *gin.Context)
+		DeleteRoleByRoleID(ctx *gin.Context)
 	}
 
 	roleHandler struct {
@@ -83,8 +83,8 @@ func (rh *roleHandler) GetRoles(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (rh *roleHandler) GetRoleByID(ctx *gin.Context) {
-	roleIDStr := ctx.Param("id")
+func (rh *roleHandler) GetRoleByRoleID(ctx *gin.Context) {
+	roleIDStr := ctx.Param("role_id")
 	roleID, err := uuid.Parse(roleIDStr)
 	if err != nil {
 		rh.logger.Error("invalid role ID", zap.String("id", roleIDStr), zap.Error(err))
@@ -93,7 +93,7 @@ func (rh *roleHandler) GetRoleByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := rh.roleService.GetRoleByID(ctx, &roleID)
+	result, err := rh.roleService.GetRoleByRoleID(ctx, &roleID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s role", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
@@ -105,7 +105,7 @@ func (rh *roleHandler) GetRoleByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (rh *roleHandler) UpdateRole(ctx *gin.Context) {
+func (rh *roleHandler) UpdateRoleByRoleID(ctx *gin.Context) {
 	roleIDStr := ctx.Param("id")
 	roleID, err := uuid.Parse(roleIDStr)
 	if err != nil {
@@ -124,7 +124,7 @@ func (rh *roleHandler) UpdateRole(ctx *gin.Context) {
 		return
 	}
 
-	result, err := rh.roleService.UpdateRole(ctx, &roleID, &payload)
+	result, err := rh.roleService.UpdateRoleByRoleID(ctx, &roleID, &payload)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s role", dto.FAILED_UPDATE), cleanErrorMessage(err))
@@ -136,7 +136,7 @@ func (rh *roleHandler) UpdateRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (rh *roleHandler) DeleteRoleByID(ctx *gin.Context) {
+func (rh *roleHandler) DeleteRoleByRoleID(ctx *gin.Context) {
 	roleIDStr := ctx.Param("id")
 	roleID, err := uuid.Parse(roleIDStr)
 	if err != nil {
@@ -146,7 +146,7 @@ func (rh *roleHandler) DeleteRoleByID(ctx *gin.Context) {
 		return
 	}
 
-	if err := rh.roleService.DeleteRoleByID(ctx, &roleID); err != nil {
+	if err := rh.roleService.DeleteRoleByRoleID(ctx, &roleID); err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(fmt.Sprintf("%s role", dto.FAILED_DELETE), cleanErrorMessage(err))
 		ctx.AbortWithStatusJSON(status, res)

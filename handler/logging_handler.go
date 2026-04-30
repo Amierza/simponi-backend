@@ -30,6 +30,27 @@ func NewLogHandler(logService service.ILogService, logger *zap.Logger) *logHandl
 	}
 }
 
+func (lh *logHandler) CreateLog(ctx *gin.Context) {
+	var req dto.LogRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		status := http.StatusBadRequest
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	result, err := lh.logService.CreateLog(ctx, req)
+	if err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s", dto.SUCCESS_CREATE_LOG), result)
+	ctx.JSON(http.StatusOK, res)
+}
+
 func (lh *logHandler) GetLogs(ctx *gin.Context) {
 	storeID := ctx.Query("store_id")
 	startDate := ctx.Query("start_date")
@@ -70,26 +91,5 @@ func (lh *logHandler) GetLogs(ctx *gin.Context) {
 		Data:     result.Data,
 		Meta:     result.PaginationResponse,
 	}
-	ctx.JSON(http.StatusOK, res)
-}
-
-func (lh *logHandler) CreateLog(ctx *gin.Context) {
-	var req dto.LogRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		status := http.StatusBadRequest
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	result, err := lh.logService.CreateLog(ctx, req)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_LOG), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s", dto.SUCCESS_CREATE_LOG), result)
 	ctx.JSON(http.StatusOK, res)
 }

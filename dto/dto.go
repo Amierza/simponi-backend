@@ -199,58 +199,223 @@ type (
 	}
 )
 
-// Logging
+// Role
 type (
-	LogRequest struct {
-		StoreID *uuid.UUID `json:"store_id" binding:"required"`
-		Action  string     `json:"action" binding:"required" example:"Create"`
-		Message string     `json:"message" binding:"required" example:"Created a new store"`
+	RoleResponse struct {
+		ID          uuid.UUID            `json:"id"`
+		Name        string               `json:"name"`
+		Permissions []PermissionResponse `json:"permissions"`
 	}
-	LogResponse struct {
-		ID        uuid.UUID  `json:"id"`
-		StoreID   *uuid.UUID `json:"store_id,omitempty"`
-		Action    string     `json:"action" example:"Create"`
-		Message   string     `json:"message" example:"Created a new store"`
-		CreatedAt time.Time  `json:"created_at"`
+	CreateRoleRequest struct {
+		Name           string       `json:"name" binding:"required"`
+		PermissionsIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
 	}
-	LogPaginationResponse struct {
+	UpdateRoleRequest struct {
+		ID            uuid.UUID    `json:"-"`
+		Name          string       `json:"name" binding:"required"`
+		PermissionIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
+	}
+	RolePaginationResponse struct {
 		response.PaginationResponse
-		Data []LogResponse `json:"data"`
+		Data []*RoleResponse `json:"data"`
 	}
-	LogPaginationRepositoryResponse struct {
+	RolePaginationRepositoryResponse struct {
 		response.PaginationResponse
-		Logs []entity.Log
+		Roles []*entity.Role
 	}
 )
 
-// Inventory Log
+// Permission
 type (
-	InventoryLogRequest struct {
-		ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
-		Change    int        `json:"change"` // -1, -2, +10
-		Source    string     `json:"source"` // shopee, tiktok, manual
-		Note      string     `json:"note"`
+	PermissionResponse struct {
+		ID       uuid.UUID `json:"id"`
+		Name     string    `json:"name"`
+		Endpoint string    `json:"endpoint"`
+		Method   string    `json:"method"`
+		Module   string    `json:"module"`
 	}
-	InventoryLogResponse struct {
-		ID        uuid.UUID        `gorm:"type:uuid;primaryKey" json:"id"`
-		Product   *ProductResponse `gorm:"type:uuid" json:"product"`
-		Change    int              `json:"change"` // -1, -2, +10
-		Source    string           `json:"source"` // shopee, tiktok, manual
-		Note      string           `json:"note"`
-		CreatedAt time.Time        `json:"created_at"`
-	}
-	InventoryLogPaginationResponse struct {
+	PermissionPaginationResponse struct {
 		response.PaginationResponse
-		Data []InventoryLogResponse `json:"data"`
+		Data []*PermissionResponse `json:"data"`
 	}
-	InventoryLogPaginationRepositoryResponse struct {
+	PermissionPaginationRepositoryResponse struct {
 		response.PaginationResponse
-		InventoryLogs []entity.InventoryLog
+		Permissions []*entity.Permission
+	}
+)
+
+// User
+type (
+	UserResponse struct {
+		ID       uuid.UUID    `json:"id"`
+		Email    string       `json:"email"`
+		Name     string       `json:"name"`
+		ImageURL string       `json:"image_url"`
+		Status   string       `json:"status"`
+		Role     RoleResponse `json:"role"`
+	}
+	CustomUserResponse struct {
+		ID    uuid.UUID `json:"id"`
+		Name  string    `json:"name"`
+		Email string    `json:"email"`
+	}
+	CreateUserRequest struct {
+		Email    string     `json:"email" binding:"email"`
+		Password string     `json:"password" binding:"required,min=5,max=8"`
+		Name     string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL string     `json:"image_url"`
+		RoleID   *uuid.UUID `json:"role_id"`
+	}
+	UpdateUserRequest struct {
+		ID       uuid.UUID  `json:"-"`
+		Email    string     `json:"email" binding:"email"`
+		Name     string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL *string    `json:"image_url,omitempty" binding:"omitempty"`
+		RoleID   *uuid.UUID `json:"role_id"`
+	}
+	UpdateUserStatus struct {
+		ID     uuid.UUID `json:"-"`
+		Status string    `json:"status" binding:"required"`
+	}
+	UserPaginationResponse struct {
+		response.PaginationResponse
+		Data []*UserResponse `json:"data"`
+	}
+	UserPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Users []*entity.User
+	}
+)
+
+// Store User
+type (
+	CreateStoreUsersRequest struct {
+		StoreID *uuid.UUID   `json:"-"`
+		UserIDs []*uuid.UUID `json:"user_ids" binding:"required"`
+	}
+	StoreUserPaginationResponse struct {
+		response.PaginationResponse
+		Data []*CustomUserResponse `json:"data"`
+	}
+	StoreUserPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		StoreUsers []*entity.StoreUser
+	}
+)
+
+// Platform
+type (
+	PlatformResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
+)
+
+// Store
+type (
+	StoreResponse struct {
+		ID          uuid.UUID          `json:"id"`
+		Name        string             `json:"name"`
+		Description string             `json:"description"`
+		ImageURL    string             `json:"image_url"`
+		IsActive    bool               `json:"is_active"`
+		Platforms   []PlatformResponse `json:"platforms"`
+	}
+	CustomStoreResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
+	CreateStoreRequest struct {
+		UserID      *uuid.UUID `json:"-"`
+		PlatformID  *uuid.UUID `json:"platform_id" binding:"required"`
+		Name        string     `json:"name" binding:"required,min=3,max=100"`
+		ImageURL    string     `json:"image_url,omitempty"`
+		Description string     `json:"description,omitempty"`
+	}
+	UpdateStoreRequest struct {
+		ID          uuid.UUID `json:"-"`
+		Name        string    `json:"name" binding:"required,min=3,max=100"`
+		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
+		Description *string   `json:"description,omitempty" binding:"omitempty"`
+		IsActive    *bool     `json:"is_active,omitempty" binding:"omitempty"`
+	}
+	StorePaginationResponse struct {
+		response.PaginationResponse
+		Data []*StoreResponse `json:"data"`
+	}
+	StorePaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Stores []*entity.Store
 	}
 )
 
 // Product
 type (
+	ProductResponse struct {
+		ID               uuid.UUID                 `json:"id"`
+		Name             string                    `json:"name" example:"Refined Bronze Hat"`
+		Description      string                    `json:"description"`
+		SKU              string                    `json:"sku" example:"L1L-448"`
+		Stock            int                       `json:"stock" example:"100"`
+		Store            *ProductStoreResponse     `json:"store,omitempty"`
+		Category         *ProductCategoryResponse  `json:"category,omitempty"`
+		Images           []ProductImageResponse    `json:"images,omitempty"`
+		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
+		CreatedAt        time.Time                 `json:"created_at"`
+		UpdatedAt        time.Time                 `json:"updated_at"`
+	}
+	CreateProductRequest struct {
+		StoreID     *uuid.UUID `json:"-"`
+		ImageID     *uuid.UUID `json:"image_id" binding:"omitempty"`
+		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
+		Description string     `json:"description,omitempty" example:"A very nice hat"`
+		SKU         string     `json:"sku" binding:"required" example:"L1L-448"`
+		Stock       int        `json:"stock" binding:"required,min=0" example:"100"`
+	}
+	UpdateProductRequest struct {
+		ID          uuid.UUID  `json:"-"`
+		Name        string     `json:"name" example:"Refined Bronze Hat"`
+		Description *string    `json:"description,omitempty" example:"A very nice hat"`
+		SKU         string     `json:"sku" example:"L1L-448"`
+		Stock       int        `json:"stock" example:"100"`
+		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+		StoreID     *uuid.UUID `json:"-,omitempty"`
+	}
+	UpdateStockRequest struct {
+		ID      uuid.UUID  `json:"-"`
+		Change  int        `json:"change" binding:"required" example:"-1"`
+		Source  string     `json:"source" binding:"required" example:"shopee"`
+		Note    string     `json:"note" example:"Order #12345"`
+		StoreID *uuid.UUID `json:"-,omitempty"`
+	}
+	ProductListResponse struct {
+		ID               uuid.UUID                 `json:"id"`
+		Name             string                    `json:"name"`
+		SKU              string                    `json:"sku"`
+		Stock            int                       `json:"stock"`
+		Store            *ProductStoreResponse     `json:"store,omitempty"`
+		Category         *ProductCategoryResponse  `json:"category,omitempty"`
+		Images           []ProductImageResponse    `json:"images,omitempty"`
+		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
+		Status           string                    `json:"status"` // "Mapped", "Unmapped", "Low Stock", "Out of Stock"
+		CreatedAt        time.Time                 `json:"created_at"`
+	}
+	ProductPaginationResponse struct {
+		response.PaginationResponse
+		Data []ProductListResponse `json:"data"`
+	}
+	ProductPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Products []entity.Product
+	}
+
+	// Product Store
+	ProductStoreResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
+
 	// Product Category
 	ProductCategoryRequest struct {
 		Name string `json:"name" binding:"required" example:"Electronics"`
@@ -268,17 +433,13 @@ type (
 		response.PaginationResponse
 		ProductCategories []entity.ProductCategory
 	}
-)
 
-type (
 	// Product Image
 	ProductImageResponse struct {
 		ID       uuid.UUID `json:"id"`
 		ImageURL string    `json:"image_url" example:"https://example.com/image.jpg"`
 	}
-)
 
-type (
 	// Product Stats
 	ProductStatsResponse struct {
 		TotalProducts int64 `json:"total_products"`
@@ -290,8 +451,78 @@ type (
 	}
 )
 
+// External Product
 type (
+	ExternalProductResponse struct {
+		ID                uuid.UUID `json:"id"`
+		ImageURL          string    `json:"image"`
+		ProductName       string    `json:"product_name"`
+		Platform          string    `json:"platform"`
+		StorePlatformName string    `json:"store_platform_name"`
+		Price             int64     `json:"price"`
+		CreatedAt         time.Time `json:"created_at"`
+		UpdatedAt         time.Time `json:"updated_at"`
+	}
+	CreateExternalProductRequest struct {
+		StoreID    *uuid.UUID `json:"-"`
+		ProductID  *uuid.UUID `json:"product_id" binding:"required"`
+		PlatformID *uuid.UUID `json:"platform_id" binding:"required"`
+		Price      int64      `json:"price" binding:"required,min=0"`
+	}
+	UpdateExternalProductRequest struct {
+		ID      uuid.UUID  `json:"-"`
+		StoreID *uuid.UUID `json:"-"`
+		Price   int64      `json:"price" binding:"required,min=0"`
+	}
+	ExternalProductPaginationResponse struct {
+		response.PaginationResponse
+		Data []ExternalProductResponse `json:"data"`
+	}
+	ExternalProductPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		ExternalProducts []entity.ExternalProduct
+	}
+)
 
+// Vendor
+type (
+	VendorResponse struct {
+		ID          uuid.UUID `json:"id"`
+		Name        string    `json:"name"`
+		Email       string    `json:"email"`
+		PhoneNumber string    `json:"phone"`
+		Address     string    `json:"address"`
+		ImageURL    string    `json:"image_url"`
+		Description string    `json:"description"`
+	}
+	CreateVendorRequest struct {
+		Name        string `json:"name" binding:"required,min=3,max=100"`
+		Email       string `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string `json:"phone_number" binding:"required"`
+		Address     string `json:"address,omitempty"`
+		ImageURL    string `json:"image_url,omitempty"`
+		Description string `json:"description,omitempty"`
+	}
+	UpdateVendorRequest struct {
+		ID          uuid.UUID `json:"-"`
+		Name        string    `json:"name" binding:"required,min=3,max=100"`
+		Email       *string   `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string    `json:"phone_number" binding:"required"`
+		Address     *string   `json:"address,omitempty" binding:"omitempty"`
+		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
+		Description *string   `json:"description,omitempty" binding:"omitempty"`
+	}
+	VendorPaginationResponse struct {
+		response.PaginationResponse
+		Data []*VendorResponse `json:"data"`
+	}
+	VendorPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Vendors []*entity.Vendor
+	}
+)
+
+type (
 	// Order
 	OrderResponse struct {
 		ID               uuid.UUID             `json:"id"`
@@ -350,248 +581,52 @@ type (
 	}
 )
 
+// Logging
 type (
-	CreateProductRequest struct {
-		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
-		Description string     `json:"description,omitempty" example:"A very nice hat"`
-		SKU         string     `json:"sku" binding:"required" example:"L1L-448"`
-		Stock       int        `json:"stock" binding:"required,min=0" example:"100"`
-		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
-		ImageID     *uuid.UUID `json:"image_id" binding:"required"`
+	LogRequest struct {
+		StoreID *uuid.UUID `json:"store_id" binding:"required"`
+		Action  string     `json:"action" binding:"required" example:"Create"`
+		Message string     `json:"message" binding:"required" example:"Created a new store"`
 	}
-
-	UpdateProductRequest struct {
-		ID          uuid.UUID  `json:"-"`
-		Name        string     `json:"name" example:"Refined Bronze Hat"`
-		Description *string    `json:"description,omitempty" example:"A very nice hat"`
-		SKU         string     `json:"sku" example:"L1L-448"`
-		Stock       int        `json:"stock" example:"100"`
-		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
+	LogResponse struct {
+		ID        uuid.UUID  `json:"id"`
+		StoreID   *uuid.UUID `json:"store_id,omitempty"`
+		Action    string     `json:"action" example:"Create"`
+		Message   string     `json:"message" example:"Created a new store"`
+		CreatedAt time.Time  `json:"created_at"`
 	}
-
-	UpdateStockRequest struct {
-		Change int    `json:"change" binding:"required" example:"-1"`
-		Source string `json:"source" binding:"required" example:"shopee"`
-		Note   string `json:"note" example:"Order #12345"`
-	}
-
-	ProductResponse struct {
-		ID               uuid.UUID                 `json:"id"`
-		Name             string                    `json:"name" example:"Refined Bronze Hat"`
-		Description      string                    `json:"description"`
-		SKU              string                    `json:"sku" example:"L1L-448"`
-		Stock            int                       `json:"stock" example:"100"`
-		Category         *ProductCategoryResponse  `json:"category,omitempty"`
-		Images           []ProductImageResponse    `json:"images,omitempty"`
-		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
-		CreatedAt        time.Time                 `json:"created_at"`
-		UpdatedAt        time.Time                 `json:"updated_at"`
-	}
-	ProductListResponse struct {
-		ID               uuid.UUID                 `json:"id"`
-		Name             string                    `json:"name"`
-		SKU              string                    `json:"sku"`
-		Stock            int                       `json:"stock"`
-		Category         *ProductCategoryResponse  `json:"category,omitempty"`
-		Images           []ProductImageResponse    `json:"images,omitempty"`
-		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
-		Status           string                    `json:"status"` // "Mapped", "Unmapped", "Low Stock", "Out of Stock"
-		CreatedAt        time.Time                 `json:"created_at"`
-	}
-	ProductPaginationResponse struct {
+	LogPaginationResponse struct {
 		response.PaginationResponse
-		Data []ProductListResponse `json:"data"`
+		Data []LogResponse `json:"data"`
 	}
-	ProductPaginationRepositoryResponse struct {
+	LogPaginationRepositoryResponse struct {
 		response.PaginationResponse
-		Products []entity.Product
+		Logs []entity.Log
 	}
 )
 
-// External Product
+// Inventory Log
 type (
-	CreateExternalProductRequest struct {
-		ProductID       *uuid.UUID `json:"product_id" binding:"required"`
-		StorePlatformID *uuid.UUID `json:"store_platform_id" binding:"required"`
-		Price           int64      `json:"price" binding:"required,min=0"`
+	InventoryLogRequest struct {
+		ProductID *uuid.UUID `gorm:"type:uuid" json:"product_id"`
+		Change    int        `json:"change"` // -1, -2, +10
+		Source    string     `json:"source"` // shopee, tiktok, manual
+		Note      string     `json:"note"`
 	}
-
-	UpdateExternalProductRequest struct {
-		ID    uuid.UUID `json:"-"`
-		Price int64     `json:"price" binding:"required,min=0"`
+	InventoryLogResponse struct {
+		ID        uuid.UUID        `gorm:"type:uuid;primaryKey" json:"id"`
+		Product   *ProductResponse `gorm:"type:uuid" json:"product"`
+		Change    int              `json:"change"` // -1, -2, +10
+		Source    string           `json:"source"` // shopee, tiktok, manual
+		Note      string           `json:"note"`
+		CreatedAt time.Time        `json:"created_at"`
 	}
-
-	ExternalProductResponse struct {
-		ID                uuid.UUID `json:"id"`
-		ImageURL          string    `json:"image"`
-		ProductName       string    `json:"product_name"`
-		Platform          string    `json:"platform"`
-		StorePlatformName string    `json:"store_platform_name"`
-		Price             int64     `json:"price"`
-		CreatedAt         time.Time `json:"created_at"`
-		UpdatedAt         time.Time `json:"updated_at"`
-	}
-
-	ExternalProductPaginationResponse struct {
+	InventoryLogPaginationResponse struct {
 		response.PaginationResponse
-		Data []ExternalProductResponse `json:"data"`
+		Data []InventoryLogResponse `json:"data"`
 	}
-
-	ExternalProductPaginationRepositoryResponse struct {
+	InventoryLogPaginationRepositoryResponse struct {
 		response.PaginationResponse
-		ExternalProducts []entity.ExternalProduct
-	}
-)
-
-// Role
-type (
-	RoleResponse struct {
-		ID          uuid.UUID            `json:"id"`
-		Name        string               `json:"name"`
-		Permissions []PermissionResponse `json:"permissions"`
-	}
-	CreateRoleRequest struct {
-		Name           string       `json:"name" binding:"required"`
-		PermissionsIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
-	}
-	UpdateRoleRequest struct {
-		ID            uuid.UUID    `json:"-"`
-		Name          string       `json:"name" binding:"required"`
-		PermissionIDs []*uuid.UUID `json:"permission_ids" binding:"required"`
-	}
-	RolePaginationResponse struct {
-		response.PaginationResponse
-		Data []*RoleResponse `json:"data"`
-	}
-	RolePaginationRepositoryResponse struct {
-		response.PaginationResponse
-		Roles []*entity.Role
-	}
-)
-
-// Permission
-type (
-	PermissionResponse struct {
-		ID       uuid.UUID `json:"id"`
-		Name     string    `json:"name"`
-		Endpoint string    `json:"endpoint"`
-		Method   string    `json:"method"`
-		Module   string    `json:"module"`
-	}
-	PermissionPaginationResponse struct {
-		response.PaginationResponse
-		Data []*PermissionResponse `json:"data"`
-	}
-	PermissionPaginationRepositoryResponse struct {
-		response.PaginationResponse
-		Permissions []*entity.Permission
-	}
-)
-
-// User
-type (
-	UserResponse struct {
-		ID       uuid.UUID    `json:"id"`
-		Email    string       `json:"email"`
-		Name     string       `json:"name"`
-		ImageURL string       `json:"image_url"`
-		Status   string       `json:"status"`
-		Role     RoleResponse `json:"role"`
-	}
-	CreateUserRequest struct {
-		Email    string     `json:"email" binding:"email"`
-		Password string     `json:"password" binding:"required,min=5,max=8"`
-		Name     string     `json:"name" binding:"required,min=3,max=100"`
-		ImageURL string     `json:"image_url"`
-		RoleID   *uuid.UUID `json:"role_id"`
-	}
-	UpdateUserRequest struct {
-		ID       uuid.UUID  `json:"-"`
-		Email    string     `json:"email" binding:"email"`
-		Name     string     `json:"name" binding:"required,min=3,max=100"`
-		ImageURL *string    `json:"image_url,omitempty" binding:"omitempty"`
-		RoleID   *uuid.UUID `json:"role_id"`
-	}
-	UpdateUserStatus struct {
-		Status string `json:"status" binding:"required"`
-	}
-	UserPaginationResponse struct {
-		response.PaginationResponse
-		Data []*UserResponse `json:"data"`
-	}
-	UserPaginationRepositoryResponse struct {
-		response.PaginationResponse
-		Users []*entity.User
-	}
-)
-
-// Vendor
-type (
-	VendorResponse struct {
-		ID          uuid.UUID `json:"id"`
-		Name        string    `json:"name"`
-		Email       string    `json:"email"`
-		PhoneNumber string    `json:"phone"`
-		Address     string    `json:"address"`
-		ImageURL    string    `json:"image_url"`
-		Description string    `json:"description"`
-	}
-	CreateVendorRequest struct {
-		Name        string `json:"name" binding:"required,min=3,max=100"`
-		Email       string `json:"email,omitempty" binding:"omitempty,email"`
-		PhoneNumber string `json:"phone_number" binding:"required"`
-		Address     string `json:"address,omitempty"`
-		ImageURL    string `json:"image_url,omitempty"`
-		Description string `json:"description,omitempty"`
-	}
-	UpdateVendorRequest struct {
-		ID          uuid.UUID `json:"-"`
-		Name        string    `json:"name" binding:"required,min=3,max=100"`
-		Email       *string   `json:"email,omitempty" binding:"omitempty,email"`
-		PhoneNumber string    `json:"phone_number" binding:"required"`
-		Address     *string   `json:"address,omitempty" binding:"omitempty"`
-		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
-		Description *string   `json:"description,omitempty" binding:"omitempty"`
-	}
-	VendorPaginationResponse struct {
-		response.PaginationResponse
-		Data []*VendorResponse `json:"data"`
-	}
-	VendorPaginationRepositoryResponse struct {
-		response.PaginationResponse
-		Vendors []*entity.Vendor
-	}
-)
-
-// Store
-type (
-	StoreResponse struct {
-		ID          uuid.UUID `json:"id"`
-		Name        string    `json:"name"`
-		Description string    `json:"description"`
-		ImageURL    string    `json:"image_url"`
-		IsActive    bool      `json:"is_active"`
-		// User        UserResponse `json:"user"` // karena nanti akan diubah
-	}
-	CreateStoreRequest struct {
-		Name        string     `json:"name" binding:"required,min=3,max=100"`
-		ImageURL    string     `json:"image_url,omitempty"`
-		Description string     `json:"description,omitempty"`
-		UserID      *uuid.UUID `json:"-"`
-	}
-	UpdateStoreRequest struct {
-		ID          uuid.UUID `json:"-"`
-		Name        string    `json:"name" binding:"required,min=3,max=100"`
-		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
-		Description *string   `json:"description,omitempty" binding:"omitempty"`
-		IsActive    *bool     `json:"is_active,omitempty" binding:"omitempty"`
-	}
-	StorePaginationResponse struct {
-		response.PaginationResponse
-		Data []*StoreResponse `json:"data"`
-	}
-	StorePaginationRepositoryResponse struct {
-		response.PaginationResponse
-		Stores []*entity.Store
+		InventoryLogs []entity.InventoryLog
 	}
 )

@@ -14,6 +14,7 @@ func Migrate(db *gorm.DB) error {
 
 		&entity.Platform{},
 		&entity.Store{},
+		&entity.StoreUser{},
 		&entity.StoreCredential{},
 		&entity.Log{},
 		&entity.StorePlatform{},

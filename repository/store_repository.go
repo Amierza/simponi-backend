@@ -20,13 +20,14 @@ type (
 
 		// READ
 		GetStores(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.StorePaginationRepositoryResponse, error)
-		GetStoreByID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error)
+		GetStoresByUserID(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, userID *uuid.UUID) (dto.StorePaginationRepositoryResponse, error)
+		GetStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error)
 
 		// UPDATE
-		UpdateStore(ctx context.Context, tx *gorm.DB, store *entity.Store) error
+		UpdateStoreByStoreID(ctx context.Context, tx *gorm.DB, store *entity.Store) error
 
 		// DELETE
-		DeleteStoreByID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) error
+		DeleteStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) error
 	}
 
 	storeRepository struct {
@@ -69,7 +70,7 @@ func (vr *storeRepository) GetStores(ctx context.Context, tx *gorm.DB, req *resp
 
 	query := tx.WithContext(ctx).
 		Model(&entity.Store{}).
-		Preload("StorePlatforms").
+		Preload("StorePlatforms.Platform").
 		Preload("Orders").
 		Preload("Logs")
 
@@ -98,7 +99,57 @@ func (vr *storeRepository) GetStores(ctx context.Context, tx *gorm.DB, req *resp
 		},
 	}, err
 }
-func (vr *storeRepository) GetStoreByID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error) {
+func (vr *storeRepository) GetStoresByUserID(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, userID *uuid.UUID) (dto.StorePaginationRepositoryResponse, error) {
+	if tx == nil {
+		tx = vr.db
+	}
+
+	var stores []*entity.Store
+	var err error
+	var count int64
+
+	if req.PerPage == 0 {
+		req.PerPage = 10
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
+	query := tx.WithContext(ctx).
+		Model(&entity.Store{}).
+		Joins("JOIN store_users su ON su.store_id = stores.id").
+		Where("su.user_id = ?", userID).
+		Preload("StorePlatforms.Platform").
+		Preload("Orders").
+		Preload("Logs")
+
+	if req.Search != "" {
+		searchValue := "%" + strings.ToLower(req.Search) + "%"
+		query = query.Where("LOWER(name) LIKE ? OR LOWER(description) LIKE ?", searchValue, searchValue)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return dto.StorePaginationRepositoryResponse{}, err
+	}
+
+	if err := query.Order(`"created_at" DESC`).Scopes(response.Paginate(req.Page, req.PerPage)).Find(&stores).Error; err != nil {
+		return dto.StorePaginationRepositoryResponse{}, err
+	}
+
+	totalPage := int64(math.Ceil(float64(count) / float64(req.PerPage)))
+
+	return dto.StorePaginationRepositoryResponse{
+		Stores: stores,
+		PaginationResponse: response.PaginationResponse{
+			Page:    req.Page,
+			PerPage: req.PerPage,
+			MaxPage: totalPage,
+			Count:   count,
+		},
+	}, err
+}
+func (vr *storeRepository) GetStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error) {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -106,7 +157,7 @@ func (vr *storeRepository) GetStoreByID(ctx context.Context, tx *gorm.DB, storeI
 	var store *entity.Store
 	err := tx.WithContext(ctx).
 		Model(&entity.Store{}).
-		Preload("StorePlatforms").
+		Preload("StorePlatforms.Platform").
 		Preload("Orders").
 		Preload("Logs").
 		Where("id = ?", storeID).
@@ -122,7 +173,7 @@ func (vr *storeRepository) GetStoreByID(ctx context.Context, tx *gorm.DB, storeI
 }
 
 // UPDATE
-func (vr *storeRepository) UpdateStore(ctx context.Context, tx *gorm.DB, store *entity.Store) error {
+func (vr *storeRepository) UpdateStoreByStoreID(ctx context.Context, tx *gorm.DB, store *entity.Store) error {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -139,7 +190,7 @@ func (vr *storeRepository) UpdateStore(ctx context.Context, tx *gorm.DB, store *
 }
 
 // DELETE
-func (vr *storeRepository) DeleteStoreByID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) error {
+func (vr *storeRepository) DeleteStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) error {
 	if tx == nil {
 		tx = vr.db
 	}

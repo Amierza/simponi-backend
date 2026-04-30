@@ -11,18 +11,20 @@ import (
 	"github.com/Amierza/simponi-backend/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type (
 	IRoleService interface {
 		CreateRole(ctx context.Context, req *dto.CreateRoleRequest) (*dto.RoleResponse, error)
 		GetRoles(ctx context.Context, req *response.PaginationRequest) (dto.RolePaginationResponse, error)
-		GetRoleByID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error)
-		UpdateRole(ctx context.Context, roleID *uuid.UUID, req *dto.UpdateRoleRequest) (*dto.RoleResponse, error)
-		DeleteRoleByID(ctx context.Context, roleID *uuid.UUID) error
+		GetRoleByRoleID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error)
+		UpdateRoleByRoleID(ctx context.Context, roleID *uuid.UUID, req *dto.UpdateRoleRequest) (*dto.RoleResponse, error)
+		DeleteRoleByRoleID(ctx context.Context, roleID *uuid.UUID) error
 	}
 
 	roleService struct {
+		tx                 repository.ITransaction
 		roleRepo           repository.IRoleRepository
 		permissionRepo     repository.IPermissionRepository
 		rolePermissionRepo repository.IRolePermissionRepository
@@ -31,8 +33,9 @@ type (
 	}
 )
 
-func NewRoleService(roleRepo repository.IRoleRepository, permissionRepo repository.IPermissionRepository, rolePermissionRepo repository.IRolePermissionRepository, logger *zap.Logger, jwtService jwt.IJWT) *roleService {
+func NewRoleService(tx repository.ITransaction, roleRepo repository.IRoleRepository, permissionRepo repository.IPermissionRepository, rolePermissionRepo repository.IRolePermissionRepository, logger *zap.Logger, jwtService jwt.IJWT) *roleService {
 	return &roleService{
+		tx:                 tx,
 		roleRepo:           roleRepo,
 		permissionRepo:     permissionRepo,
 		rolePermissionRepo: rolePermissionRepo,
@@ -71,7 +74,7 @@ func (rs *roleService) CreateRole(ctx context.Context, req *dto.CreateRoleReques
 
 	var permissions []*entity.Permission
 	for _, permissionID := range req.PermissionsIDs {
-		permission, found, err := rs.permissionRepo.GetPermissionByID(ctx, nil, permissionID)
+		permission, found, err := rs.permissionRepo.GetPermissionByPermissionID(ctx, nil, permissionID)
 		if err != nil {
 			rs.logger.Error("failed to get permission by id", zap.String("id", permission.ID.String()), zap.Error(err))
 			return nil, fmt.Errorf("failed to get permission by id: %w", dto.ErrInternal)
@@ -136,8 +139,8 @@ func (rs *roleService) GetRoles(ctx context.Context, req *response.PaginationReq
 	}, nil
 }
 
-func (rs *roleService) GetRoleByID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error) {
-	role, found, err := rs.roleRepo.GetRoleByID(ctx, nil, roleID)
+func (rs *roleService) GetRoleByRoleID(ctx context.Context, roleID *uuid.UUID) (*dto.RoleResponse, error) {
+	role, found, err := rs.roleRepo.GetRoleByRoleID(ctx, nil, roleID)
 	if err != nil {
 		rs.logger.Error("failed to get role by ID", zap.String("roleID", roleID.String()), zap.Error(err))
 		return nil, fmt.Errorf("failed to get role ID: %w", dto.ErrInternal)
@@ -158,8 +161,8 @@ func (rs *roleService) GetRoleByID(ctx context.Context, roleID *uuid.UUID) (*dto
 	return mapToRoleResponse(role, rawPermissions), nil
 }
 
-func (rs *roleService) UpdateRole(ctx context.Context, roleID *uuid.UUID, req *dto.UpdateRoleRequest) (*dto.RoleResponse, error) {
-	role, found, err := rs.roleRepo.GetRoleByID(ctx, nil, roleID)
+func (rs *roleService) UpdateRoleByRoleID(ctx context.Context, roleID *uuid.UUID, req *dto.UpdateRoleRequest) (*dto.RoleResponse, error) {
+	role, found, err := rs.roleRepo.GetRoleByRoleID(ctx, nil, roleID)
 	if err != nil {
 		rs.logger.Error("failed to get role by ID", zap.String("roleID", roleID.String()), zap.Error(err))
 		return nil, fmt.Errorf("failed to get role ID: %w", dto.ErrInternal)
@@ -172,7 +175,7 @@ func (rs *roleService) UpdateRole(ctx context.Context, roleID *uuid.UUID, req *d
 
 	var permissions []*entity.Permission
 	for _, permissionID := range req.PermissionIDs {
-		permission, found, err := rs.permissionRepo.GetPermissionByID(ctx, nil, permissionID)
+		permission, found, err := rs.permissionRepo.GetPermissionByPermissionID(ctx, nil, permissionID)
 		if err != nil {
 			rs.logger.Error("failed to get permission by name", zap.String("name", permission.Name), zap.Error(err))
 			return nil, fmt.Errorf("failed to get permission by name: %w", dto.ErrInternal)
@@ -184,8 +187,8 @@ func (rs *roleService) UpdateRole(ctx context.Context, roleID *uuid.UUID, req *d
 		permissions = append(permissions, permission)
 	}
 
-	err = rs.roleRepo.RunInTransaction(ctx, func(txRepo repository.IRoleRepository) error {
-		err = txRepo.UpdateRole(ctx, nil, role)
+	err = rs.tx.Run(ctx, func(tx *gorm.DB) error {
+		err = rs.roleRepo.UpdateRoleByRoleID(ctx, nil, role)
 		if err != nil {
 			rs.logger.Error("failed to update role", zap.String("id", roleID.String()), zap.Error(err))
 			return fmt.Errorf("failed to update role: %w", dto.ErrInternal)
@@ -216,8 +219,8 @@ func (rs *roleService) UpdateRole(ctx context.Context, roleID *uuid.UUID, req *d
 	return mapToRoleResponse(role, permissions), nil
 }
 
-func (rs *roleService) DeleteRoleByID(ctx context.Context, roleID *uuid.UUID) error {
-	role, found, err := rs.roleRepo.GetRoleByID(ctx, nil, roleID)
+func (rs *roleService) DeleteRoleByRoleID(ctx context.Context, roleID *uuid.UUID) error {
+	role, found, err := rs.roleRepo.GetRoleByRoleID(ctx, nil, roleID)
 	if err != nil {
 		rs.logger.Error("failed to get role by ID", zap.String("roleID", roleID.String()), zap.Error(err))
 		return fmt.Errorf("failed to get role ID: %w", dto.ErrInternal)
@@ -227,14 +230,18 @@ func (rs *roleService) DeleteRoleByID(ctx context.Context, roleID *uuid.UUID) er
 		return fmt.Errorf("role not found: %v", dto.ErrNotFound)
 	}
 
-	if err := rs.rolePermissionRepo.DeleteRolePermissionsByRoleID(ctx, nil, &role.ID); err != nil {
-		return fmt.Errorf("failed to delete role permissions by role id: %w", dto.ErrInternal)
-	}
+	err = rs.tx.Run(ctx, func(tx *gorm.DB) error {
+		if err := rs.rolePermissionRepo.DeleteRolePermissionsByRoleID(ctx, nil, &role.ID); err != nil {
+			return fmt.Errorf("failed to delete role permissions by role id: %w", dto.ErrInternal)
+		}
 
-	if err := rs.roleRepo.DeleteRoleByID(ctx, nil, roleID); err != nil {
-		rs.logger.Error("failed to delete role by id", zap.String("roleID", roleID.String()), zap.Error(err))
-		return fmt.Errorf("failed to delete role by id: %w", dto.ErrInternal)
-	}
+		if err := rs.roleRepo.DeleteRoleByRoleID(ctx, nil, roleID); err != nil {
+			rs.logger.Error("failed to delete role by id", zap.String("roleID", roleID.String()), zap.Error(err))
+			return fmt.Errorf("failed to delete role by id: %w", dto.ErrInternal)
+		}
+
+		return nil
+	})
 
 	return nil
 }

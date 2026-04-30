@@ -16,12 +16,11 @@ import (
 type (
 	IExternalProductRepository interface {
 		CreateExternalProduct(ctx context.Context, tx *gorm.DB, externalProduct *entity.ExternalProduct) (*entity.ExternalProduct, error)
-		GetExternalProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ExternalProductPaginationRepositoryResponse, error)
-		GetExternalProductByID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) (*entity.ExternalProduct, bool, error)
-		GetExternalProductByProductID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) ([]entity.ExternalProduct, error)
-		GetExternalProductByStorePlatformID(ctx context.Context, tx *gorm.DB, storePlatformID *uuid.UUID) ([]entity.ExternalProduct, error)
-		UpdateExternalProduct(ctx context.Context, tx *gorm.DB, externalProduct *entity.ExternalProduct) (*entity.ExternalProduct, error)
-		DeleteExternalProductByID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) error
+		GetExternalProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ExternalProductPaginationRepositoryResponse, error)
+		GetExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, externalProductID *uuid.UUID) (*entity.ExternalProduct, bool, error)
+		GetExternalProductsByStoreIDAndStorePlatformID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, storePlatformID *uuid.UUID) ([]entity.ExternalProduct, error)
+		UpdateExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, externalProduct *entity.ExternalProduct) (*entity.ExternalProduct, error)
+		DeleteExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) error
 	}
 
 	externalProductRepository struct {
@@ -47,7 +46,7 @@ func (epr *externalProductRepository) CreateExternalProduct(ctx context.Context,
 	return externalProduct, nil
 }
 
-func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.ExternalProductPaginationRepositoryResponse, error) {
+func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ExternalProductPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = epr.db
 	}
@@ -65,6 +64,8 @@ func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, t
 
 	query := tx.WithContext(ctx).
 		Model(&entity.ExternalProduct{}).
+		Joins("JOIN store_platforms sp ON sp.id = external_products.store_platform_id").
+		Where("sp.store_id = ?", storeID).
 		Preload("Product").
 		Preload("Product.Images").
 		Preload("StorePlatform").
@@ -99,7 +100,7 @@ func (epr *externalProductRepository) GetExternalProducts(ctx context.Context, t
 	}, nil
 }
 
-func (epr *externalProductRepository) GetExternalProductByID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) (*entity.ExternalProduct, bool, error) {
+func (epr *externalProductRepository) GetExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, externalProductID *uuid.UUID) (*entity.ExternalProduct, bool, error) {
 	if tx == nil {
 		tx = epr.db
 	}
@@ -113,7 +114,9 @@ func (epr *externalProductRepository) GetExternalProductByID(ctx context.Context
 		Preload("StorePlatform").
 		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform").
-		Where("id = ?", externalProductID).
+		Joins("JOIN store_platforms sp ON sp.id = external_products.store_platform_id").
+		Where("sp.store_id = ?", storeID).
+		Where("external_products.id = ?", externalProductID).
 		First(&externalProduct).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -125,7 +128,7 @@ func (epr *externalProductRepository) GetExternalProductByID(ctx context.Context
 	return &externalProduct, true, nil
 }
 
-func (epr *externalProductRepository) GetExternalProductByProductID(ctx context.Context, tx *gorm.DB, productID *uuid.UUID) ([]entity.ExternalProduct, error) {
+func (epr *externalProductRepository) GetExternalProductsByStoreIDAndStorePlatformID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, storePlatformID *uuid.UUID) ([]entity.ExternalProduct, error) {
 	if tx == nil {
 		tx = epr.db
 	}
@@ -139,7 +142,9 @@ func (epr *externalProductRepository) GetExternalProductByProductID(ctx context.
 		Preload("StorePlatform").
 		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform").
-		Where("product_id = ?", productID).
+		Joins("JOIN store_platforms sp ON sp.ID = external_products.store_platform_id").
+		Where("sp.id = ?", storePlatformID).
+		Where("sp.store_id = ?", storeID).
 		Find(&externalProducts).Error; err != nil {
 		return nil, err
 	}
@@ -147,29 +152,7 @@ func (epr *externalProductRepository) GetExternalProductByProductID(ctx context.
 	return externalProducts, nil
 }
 
-func (epr *externalProductRepository) GetExternalProductByStorePlatformID(ctx context.Context, tx *gorm.DB, storePlatformID *uuid.UUID) ([]entity.ExternalProduct, error) {
-	if tx == nil {
-		tx = epr.db
-	}
-
-	var externalProducts []entity.ExternalProduct
-
-	if err := tx.WithContext(ctx).
-		Model(&entity.ExternalProduct{}).
-		Preload("Product").
-		Preload("Product.Images").
-		Preload("StorePlatform").
-		Preload("StorePlatform.Store").
-		Preload("StorePlatform.Platform").
-		Where("store_platform_id = ?", storePlatformID).
-		Find(&externalProducts).Error; err != nil {
-		return nil, err
-	}
-
-	return externalProducts, nil
-}
-
-func (epr *externalProductRepository) UpdateExternalProduct(ctx context.Context, tx *gorm.DB, externalProduct *entity.ExternalProduct) (*entity.ExternalProduct, error) {
+func (epr *externalProductRepository) UpdateExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, externalProduct *entity.ExternalProduct) (*entity.ExternalProduct, error) {
 	if tx == nil {
 		tx = epr.db
 	}
@@ -181,7 +164,7 @@ func (epr *externalProductRepository) UpdateExternalProduct(ctx context.Context,
 	return externalProduct, nil
 }
 
-func (epr *externalProductRepository) DeleteExternalProductByID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) error {
+func (epr *externalProductRepository) DeleteExternalProductByStoreIDAndExprodID(ctx context.Context, tx *gorm.DB, externalProductID *uuid.UUID) error {
 	if tx == nil {
 		tx = epr.db
 	}
