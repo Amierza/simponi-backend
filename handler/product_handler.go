@@ -16,6 +16,7 @@ type (
 	IProductHandler interface {
 		CreateProduct(ctx *gin.Context)
 		GetProducts(ctx *gin.Context)
+		GetProductCategory(ctx *gin.Context)
 		GetProductStats(ctx *gin.Context)
 		GetProductByID(ctx *gin.Context)
 		UpdateProduct(ctx *gin.Context)
@@ -59,7 +60,7 @@ func (ph *productHandler) CreateProduct(ctx *gin.Context) {
 }
 
 func (ph *productHandler) GetProducts(ctx *gin.Context) {
-	var payload response.PaginationRequest
+	var payload dto.ProductPaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
 		ph.logger.Error("invalid get products query payload", zap.Error(err), zap.Any("payload", payload))
 		status := mapErrorStatus(err)
@@ -82,6 +83,19 @@ func (ph *productHandler) GetProducts(ctx *gin.Context) {
 		Data:     result.Data,
 		Meta:     result.PaginationResponse,
 	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (ph *productHandler) GetProductCategory(ctx *gin.Context) {
+	result, err := ph.productService.GetProductCategory(ctx)
+	if err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s product category", dto.FAILED_GET_ALL), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s product category", dto.SUCCESS_GET_ALL), result)
 	ctx.JSON(http.StatusOK, res)
 }
 
