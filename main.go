@@ -160,7 +160,7 @@ func main() {
 		productCategoriesRepo    = repository.NewProductCategoriesRepository(db)
 		productCategoriesService = service.NewProductCategoriesService(productCategoriesRepo, zapLogger, jwt)
 		productCategoriesHandler = handler.NewProductCategoriesHandler(productCategoriesService, zapLogger)
-		
+
 		// Product
 		productRepo    = repository.NewProductRepository(db)
 		productService = service.NewProductService(productRepo, storeRepo, zapLogger, jwt)

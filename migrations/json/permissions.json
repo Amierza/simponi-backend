@@ -94,6 +94,13 @@
     "module": "user"
   },
   {
+    "id": "9c0341f5-e6d5-4e56-8923-12e1c068c253",
+    "name": "UpdateUserProfile",
+    "endpoint": "/api/v1/users/profile",
+    "method": "PUT",
+    "module": "user"
+  },
+  {
     "id": "793aaad8-d456-4d1d-9699-867196659bbe",
     "name": "DeleteUserByUserID",
     "endpoint": "/api/v1/users/:user_id",

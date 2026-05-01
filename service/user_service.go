@@ -21,6 +21,7 @@ type (
 		GetUserProfile(ctx context.Context) (*dto.UserResponse, error)
 		UpdateUserByUserID(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
 		UpdateUserStatusByUserID(ctx context.Context, req *dto.UpdateUserStatus) (*dto.UserResponse, error)
+		UpdateUserProfile(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error)
 		DeleteUserByUserID(ctx context.Context, userID *uuid.UUID) error
 	}
 
@@ -272,6 +273,70 @@ func (us *userService) UpdateUserStatusByUserID(ctx context.Context, req *dto.Up
 	if err != nil {
 		us.logger.Error("failed to update user status", zap.String("status", req.Status), zap.Error(err))
 		return nil, fmt.Errorf("failed to update user status: %w", dto.ErrInternal)
+	}
+
+	return mapToUserResponse(user, &user.Role), nil
+}
+
+func (us *userService) UpdateUserProfile(ctx context.Context, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
+	userIDString := ctx.Value("user_id").(string)
+	userID, err := uuid.Parse(userIDString)
+	if err != nil {
+		us.logger.Error("failed to parse user_id", zap.String("user_id", userIDString), zap.Error(err))
+		return nil, fmt.Errorf("failed to create store: %w", dto.ErrInternal)
+	}
+
+	user, found, err := us.userRepo.GetUserByUserID(ctx, nil, &userID)
+	if err != nil {
+		us.logger.Error("failed to get user by ID", zap.String("userID", userID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to get user ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		us.logger.Warn("user not found", zap.String("userID", userID.String()))
+		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
+	}
+
+	// validate email
+	if user.Email != req.Email {
+		_, found, err = us.userRepo.GetUserByEmail(ctx, nil, &req.Email)
+		if err != nil {
+			us.logger.Error("failed to get user by email", zap.String("email", req.Email), zap.Error(err))
+			return nil, fmt.Errorf("failed to get user by email: %w", dto.ErrInternal)
+		}
+
+		if found {
+			us.logger.Warn("user email already exists", zap.String("email", req.Email))
+			return nil, fmt.Errorf("user email already exists: %w", dto.ErrAlreadyExists)
+		}
+	}
+	user.Email = req.Email
+
+	// validate role
+	if req.RoleID != nil {
+		if user.RoleID != req.RoleID {
+			role, found, err := us.roleRepo.GetRoleByRoleID(ctx, nil, req.RoleID)
+			if err != nil {
+				us.logger.Error("failed to get role by id", zap.String("role_id", req.RoleID.String()), zap.Error(err))
+				return nil, fmt.Errorf("failed to get role by id: %w", dto.ErrInternal)
+			}
+			if !found {
+				us.logger.Warn("role not found", zap.String("role_id", req.RoleID.String()))
+				return nil, fmt.Errorf("role not found: %w", dto.ErrNotFound)
+			}
+			user.Role = *role
+		}
+		user.RoleID = req.RoleID
+	}
+
+	if req.ImageURL != nil {
+		user.ImageURL = *req.ImageURL
+	}
+	user.Name = req.Name
+
+	err = us.userRepo.UpdateUserByUserID(ctx, nil, user)
+	if err != nil {
+		us.logger.Error("failed to update user", zap.String("id", req.ID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to update user: %w", dto.ErrInternal)
 	}
 
 	return mapToUserResponse(user, &user.Role), nil

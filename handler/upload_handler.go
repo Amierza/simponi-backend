@@ -37,8 +37,7 @@ func NewUploadHandler(uploadService service.IUploadService, logger *zap.Logger) 
 //	@Accept			multipart/form-data
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			files	formData	file	true	"Upload file(s)"
-//	@Success		200		{object}	dto.UploadSuccessSingleResponse
+//	@Param			files	formData	[]file	true	"Upload multiple files"
 //	@Success		200		{object}	dto.UploadSuccessMultipleResponse
 //	@Failure		400		{object}	dto.ErrorResponse
 //	@Router			/uploads [post]

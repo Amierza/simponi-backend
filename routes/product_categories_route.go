@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-	func ProductCategories(route *gin.Engine, productCategoriesHandler handler.IProductCategoriesHandler, jwtService jwt.IJWT) {
-		routes := route.Group("/api/v1/products/categories")
-		{
-			routes.GET("/", productCategoriesHandler.GetProductCategories)
-		}
+func ProductCategories(route *gin.Engine, productCategoriesHandler handler.IProductCategoriesHandler, jwtService jwt.IJWT) {
+	routes := route.Group("/api/v1/products/categories")
+	{
+		routes.GET("/", productCategoriesHandler.GetProductCategories)
 	}
+}

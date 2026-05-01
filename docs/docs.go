@@ -2095,8 +2095,12 @@ const docTemplate = `{
                 "summary": "Upload file(s)",
                 "parameters": [
                     {
-                        "type": "file",
-                        "description": "Upload file(s)",
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Upload multiple files",
                         "name": "files",
                         "in": "formData",
                         "required": true
@@ -2292,6 +2296,73 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update current logged-in user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "description": "Update user profile request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -3569,9 +3640,6 @@ const docTemplate = `{
         "dto.UploadImageResponse": {
             "type": "object",
             "properties": {
-                "image_id": {
-                    "type": "string"
-                },
                 "image_url": {
                     "type": "string"
                 }
@@ -3589,22 +3657,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "success upload files"
-                },
-                "status": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.UploadSuccessSingleResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.UploadImageResponse"
-                },
-                "message": {
-                    "type": "string",
-                    "example": "success upload file"
                 },
                 "status": {
                     "type": "boolean",
@@ -3681,6 +3733,20 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {},
+                "message": {
+                    "type": "string"
+                },
+                "meta": {},
+                "status": {
+                    "type": "boolean"
                 }
             }
         }
@@ -3767,6 +3833,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "REST API for Simponi - multi-store inventory and omnichannel management system.\nThis API supports store management, product management, external product integration, vendor management, and role-based access control (RBAC).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

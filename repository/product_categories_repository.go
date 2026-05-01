@@ -23,7 +23,6 @@ func NewProductCategoriesRepository(db *gorm.DB) *productCategoriesRepository {
 	}
 }
 
-
 func (pr *productCategoriesRepository) GetProductCategories(ctx context.Context, tx *gorm.DB) ([]entity.ProductCategory, error) {
 	if tx == nil {
 		tx = pr.db
@@ -34,7 +33,7 @@ func (pr *productCategoriesRepository) GetProductCategories(ctx context.Context,
 	if err := tx.WithContext(ctx).
 		Model(&entity.ProductCategory{}).
 		Find(&categories).Error; err != nil {
-			return nil, err
-		}
+		return nil, err
+	}
 	return categories, nil
 }

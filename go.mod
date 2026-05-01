@@ -3,7 +3,7 @@ module github.com/Amierza/simponi-backend
 go 1.23.2
 
 require (
-	github.com/swaggo/swag v1.8.12
+	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.36.0
 	gorm.io/gorm v1.30.0
 )

@@ -175,8 +175,7 @@ var (
 // Without Pagination
 type (
 	UploadImageResponse struct {
-		ImageID  uuid.UUID `json:"image_id"`
-		ImageURL string    `json:"image_url"`
+		ImageURL string `json:"image_url"`
 	}
 
 	// Authentication

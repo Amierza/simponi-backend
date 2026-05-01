@@ -681,8 +681,6 @@ definitions:
     type: object
   dto.UploadImageResponse:
     properties:
-      image_id:
-        type: string
       image_url:
         type: string
     type: object
@@ -694,17 +692,6 @@ definitions:
         type: array
       message:
         example: success upload files
-        type: string
-      status:
-        example: true
-        type: boolean
-    type: object
-  dto.UploadSuccessSingleResponse:
-    properties:
-      data:
-        $ref: '#/definitions/dto.UploadImageResponse'
-      message:
-        example: success upload file
         type: string
       status:
         example: true
@@ -757,6 +744,16 @@ definitions:
       meta: {}
       status:
         example: true
+        type: boolean
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      meta: {}
+      status:
         type: boolean
     type: object
 externalDocs:
@@ -2116,11 +2113,14 @@ paths:
       description: 'Upload single or multiple images using multipart/form-data (key:
         files)'
       parameters:
-      - description: Upload file(s)
+      - collectionFormat: csv
+        description: Upload multiple files
         in: formData
+        items:
+          type: file
         name: files
         required: true
-        type: file
+        type: array
       produces:
       - application/json
       responses:
@@ -2425,6 +2425,46 @@ paths:
       security:
       - BearerAuth: []
       summary: Get current user profile
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update current logged-in user profile
+      parameters:
+      - description: Update user profile request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update user profile
       tags:
       - Users
 securityDefinitions:

@@ -17,15 +17,15 @@ type (
 	}
 
 	productCategoriesHandler struct {
-		productCategoriesService 	service.IProductCategoriesService
-		logger         				*zap.Logger
+		productCategoriesService service.IProductCategoriesService
+		logger                   *zap.Logger
 	}
 )
 
 func NewProductCategoriesHandler(productCategoriesService service.IProductCategoriesService, logger *zap.Logger) *productCategoriesHandler {
 	return &productCategoriesHandler{
 		productCategoriesService: productCategoriesService,
-		logger: logger,
+		logger:                   logger,
 	}
 }
 
