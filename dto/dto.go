@@ -377,6 +377,7 @@ type (
 	UpdateProductRequest struct {
 		ID          uuid.UUID  `json:"-"`
 		Name        string     `json:"name" example:"Refined Bronze Hat"`
+			Images     []string `json:"images" binding:"omitempty,dive"`
 		Description *string    `json:"description,omitempty" example:"A very nice hat"`
 		SKU         string     `json:"sku" example:"L1L-448"`
 		Stock       int        `json:"stock" example:"100"`
