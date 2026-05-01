@@ -297,6 +297,33 @@ func (ps *productService) UpdateProductByStoreIDAndProductID(ctx context.Context
 		return dto.ProductResponse{}, fmt.Errorf("failed to update product: %w", dto.ErrInternal)
 	}
 
+	if len(req.Images) > 0 {
+		for _, imageURL := range req.Images {
+			trimmedURL := strings.TrimSpace(imageURL)
+			if trimmedURL == "" {
+				continue
+			}
+
+			_, err := ps.productRepo.CreateProductImage(ctx, nil, &entity.ProductImage{
+				ID:        uuid.New(),
+				ImageURL:  trimmedURL,
+				ProductID: &updatedProduct.ID,
+			})
+			if err != nil {
+				ps.logger.Error("failed to create product image", zap.String("productID", updatedProduct.ID.String()), zap.String("imageURL", trimmedURL), zap.Error(err))
+				return dto.ProductResponse{}, fmt.Errorf("failed to create product image: %w", dto.ErrInternal)
+			}
+		}
+	}
+
+	updatedProduct, _, err = ps.productRepo.GetProductByStoreIDAndProductID(ctx, nil, &updatedProduct.StoreID, &updatedProduct.ID)
+	if err != nil {
+		ps.logger.Error("failed to reload product after image attach", zap.String("productID", updatedProduct.ID.String()), zap.Error(err))
+		return dto.ProductResponse{}, fmt.Errorf("failed to load product: %w", dto.ErrInternal)
+	}
+
+	ps.logger.Info("success to create product", zap.String("id", updatedProduct.ID.String()))
+
 	return MapToProductResponse(*updatedProduct), nil
 }
 
