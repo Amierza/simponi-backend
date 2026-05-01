@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -240,20 +241,13 @@ func (us *userService) UpdateUserByUserID(ctx context.Context, req *dto.UpdateUs
 }
 
 func (us *userService) UpdateUserStatusByUserID(ctx context.Context, req *dto.UpdateUserStatus) (*dto.UserResponse, error) {
-	userIDString := ctx.Value("user_id").(string)
-	userID, err := uuid.Parse(userIDString)
+	user, found, err := us.userRepo.GetUserByUserID(ctx, nil, &req.ID)
 	if err != nil {
-		us.logger.Error("failed to parse user_id", zap.String("user_id", userIDString), zap.Error(err))
-		return nil, fmt.Errorf("failed to create store: %w", dto.ErrInternal)
-	}
-
-	user, found, err := us.userRepo.GetUserByUserID(ctx, nil, &userID)
-	if err != nil {
-		us.logger.Error("failed to get user by ID", zap.String("userID", userID.String()), zap.Error(err))
+		us.logger.Error("failed to get user by ID", zap.String("userID", req.ID.String()), zap.Error(err))
 		return nil, fmt.Errorf("failed to get user ID: %w", dto.ErrInternal)
 	}
 	if !found {
-		us.logger.Warn("user not found", zap.String("userID", userID.String()))
+		us.logger.Warn("user not found", zap.String("userID", req.ID.String()))
 		return nil, fmt.Errorf("user not found: %w", dto.ErrNotFound)
 	}
 
@@ -268,6 +262,7 @@ func (us *userService) UpdateUserStatusByUserID(ctx context.Context, req *dto.Up
 		return nil, fmt.Errorf("invalid status: %w", dto.ErrBadRequest)
 	}
 	user.Status = req.Status
+	log.Println(user.Status)
 
 	err = us.userRepo.UpdateUserStatusByUserID(ctx, nil, user)
 	if err != nil {
