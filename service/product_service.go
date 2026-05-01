@@ -173,10 +173,22 @@ func (ps *productService) CreateProduct(ctx context.Context, req *dto.CreateProd
 		return dto.ProductResponse{}, fmt.Errorf("failed to create product: %w", dto.ErrInternal)
 	}
 
-	if req.ImageID != nil {
-		if err := ps.productRepo.AttachProductImageToProduct(ctx, nil, req.ImageID, &newProduct.ID); err != nil {
-			ps.logger.Error("failed to attach image to product", zap.String("productID", newProduct.ID.String()), zap.String("imageID", req.ImageID.String()), zap.Error(err))
-			return dto.ProductResponse{}, fmt.Errorf("failed to attach image to product: %w", dto.ErrBadRequest)
+	if len(req.Images) > 0 {
+		for _, imageURL := range req.Images {
+			trimmedURL := strings.TrimSpace(imageURL)
+			if trimmedURL == "" {
+				continue
+			}
+
+			_, err := ps.productRepo.CreateProductImage(ctx, nil, &entity.ProductImage{
+				ID:        uuid.New(),
+				ImageURL:  trimmedURL,
+				ProductID: &newProduct.ID,
+			})
+			if err != nil {
+				ps.logger.Error("failed to create product image", zap.String("productID", newProduct.ID.String()), zap.String("imageURL", trimmedURL), zap.Error(err))
+				return dto.ProductResponse{}, fmt.Errorf("failed to create product image: %w", dto.ErrInternal)
+			}
 		}
 	}
 

@@ -367,7 +367,7 @@ type (
 	}
 	CreateProductRequest struct {
 		StoreID     *uuid.UUID `json:"-"`
-		ImageID     *uuid.UUID `json:"image_id" binding:"omitempty"`
+		Images     []string `json:"images" binding:"omitempty,dive"`
 		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
 		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
 		Description string     `json:"description,omitempty" example:"A very nice hat"`
