@@ -2678,8 +2678,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "A very nice hat"
                 },
-                "image_id": {
-                    "type": "string"
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "name": {
                     "type": "string",

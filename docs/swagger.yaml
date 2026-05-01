@@ -21,8 +21,10 @@ definitions:
       description:
         example: A very nice hat
         type: string
-      image_id:
-        type: string
+      images:
+        items:
+          type: string
+        type: array
       name:
         example: Refined Bronze Hat
         maxLength: 100

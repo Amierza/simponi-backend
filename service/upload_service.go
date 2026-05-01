@@ -17,7 +17,7 @@ import (
 type (
 	IUploadService interface {
 		// public function
-		Upload(ctx context.Context, files []*multipart.FileHeader) ([]string, error)
+		Upload(ctx context.Context, files []*multipart.FileHeader) ([]dto.UploadImageResponse, error)
 		// private / helper function
 		saveUploadedFile(file *multipart.FileHeader, savePath string) error
 		createFile(path string) (*os.File, error)
@@ -47,13 +47,14 @@ var allowedExt = map[string]bool{
 }
 
 // Upload bisa handle single atau multiple file
-func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHeader) ([]string, error) {
+func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHeader) ([]dto.UploadImageResponse, error) {
 	if len(files) == 0 {
 		us.logger.Warn("Upload attempted with no files")
 		return nil, dto.ErrNoFilesUploaded
 	}
 
-	var uploadedPaths []string
+	var results []dto.UploadImageResponse
+
 	for _, file := range files {
 		ext := strings.ToLower(filepath.Ext(file.Filename))
 		if !allowedExt[ext] {
@@ -64,10 +65,10 @@ func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHead
 			return nil, dto.ErrInvalidFileType
 		}
 
-		newFileName := fmt.Sprintf("%s%s", uuid.New().String(), ext)
+		imageID := uuid.New()
+		newFileName := fmt.Sprintf("%s%s", imageID.String(), ext)
 		storagePath := filepath.Join("uploads", newFileName)
 
-		// Simpan file (local)
 		if err := us.saveUploadedFile(file, storagePath); err != nil {
 			us.logger.Error("Failed to save uploaded file",
 				zap.String("filename", file.Filename),
@@ -77,10 +78,12 @@ func (us *uploadService) Upload(ctx context.Context, files []*multipart.FileHead
 			return nil, dto.ErrSaveFile
 		}
 
-		uploadedPaths = append(uploadedPaths, storagePath)
+		results = append(results, dto.UploadImageResponse{
+			ImageURL: "/" + storagePath, // biar bisa langsung diakses via static
+		})
 	}
 
-	return uploadedPaths, nil
+	return results, nil
 }
 
 func (us *uploadService) saveUploadedFile(file *multipart.FileHeader, savePath string) error {

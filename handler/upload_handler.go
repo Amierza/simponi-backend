@@ -52,7 +52,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 
 	files := form.File["files"]
 
-	// upload with key "files"
+	// fallback kalau kirim single file
 	if len(files) == 0 {
 		file, err := ctx.FormFile("files")
 		if err != nil {
@@ -64,7 +64,6 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 		files = []*multipart.FileHeader{file}
 	}
 
-	// call service
 	uploadedImages, err := uh.uploadService.Upload(ctx, files)
 	if err != nil {
 		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error())
@@ -72,14 +71,7 @@ func (uh *uploadHandler) Upload(ctx *gin.Context) {
 		return
 	}
 
-	// kalau hanya 1 file → balikin object image
-	if len(uploadedImages) == 1 {
-		res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILE, uploadedImages[0])
-		ctx.JSON(http.StatusOK, res)
-		return
-	}
-
-	// kalau banyak file → balikin array object image
+	// ✅ SELALU ARRAY
 	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILES, uploadedImages)
 	ctx.JSON(http.StatusOK, res)
 }

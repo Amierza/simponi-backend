@@ -11,6 +11,6 @@ import (
 func Upload(route *gin.Engine, uploadHandler handler.IUploadHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/uploads").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "Upload"), uploadHandler.Upload)
+		routes.POST("", middleware.RBAC(rolePermissionRepo, "Upload"), uploadHandler.Upload)
 	}
 }
