@@ -79,6 +79,7 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 
 	query := tx.WithContext(ctx).Model(&entity.Order{}).
 		Where("store_id = ?", storeID).
+		Preload("Store").
 		Preload("StorePlatform").
 		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform")
