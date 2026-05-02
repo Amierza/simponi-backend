@@ -18,7 +18,7 @@ type (
 		// CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail *entity.OrderDetail) (*entity.OrderDetail, error)
 
 		// READ
-		GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
+		GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationRepositoryResponse, error)
 		GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID) (*entity.Order, bool, error)
 		// GetOrdersByVendorID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
 		// GetOrdersByCustomerID(ctx context.Context, tx *gorm.DB, customerID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
@@ -61,7 +61,7 @@ func NewOrderRepository(db *gorm.DB) *OrderRepository {
 // 	return orderDetail, nil
 // }
 
-func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error) {
+func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = or.db
 	}
@@ -78,6 +78,8 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 	}
 
 	query := tx.WithContext(ctx).Model(&entity.Order{}).
+		Where("store_id = ?", storeID).
+		Preload("Store").
 		Preload("StorePlatform").
 		Preload("StorePlatform.Store").
 		Preload("StorePlatform.Platform")

@@ -9,7 +9,7 @@ import (
 )
 
 func Order(route *gin.Engine, orderHandler handler.IOrderHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
-	routes := route.Group("/api/v1/orders").Use(middleware.Authentication(jwtService))
+	routes := route.Group("/api/v1/stores/:store_id/orders").Use(middleware.Authentication(jwtService))
 	{
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetOrders"), orderHandler.GetOrders)
 		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetOrderByID"), orderHandler.GetOrderByID)
