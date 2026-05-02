@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Amierza/simponi-backend/dto"
@@ -32,6 +33,16 @@ func NewOrderHandler(orderService service.IOrderService, logger *zap.Logger) *or
 }
 
 func (oh *orderHandler) GetOrders(ctx *gin.Context) {
+	log.Println("sdfsf")
+	storeIDStr := ctx.Param("store_id")
+	log.Print(storeIDStr)
+	storeID, err := uuid.Parse(storeIDStr)
+	// if err != nil {
+	// 	oh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+	// 	res := response.BuildResponseFailed(fmt.Sprintf("%s order", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+	// 	ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+	// 	return
+	// }
 	var payload response.PaginationRequest
 
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
@@ -42,7 +53,9 @@ func (oh *orderHandler) GetOrders(ctx *gin.Context) {
 		return
 	}
 
-	result, err := oh.orderService.GetOrders(ctx, payload)
+	log.Print("woii")
+
+	result, err := oh.orderService.GetOrders(ctx, payload, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed("failed to get orders", cleanErrorMessage(err))

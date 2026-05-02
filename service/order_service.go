@@ -16,7 +16,7 @@ import (
 
 type (
 	IOrderService interface {
-		GetOrders(ctx context.Context, req response.PaginationRequest) (dto.OrderPaginationResponse, error)
+		GetOrders(ctx context.Context, req response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationResponse, error)
 		GetOrderByID(ctx context.Context, orderID *uuid.UUID) (dto.OrderResponse, error)
 	}
 
@@ -86,8 +86,8 @@ func NewOrderService(orderRepo repository.IOrderRepository, logger *zap.Logger, 
 	}
 }
 
-func (os *OrderService) GetOrders(ctx context.Context, req response.PaginationRequest) (dto.OrderPaginationResponse, error) {
-	datas, err := os.orderRepo.GetOrders(ctx, nil, &req)
+func (os *OrderService) GetOrders(ctx context.Context, req response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationResponse, error) {
+	datas, err := os.orderRepo.GetOrders(ctx, nil, &req, storeID)
 	if err != nil {
 		os.logger.Error("failed to get orders", zap.Error(err))
 		return dto.OrderPaginationResponse{}, fmt.Errorf("failed to get orders: %w", dto.ErrInternal)
