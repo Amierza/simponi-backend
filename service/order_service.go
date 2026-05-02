@@ -17,7 +17,7 @@ import (
 type (
 	IOrderService interface {
 		GetOrders(ctx context.Context, req response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationResponse, error)
-		GetOrderByID(ctx context.Context, orderID *uuid.UUID) (dto.OrderResponse, error)
+		GetOrderByID(ctx context.Context, orderID *uuid.UUID, storeID *uuid.UUID) (dto.OrderResponse, error)
 	}
 
 	OrderService struct {
@@ -144,9 +144,9 @@ func (os *OrderService) GetOrders(ctx context.Context, req response.PaginationRe
 	}, nil
 }
 
-func (os *OrderService) GetOrderByID(ctx context.Context, orderID *uuid.UUID) (dto.OrderResponse, error) {
+func (os *OrderService) GetOrderByID(ctx context.Context, orderID *uuid.UUID, storeID *uuid.UUID) (dto.OrderResponse, error) {
 
-	order, found, err := os.orderRepo.GetOrderByID(ctx, nil, orderID)
+	order, found, err := os.orderRepo.GetOrderByID(ctx, nil, orderID, storeID)
 
 	if err != nil {
 		os.logger.Error("failed to get order by ID", zap.String("order_id", orderID.String()), zap.Error(err))
