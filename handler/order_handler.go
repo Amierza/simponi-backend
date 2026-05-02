@@ -68,6 +68,15 @@ func (oh *orderHandler) GetOrders(ctx *gin.Context) {
 }
 
 func (oh *orderHandler) GetOrderByID(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		oh.logger.Error("invalid store ID", zap.String("store_id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s order", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
 	orderIDStr := ctx.Param("id")
 	orderID, err := uuid.Parse(orderIDStr)
 	if err != nil {
@@ -78,7 +87,7 @@ func (oh *orderHandler) GetOrderByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := oh.orderService.GetOrderByID(ctx, &orderID)
+	result, err := oh.orderService.GetOrderByID(ctx, &orderID, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed("failed to get order", cleanErrorMessage(err))

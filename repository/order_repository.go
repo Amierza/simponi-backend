@@ -19,7 +19,7 @@ type (
 
 		// READ
 		GetOrders(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.OrderPaginationRepositoryResponse, error)
-		GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID) (*entity.Order, bool, error)
+		GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID, storeID *uuid.UUID) (*entity.Order, bool, error)
 		// GetOrdersByVendorID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
 		// GetOrdersByCustomerID(ctx context.Context, tx *gorm.DB, customerID *uuid.UUID, req *response.PaginationRequest) (dto.OrderPaginationRepositoryResponse, error)
 
@@ -111,7 +111,7 @@ func (or *OrderRepository) GetOrders(ctx context.Context, tx *gorm.DB, req *resp
 
 }
 
-func (or *OrderRepository) GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID) (*entity.Order, bool, error) {
+func (or *OrderRepository) GetOrderByID(ctx context.Context, tx *gorm.DB, orderID *uuid.UUID, storeID *uuid.UUID) (*entity.Order, bool, error) {
 	if tx == nil {
 		tx = or.db
 	}
@@ -128,7 +128,7 @@ func (or *OrderRepository) GetOrderByID(ctx context.Context, tx *gorm.DB, orderI
 		Preload("OrderDetails.ExternalProduct.StorePlatform").
 		Preload("OrderDetails.ExternalProduct.StorePlatform.Store").
 		Preload("OrderDetails.ExternalProduct.StorePlatform.Platform").
-		First(&order, "id = ?", orderID).Error; err != nil {
+		First(&order, "id = ? AND store_id = ?", orderID, storeID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, false, nil
 		}
