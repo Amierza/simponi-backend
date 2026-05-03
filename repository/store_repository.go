@@ -22,6 +22,7 @@ type (
 		GetStores(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.StorePaginationRepositoryResponse, error)
 		GetStoresByUserID(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, userID *uuid.UUID) (dto.StorePaginationRepositoryResponse, error)
 		GetStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error)
+		GetStoreByUserID(ctx context.Context, tx *gorm.DB, userID *uuid.UUID) (*entity.Store, bool, error)
 
 		// UPDATE
 		UpdateStoreByStoreID(ctx context.Context, tx *gorm.DB, store *entity.Store) error
@@ -149,6 +150,52 @@ func (vr *storeRepository) GetStoresByUserID(ctx context.Context, tx *gorm.DB, r
 		},
 	}, err
 }
+func (vr *storeRepository) GetStoreByUserID(
+	ctx context.Context, tx *gorm.DB, userID *uuid.UUID,
+) (*entity.Store, bool, error) {
+	if tx == nil {
+		tx = vr.db
+	}
+
+	// Scan ke string dulu — GORM tidak bisa auto-convert UUID string ke uuid.UUID
+	var storeIDStr string
+	err := tx.WithContext(ctx).
+		Table("store_users").
+		Select("store_id").
+		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Limit(1).
+		Scan(&storeIDStr).Error
+	if err != nil {
+		return nil, false, err
+	}
+
+	// Scan tidak return ErrRecordNotFound, cek manual
+	if storeIDStr == "" {
+		return nil, false, nil
+	}
+
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		return nil, false, err
+	}
+
+	var store entity.Store
+	err = tx.WithContext(ctx).
+		Where("id = ? AND deleted_at IS NULL", storeID).
+		Preload("StorePlatforms", "deleted_at IS NULL").
+		Preload("StorePlatforms.Platform").
+		First(&store).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, false, nil
+	}
+	if err != nil {
+		return nil, false, err
+	}
+
+	return &store, true, nil
+}
+
 func (vr *storeRepository) GetStoreByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (*entity.Store, bool, error) {
 	if tx == nil {
 		tx = vr.db
