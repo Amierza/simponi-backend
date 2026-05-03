@@ -58,6 +58,9 @@ import (
 //	@tag.name			Store Users
 //	@tag.description	Manage users within a store (membership & access)
 
+//	@tag.name			Platforms
+//	@tag.description	Platform connection management (Shopee, Tokopedia)
+
 //	@tag.name			Products
 //	@tag.description	Product and inventory management
 
@@ -88,12 +91,11 @@ func main() {
 	db := database.SetUpPostgreSQLConnection()
 	defer database.ClosePostgreSQLConnection(db)
 
-	// Zap logger
 	zapLogger, err := logger.New()
 	if err != nil {
 		log.Fatalf("failed to init logger: %v", err)
 	}
-	defer zapLogger.Sync() // flush buffer
+	defer zapLogger.Sync()
 
 	if len(os.Args) > 1 {
 		cmd.Command(db)
@@ -101,13 +103,8 @@ func main() {
 	}
 
 	var (
-		// jwt
 		jwt = jwt.NewJWT()
 
-		// External API
-		// externalGateway = gateway.NewExternalGateway(os.Getenv("API_EXTERNAL"), zapLogger)
-
-		// Transaction
 		tx = repository.NewTransaction(db)
 
 		// Upload
@@ -145,16 +142,18 @@ func main() {
 		storeUserService = service.NewStoreUserService(storeUserRepo, zapLogger, jwt)
 		storeUserHandler = handler.NewStoreUserHandler(storeUserService, zapLogger)
 
-		// Platform
-		platformRepo = repository.NewPlatformRepository(db)
-
-		// Store Platform
+		// Platform & Store Platform repos (dipakai oleh store service DAN platform service)
+		platformRepo      = repository.NewPlatformRepository(db)
 		storePlatformRepo = repository.NewStorePlatformRepository(db)
 
 		// Store
 		storeRepo    = repository.NewStoreRepository(db)
 		storeService = service.NewStoreService(tx, storeRepo, storeUserRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		storeHandler = handler.NewStoreHandler(storeService, zapLogger)
+
+		// Platform connection (tambahan baru)
+		platformService = service.NewPlatformService(tx, storeRepo, storeUserRepo, platformRepo, storePlatformRepo, zapLogger)
+		platformHandler = handler.NewPlatformHandler(platformService, zapLogger)
 
 		// Product Categories
 		productCategoriesRepo    = repository.NewProductCategoriesRepository(db)
@@ -203,6 +202,7 @@ func main() {
 	routes.Auth(server, authHandler)
 	routes.StoreUser(server, storeUserHandler, jwt, rolePermissionRepo)
 	routes.Store(server, storeHandler, jwt, rolePermissionRepo)
+	routes.Platform(server, platformHandler, jwt) // ← tambahan baru
 	routes.ProductCategories(server, productCategoriesHandler, jwt)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
@@ -210,9 +210,8 @@ func main() {
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
 	routes.InventoryLog(server, inventoryLogHandler, jwt, rolePermissionRepo)
-	// swagger endpoint
-	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	server.Static("/uploads", "./uploads")
 
 	port := os.Getenv("PORT")

@@ -310,6 +310,33 @@ type (
 		ID   uuid.UUID `json:"id"`
 		Name string    `json:"name"`
 	}
+	ConnectPlatformRequest struct {
+		PlatformID     *uuid.UUID `json:"platform_id" binding:"required"`
+		ExternalName   string     `json:"external_name" binding:"required,min=2,max=100"` // nama toko di marketplace
+		ExternalShopID string     `json:"external_shop_id" binding:"required"`            // shop_id dari marketplace
+
+		StoreName        string  `json:"store_name"`
+		StoreDescription *string `json:"store_description,omitempty"`
+		StoreImageURL    *string `json:"store_image_url,omitempty"`
+	}
+
+	MyStoreResponse struct {
+		ID          uuid.UUID                 `json:"id"`
+		Name        string                    `json:"name"`
+		Description string                    `json:"description"`
+		ImageURL    string                    `json:"image_url"`
+		IsActive    bool                      `json:"is_active"`
+		Platforms   []ConnectedPlatformDetail `json:"platforms"`
+	}
+
+	ConnectedPlatformDetail struct {
+		StorePlatformID uuid.UUID `json:"store_platform_id"`
+		PlatformID      uuid.UUID `json:"platform_id"`
+		PlatformName    string    `json:"platform_name"`
+		ExternalName    string    `json:"external_name"`    // nama toko di marketplace
+		ExternalShopID  string    `json:"external_shop_id"` // shop_id
+		IsConnected     bool      `json:"is_connected"`
+	}
 )
 
 // Store
@@ -367,7 +394,7 @@ type (
 	}
 	CreateProductRequest struct {
 		StoreID     *uuid.UUID `json:"-"`
-		Images     []string `json:"images" binding:"omitempty,dive"`
+		Images      []string   `json:"images" binding:"omitempty,dive"`
 		CategoryID  *uuid.UUID `json:"category_id,omitempty"`
 		Name        string     `json:"name" binding:"required,min=3,max=100" example:"Refined Bronze Hat"`
 		Description string     `json:"description,omitempty" example:"A very nice hat"`
@@ -377,7 +404,7 @@ type (
 	UpdateProductRequest struct {
 		ID          uuid.UUID  `json:"-"`
 		Name        string     `json:"name" example:"Refined Bronze Hat"`
-		Images     []string `json:"images" binding:"omitempty,dive"`
+		Images      []string   `json:"images" binding:"omitempty,dive"`
 		Description *string    `json:"description,omitempty" example:"A very nice hat"`
 		SKU         string     `json:"sku" example:"L1L-448"`
 		Stock       int        `json:"stock" example:"100"`
