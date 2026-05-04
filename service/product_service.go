@@ -26,19 +26,36 @@ type (
 	}
 
 	productService struct {
-		productRepo repository.IProductRepository
-		storeRepo   repository.IStoreRepository
-		logger      *zap.Logger
-		jwtService  jwt.IJWT
+		productRepo        repository.IProductRepository
+		storeRepo          repository.IStoreRepository
+		inventoryLogService IInventoryLogService
+		logger             *zap.Logger
+		jwtService         jwt.IJWT
 	}
 )
 
-func NewProductService(productRepo repository.IProductRepository, storeRepo repository.IStoreRepository, logger *zap.Logger, jwtService jwt.IJWT) *productService {
+func NewProductService(productRepo repository.IProductRepository, storeRepo repository.IStoreRepository, inventoryLogService IInventoryLogService, logger *zap.Logger, jwtService jwt.IJWT) *productService {
 	return &productService{
-		productRepo: productRepo,
-		storeRepo:   storeRepo,
-		logger:      logger,
-		jwtService:  jwtService,
+		productRepo:         productRepo,
+		storeRepo:           storeRepo,
+		inventoryLogService: inventoryLogService,
+		logger:              logger,
+		jwtService:          jwtService,
+	}
+}
+
+func (ps *productService) createInventoryLog(ctx context.Context, productID *uuid.UUID, change int, source, note string) {
+	if ps.inventoryLogService == nil || productID == nil || change == 0 {
+		return
+	}
+
+	if _, err := ps.inventoryLogService.CreateInventoryLog(ctx, dto.InventoryLogRequest{
+		ProductID: productID,
+		Change:    change,
+		Source:    source,
+		Note:      note,
+	}); err != nil {
+		ps.logger.Warn("failed to create inventory log", zap.String("productID", productID.String()), zap.Error(err))
 	}
 }
 
@@ -200,6 +217,8 @@ func (ps *productService) CreateProduct(ctx context.Context, req *dto.CreateProd
 
 	ps.logger.Info("success to create product", zap.String("id", newProduct.ID.String()))
 
+	ps.createInventoryLog(ctx, &newProduct.ID, newProduct.Stock, "product", "create product")
+
 	return MapToProductResponse(*newProduct), nil
 }
 
@@ -286,6 +305,7 @@ func (ps *productService) UpdateProductByStoreIDAndProductID(ctx context.Context
 		product.CategoryID = req.CategoryID
 	}
 
+	oldStock := product.Stock
 	if req.Stock >= 0 {
 		product.Stock = req.Stock
 	}
@@ -324,6 +344,8 @@ func (ps *productService) UpdateProductByStoreIDAndProductID(ctx context.Context
 
 	ps.logger.Info("success to create product", zap.String("id", updatedProduct.ID.String()))
 
+	ps.createInventoryLog(ctx, &updatedProduct.ID, updatedProduct.Stock-oldStock, "product", "update product")
+
 	return MapToProductResponse(*updatedProduct), nil
 }
 
@@ -350,7 +372,7 @@ func (ps *productService) UpdateStockByStoreIDAndProductID(ctx context.Context, 
 }
 
 func (ps *productService) DeleteProductByStoreIDAndProductID(ctx context.Context, storeID *uuid.UUID, productID *uuid.UUID) error {
-	_, found, err := ps.productRepo.GetProductByStoreIDAndProductID(ctx, nil, storeID, productID)
+	product, found, err := ps.productRepo.GetProductByStoreIDAndProductID(ctx, nil, storeID, productID)
 	if err != nil {
 		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
 		return fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
@@ -359,6 +381,8 @@ func (ps *productService) DeleteProductByStoreIDAndProductID(ctx context.Context
 		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
 		return fmt.Errorf("product not found: %w", dto.ErrNotFound)
 	}
+
+	ps.createInventoryLog(ctx, &product.ID, -product.Stock, "product", "delete product")
 
 	if err := ps.productRepo.DeleteProductByStoreIDAndProductID(ctx, nil, storeID, productID); err != nil {
 		ps.logger.Error("failed to delete product", zap.String("productID", productID.String()), zap.Error(err))

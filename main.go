@@ -160,9 +160,14 @@ func main() {
 		productCategoriesService = service.NewProductCategoriesService(productCategoriesRepo, zapLogger, jwt)
 		productCategoriesHandler = handler.NewProductCategoriesHandler(productCategoriesService, zapLogger)
 
+		// Inventory Logging
+		inventoryLogRepo    = repository.NewInventoryLoggingRepository(db)
+		inventoryLogService = service.NewInventoryLoggingService(inventoryLogRepo, zapLogger, jwt)
+		inventoryLogHandler = handler.NewInventoryLoggingHandler(inventoryLogService, zapLogger)
+
 		// Product
 		productRepo    = repository.NewProductRepository(db)
-		productService = service.NewProductService(productRepo, storeRepo, zapLogger, jwt)
+		productService = service.NewProductService(productRepo, storeRepo, inventoryLogService, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
 		// External Product
@@ -185,10 +190,6 @@ func main() {
 		logService = service.NewLogService(logRepo, zapLogger, jwt)
 		logHandler = handler.NewLogHandler(logService, zapLogger)
 
-		// Inventory Logging
-		inventoryLogRepo    = repository.NewInventoryLoggingRepository(db)
-		inventoryLogService = service.NewInventoryLoggingService(inventoryLogRepo, zapLogger, jwt)
-		inventoryLogHandler = handler.NewInventoryLoggingHandler(inventoryLogService, zapLogger)
 	)
 
 	server := gin.Default()
