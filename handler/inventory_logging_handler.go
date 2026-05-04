@@ -13,7 +13,6 @@ import (
 
 type (
 	IInventoryLoggingHandler interface {
-		CreateInventoryLog(ctx *gin.Context)
 		GetInventoryLogs(ctx *gin.Context)
 	}
 
@@ -28,27 +27,6 @@ func NewInventoryLoggingHandler(inventoryLogService service.IInventoryLogService
 		inventoryLogService: inventoryLogService,
 		logger:              logger,
 	}
-}
-
-func (ilh *inventoryLoggingHandler) CreateInventoryLog(ctx *gin.Context) {
-	var req dto.InventoryLogRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_INVENTORY_LOG), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	result, err := ilh.inventoryLogService.CreateInventoryLog(ctx, req)
-	if err != nil {
-		status := mapErrorStatus(err)
-		res := response.BuildResponseFailed(fmt.Sprintf("%s", dto.FAILED_CREATE_INVENTORY_LOG), err.Error())
-		ctx.AbortWithStatusJSON(status, res)
-		return
-	}
-
-	res := response.BuildResponseSuccess(fmt.Sprintf("%s", dto.SUCCESS_CREATE_INVENTORY_LOG), result)
-	ctx.JSON(http.StatusCreated, res)
 }
 
 func (ilh *inventoryLoggingHandler) GetInventoryLogs(ctx *gin.Context) {

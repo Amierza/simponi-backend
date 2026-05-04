@@ -11,7 +11,6 @@ import (
 func InventoryLog(route *gin.Engine, inventoryLogHandler handler.IInventoryLoggingHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/inventory-logs").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateInventoryLog"), inventoryLogHandler.CreateInventoryLog)
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetInventoryLogs"), inventoryLogHandler.GetInventoryLogs)
 	}
 }
