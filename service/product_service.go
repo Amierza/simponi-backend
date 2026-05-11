@@ -23,21 +23,28 @@ type (
 		UpdateProductByStoreIDAndProductID(ctx context.Context, req *dto.UpdateProductRequest) (dto.ProductResponse, error)
 		UpdateStockByStoreIDAndProductID(ctx context.Context, req *dto.UpdateStockRequest) error
 		DeleteProductByStoreIDAndProductID(ctx context.Context, storeID *uuid.UUID, productID *uuid.UUID) error
+
+		AttachVendorToProduct(ctx context.Context, storeID, productID, vendorID *uuid.UUID) error
+		DetachVendorFromProduct(ctx context.Context, storeID, productID, vendorID *uuid.UUID) error
 	}
 
 	productService struct {
-		productRepo        repository.IProductRepository
-		storeRepo          repository.IStoreRepository
+		productRepo         repository.IProductRepository
+		storeRepo           repository.IStoreRepository
+		vendorRepo          repository.IVendorRepository
+		productVendorRepo   repository.IProductVendorRepository
 		inventoryLogService IInventoryLogService
-		logger             *zap.Logger
-		jwtService         jwt.IJWT
+		logger              *zap.Logger
+		jwtService          jwt.IJWT
 	}
 )
 
-func NewProductService(productRepo repository.IProductRepository, storeRepo repository.IStoreRepository, inventoryLogService IInventoryLogService, logger *zap.Logger, jwtService jwt.IJWT) *productService {
+func NewProductService(productRepo repository.IProductRepository, storeRepo repository.IStoreRepository, vendorRepo repository.IVendorRepository, productVendorRepo repository.IProductVendorRepository, inventoryLogService IInventoryLogService, logger *zap.Logger, jwtService jwt.IJWT) *productService {
 	return &productService{
 		productRepo:         productRepo,
 		storeRepo:           storeRepo,
+		vendorRepo:          vendorRepo,
+		productVendorRepo:   productVendorRepo,
 		inventoryLogService: inventoryLogService,
 		logger:              logger,
 		jwtService:          jwtService,
@@ -72,8 +79,8 @@ func getProductStatus(p entity.Product) string {
 	return "Mapped"
 }
 
-func MapToProductStoreResponse(p entity.Product) *dto.ProductStoreResponse {
-	return &dto.ProductStoreResponse{
+func MapToProductStoreResponse(p entity.Product) *dto.CustomProductResponse {
+	return &dto.CustomProductResponse{
 		ID:   p.Store.ID,
 		Name: p.Store.Name,
 	}
@@ -390,6 +397,74 @@ func (ps *productService) DeleteProductByStoreIDAndProductID(ctx context.Context
 	}
 
 	ps.logger.Info("success to delete product", zap.String("id", productID.String()))
+
+	return nil
+}
+
+func (ps *productService) AttachVendorToProduct(ctx context.Context, storeID, productID, vendorID *uuid.UUID) error {
+	product, found, err := ps.productRepo.GetProductByStoreIDAndProductID(ctx, nil, storeID, productID)
+	if err != nil {
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return fmt.Errorf("product not found: %w", dto.ErrNotFound)
+	}
+
+	vendor, found, err := ps.vendorRepo.GetVendorByStoreIDAndVendorID(ctx, nil, storeID, vendorID)
+	if err != nil {
+		ps.logger.Error("failed to get vendor by store ID and Vendor ID", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get vendor by store ID and Vendor ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		ps.logger.Warn("vendor not found", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()))
+		return fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
+	}
+
+	newProductVendor := &entity.ProductVendor{
+		ID:        uuid.New(),
+		ProductID: &product.ID,
+		VendorID:  &vendor.ID,
+	}
+
+	if err := ps.productVendorRepo.CreateProductVendor(ctx, nil, newProductVendor); err != nil {
+		ps.logger.Error("failed to create product vendor", zap.String("productID", productID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return fmt.Errorf("failed to create product vendor: %w", dto.ErrInternal)
+	}
+
+	ps.logger.Info("success to create product vendor", zap.String("id", newProductVendor.ID.String()))
+
+	return nil
+}
+
+func (ps *productService) DetachVendorFromProduct(ctx context.Context, storeID, productID, vendorID *uuid.UUID) error {
+	product, found, err := ps.productRepo.GetProductByStoreIDAndProductID(ctx, nil, storeID, productID)
+	if err != nil {
+		ps.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		ps.logger.Warn("product not found", zap.String("productID", productID.String()))
+		return fmt.Errorf("product not found: %w", dto.ErrNotFound)
+	}
+
+	vendor, found, err := ps.vendorRepo.GetVendorByStoreIDAndVendorID(ctx, nil, storeID, vendorID)
+	if err != nil {
+		ps.logger.Error("failed to get vendor by store ID and Vendor ID", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get vendor by store ID and Vendor ID: %w", dto.ErrInternal)
+	}
+	if !found {
+		ps.logger.Warn("vendor not found", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()))
+		return fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
+	}
+
+	if err := ps.productVendorRepo.DeleteProductVendorByProductIDAndVendorID(ctx, nil, &product.ID, &vendor.ID); err != nil {
+		ps.logger.Error("failed to delete product vendor", zap.String("productID", productID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return fmt.Errorf("failed to delete product vendor: %w", dto.ErrInternal)
+	}
+
+	ps.logger.Info("success to delete product vendor", zap.String("product_id", product.ID.String()), zap.String("vendor_id", vendor.ID.String()))
 
 	return nil
 }

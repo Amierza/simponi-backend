@@ -343,11 +343,17 @@ type (
 type (
 	StoreResponse struct {
 		ID          uuid.UUID          `json:"id"`
+		Owner       StoreOwnerResponse `json:"owner"`
 		Name        string             `json:"name"`
 		Description string             `json:"description"`
 		ImageURL    string             `json:"image_url"`
 		IsActive    bool               `json:"is_active"`
 		Platforms   []PlatformResponse `json:"platforms"`
+	}
+	StoreOwnerResponse struct {
+		ID    uuid.UUID `json:"id"`
+		Name  string    `json:"name"`
+		Email string    `json:"email"`
 	}
 	CustomStoreResponse struct {
 		ID   uuid.UUID `json:"id"`
@@ -385,12 +391,16 @@ type (
 		Description      string                    `json:"description"`
 		SKU              string                    `json:"sku" example:"L1L-448"`
 		Stock            int                       `json:"stock" example:"100"`
-		Store            *ProductStoreResponse     `json:"store,omitempty"`
+		Store            *CustomProductResponse    `json:"store,omitempty"`
 		Category         *ProductCategoryResponse  `json:"category,omitempty"`
 		Images           []ProductImageResponse    `json:"images,omitempty"`
 		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
 		CreatedAt        time.Time                 `json:"created_at"`
 		UpdatedAt        time.Time                 `json:"updated_at"`
+	}
+	CustomProductResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 	}
 	CreateProductRequest struct {
 		StoreID     *uuid.UUID `json:"-"`
@@ -423,7 +433,7 @@ type (
 		Name             string                    `json:"name"`
 		SKU              string                    `json:"sku"`
 		Stock            int                       `json:"stock"`
-		Store            *ProductStoreResponse     `json:"store,omitempty"`
+		Store            *CustomProductResponse    `json:"store,omitempty"`
 		Category         *ProductCategoryResponse  `json:"category,omitempty"`
 		Images           []ProductImageResponse    `json:"images,omitempty"`
 		ExternalProducts []ExternalProductResponse `json:"external_products,omitempty"`
@@ -437,12 +447,6 @@ type (
 	ProductPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Products []entity.Product
-	}
-
-	// Product Store
-	ProductStoreResponse struct {
-		ID   uuid.UUID `json:"id"`
-		Name string    `json:"name"`
 	}
 
 	// Product Category
@@ -524,22 +528,28 @@ type (
 		ImageURL    string    `json:"image_url"`
 		Description string    `json:"description"`
 	}
+	VendorCustomResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
 	CreateVendorRequest struct {
-		Name        string `json:"name" binding:"required,min=3,max=100"`
-		Email       string `json:"email,omitempty" binding:"omitempty,email"`
-		PhoneNumber string `json:"phone_number" binding:"required"`
-		Address     string `json:"address,omitempty"`
-		ImageURL    string `json:"image_url,omitempty"`
-		Description string `json:"description,omitempty"`
+		StoreID     *uuid.UUID `json:"-"`
+		Name        string     `json:"name" binding:"required,min=3,max=100"`
+		Email       string     `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string     `json:"phone_number" binding:"required"`
+		Address     string     `json:"address,omitempty"`
+		ImageURL    string     `json:"image_url,omitempty"`
+		Description string     `json:"description,omitempty"`
 	}
 	UpdateVendorRequest struct {
-		ID          uuid.UUID `json:"-"`
-		Name        string    `json:"name" binding:"required,min=3,max=100"`
-		Email       *string   `json:"email,omitempty" binding:"omitempty,email"`
-		PhoneNumber string    `json:"phone_number" binding:"required"`
-		Address     *string   `json:"address,omitempty" binding:"omitempty"`
-		ImageURL    *string   `json:"image_url,omitempty" binding:"omitempty"`
-		Description *string   `json:"description,omitempty" binding:"omitempty"`
+		ID          uuid.UUID  `json:"-"`
+		StoreID     *uuid.UUID `json:"-"`
+		Name        string     `json:"name" binding:"required,min=3,max=100"`
+		Email       *string    `json:"email,omitempty" binding:"omitempty,email"`
+		PhoneNumber string     `json:"phone_number" binding:"required"`
+		Address     *string    `json:"address,omitempty" binding:"omitempty"`
+		ImageURL    *string    `json:"image_url,omitempty" binding:"omitempty"`
+		Description *string    `json:"description,omitempty" binding:"omitempty"`
 	}
 	VendorPaginationResponse struct {
 		response.PaginationResponse
@@ -551,8 +561,8 @@ type (
 	}
 )
 
+// Order
 type (
-	// Order
 	OrderResponse struct {
 		ID               uuid.UUID             `json:"id"`
 		ExternalOrderID  string                `json:"external_order_id" example:"1234567890"`

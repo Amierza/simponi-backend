@@ -165,20 +165,23 @@ func main() {
 		inventoryLogService = service.NewInventoryLoggingService(inventoryLogRepo, zapLogger, jwt)
 		inventoryLogHandler = handler.NewInventoryLoggingHandler(inventoryLogService, zapLogger)
 
+		// Vendor
+		vendorRepo    = repository.NewVendorRepository(db)
+		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
+		vendorHandler = handler.NewVendorHandler(vendorService, zapLogger)
+
+		// Product Vendor
+		productVendorRepo = repository.NewProductVendorRepository(db)
+
 		// Product
 		productRepo    = repository.NewProductRepository(db)
-		productService = service.NewProductService(productRepo, storeRepo, inventoryLogService, zapLogger, jwt)
+		productService = service.NewProductService(productRepo, storeRepo, vendorRepo, productVendorRepo, inventoryLogService, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
 		// External Product
 		externalProductRepo    = repository.NewExternalProductRepository(db)
 		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, storeRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
-
-		// Vendor
-		vendorRepo    = repository.NewVendorRepository(db)
-		vendorService = service.NewVendorService(vendorRepo, zapLogger, jwt)
-		vendorHandler = handler.NewVendorHandler(vendorService, zapLogger)
 
 		// Order
 		orderRepo    = repository.NewOrderRepository(db)
@@ -189,7 +192,6 @@ func main() {
 		logRepo    = repository.NewLogRepository(db)
 		logService = service.NewLogService(logRepo, zapLogger, jwt)
 		logHandler = handler.NewLogHandler(logService, zapLogger)
-
 	)
 
 	server := gin.Default()
@@ -201,9 +203,9 @@ func main() {
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
 	routes.Impersonate(server, impersonateHandler, jwt, rolePermissionRepo)
 	routes.Auth(server, authHandler)
-	routes.StoreUser(server, storeUserHandler, jwt, rolePermissionRepo)
-	routes.Store(server, storeHandler, jwt, rolePermissionRepo)
-	routes.Platform(server, platformHandler, jwt) // ← tambahan baru
+	routes.StoreUser(server, storeUserHandler, jwt, storeRepo, rolePermissionRepo)
+	routes.Store(server, storeHandler, jwt, storeRepo, rolePermissionRepo)
+	routes.Platform(server, platformHandler, jwt)
 	routes.ProductCategories(server, productCategoriesHandler, jwt)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)

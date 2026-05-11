@@ -16,11 +16,11 @@ import (
 
 type (
 	IVendorService interface {
-		CreateVendor(ctx context.Context, req *dto.CreateVendorRequest) (*dto.VendorResponse, error)
-		GetVendors(ctx context.Context, req *response.PaginationRequest) (dto.VendorPaginationResponse, error)
-		GetVendorByID(ctx context.Context, vendorID *uuid.UUID) (*dto.VendorResponse, error)
-		UpdateVendor(ctx context.Context, vendorID *uuid.UUID, req *dto.UpdateVendorRequest) (*dto.VendorResponse, error)
-		DeleteVendorByID(ctx context.Context, vendorID *uuid.UUID) error
+		CreateVendorByStoreID(ctx context.Context, req *dto.CreateVendorRequest) (*dto.VendorResponse, error)
+		GetVendorsByStoreID(ctx context.Context, storeID *uuid.UUID, req *response.PaginationRequest) (dto.VendorPaginationResponse, error)
+		GetVendorByStoreIDAndVendorID(ctx context.Context, storeID *uuid.UUID, vendorID *uuid.UUID) (*dto.VendorResponse, error)
+		UpdateVendorByStoreIDAndVendorID(ctx context.Context, req *dto.UpdateVendorRequest) (*dto.VendorResponse, error)
+		DeleteVendorByStoreIDAndVendorID(ctx context.Context, storeID *uuid.UUID, vendorID *uuid.UUID) error
 	}
 
 	vendorService struct {
@@ -50,13 +50,13 @@ func mapToVendorResponse(v *entity.Vendor) *dto.VendorResponse {
 	}
 }
 
-func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendorRequest) (*dto.VendorResponse, error) {
+func (vs *vendorService) CreateVendorByStoreID(ctx context.Context, req *dto.CreateVendorRequest) (*dto.VendorResponse, error) {
 	// check if email already exists
 	if req.Email != "" {
-		_, found, err := vs.vendorRepo.GetVendorByEmail(ctx, nil, req.Email)
+		_, found, err := vs.vendorRepo.GetVendorByStoreIDAndVendorEmail(ctx, nil, req.StoreID, req.Email)
 		if err != nil {
-			vs.logger.Error("failed to get vendor by email", zap.String("email", req.Email), zap.Error(err))
-			return nil, fmt.Errorf("failed to get vendor by email: %w", dto.ErrInternal)
+			vs.logger.Error("failed to get vendor by store ID and email", zap.String("store_id", req.StoreID.String()), zap.String("email", req.Email), zap.Error(err))
+			return nil, fmt.Errorf("failed to get vendor by store ID and email: %w", dto.ErrInternal)
 		}
 		if found {
 			vs.logger.Warn("vendor email already exists", zap.String("email", req.Email))
@@ -71,10 +71,10 @@ func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendor
 		return nil, fmt.Errorf("invalid phone number: %w", dto.ErrBadRequest)
 	}
 
-	_, found, err := vs.vendorRepo.GetVendorByPhoneNumber(ctx, nil, phoneNumber)
+	_, found, err := vs.vendorRepo.GetVendorByStoreIDAndVendorPhoneNumber(ctx, nil, req.StoreID, phoneNumber)
 	if err != nil {
-		vs.logger.Error("failed to get vendor by phone number", zap.String("phone_number", phoneNumber), zap.Error(err))
-		return nil, fmt.Errorf("failed to get vendor by phone number: %w", dto.ErrInternal)
+		vs.logger.Error("failed to get vendor by store ID and phone number", zap.String("store_id", req.StoreID.String()), zap.String("phone_number", phoneNumber), zap.Error(err))
+		return nil, fmt.Errorf("failed to get vendor by store ID and phone number: %w", dto.ErrInternal)
 	}
 	if found {
 		vs.logger.Warn("vendor already exists", zap.String("phone_number", phoneNumber))
@@ -84,6 +84,7 @@ func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendor
 	newID := uuid.New()
 	newVendor := &entity.Vendor{
 		ID:          newID,
+		StoreID:     *req.StoreID,
 		Name:        req.Name,
 		Email:       req.Email,
 		PhoneNumber: phoneNumber,
@@ -103,11 +104,11 @@ func (vs *vendorService) CreateVendor(ctx context.Context, req *dto.CreateVendor
 	return mapToVendorResponse(newVendor), nil
 }
 
-func (vs *vendorService) GetVendors(ctx context.Context, req *response.PaginationRequest) (dto.VendorPaginationResponse, error) {
-	datas, err := vs.vendorRepo.GetVendors(ctx, nil, req)
+func (vs *vendorService) GetVendorsByStoreID(ctx context.Context, storeID *uuid.UUID, req *response.PaginationRequest) (dto.VendorPaginationResponse, error) {
+	datas, err := vs.vendorRepo.GetVendorsByStoreID(ctx, nil, storeID, req)
 	if err != nil {
-		vs.logger.Error("failed to get vendors", zap.Error(err))
-		return dto.VendorPaginationResponse{}, fmt.Errorf("failed to get vendors: %w", dto.ErrInternal)
+		vs.logger.Error("failed to get vendors by store ID", zap.Error(err))
+		return dto.VendorPaginationResponse{}, fmt.Errorf("failed to get vendors by store ID: %w", dto.ErrInternal)
 	}
 
 	vs.logger.Info("success to get vendors", zap.Int64("count", datas.Count))
@@ -123,14 +124,14 @@ func (vs *vendorService) GetVendors(ctx context.Context, req *response.Paginatio
 	}, nil
 }
 
-func (vs *vendorService) GetVendorByID(ctx context.Context, vendorID *uuid.UUID) (*dto.VendorResponse, error) {
-	vendor, found, err := vs.vendorRepo.GetVendorByID(ctx, nil, vendorID)
+func (vs *vendorService) GetVendorByStoreIDAndVendorID(ctx context.Context, storeID, vendorID *uuid.UUID) (*dto.VendorResponse, error) {
+	vendor, found, err := vs.vendorRepo.GetVendorByStoreIDAndVendorID(ctx, nil, storeID, vendorID)
 	if err != nil {
-		vs.logger.Error("failed to get vendor by ID", zap.String("vendorID", vendorID.String()), zap.Error(err))
-		return nil, fmt.Errorf("failed to get vendor ID: %w", dto.ErrInternal)
+		vs.logger.Error("failed to get vendor by store ID and Vendor ID", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to get vendor by store ID and Vendor ID: %w", dto.ErrInternal)
 	}
 	if !found {
-		vs.logger.Warn("vendor not found", zap.String("vendorID", vendorID.String()))
+		vs.logger.Warn("vendor not found", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()))
 		return nil, fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
 	}
 
@@ -139,29 +140,28 @@ func (vs *vendorService) GetVendorByID(ctx context.Context, vendorID *uuid.UUID)
 	return mapToVendorResponse(vendor), nil
 }
 
-func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, req *dto.UpdateVendorRequest) (*dto.VendorResponse, error) {
-	vendor, found, err := vs.vendorRepo.GetVendorByID(ctx, nil, vendorID)
+func (vs *vendorService) UpdateVendorByStoreIDAndVendorID(ctx context.Context, req *dto.UpdateVendorRequest) (*dto.VendorResponse, error) {
+	vendor, found, err := vs.vendorRepo.GetVendorByStoreIDAndVendorID(ctx, nil, req.StoreID, &req.ID)
 	if err != nil {
-		vs.logger.Error("failed to get vendor by ID", zap.String("vendorID", vendorID.String()), zap.Error(err))
-		return nil, fmt.Errorf("failed to get vendor ID: %w", dto.ErrInternal)
+		vs.logger.Error("failed to get vendor by store ID and Vendor ID", zap.String("store_id", req.StoreID.String()), zap.String("vendorID", req.ID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to get vendor by store ID and Vendor ID: %w", dto.ErrInternal)
 	}
 	if !found {
-		vs.logger.Warn("vendor not found", zap.String("vendorID", vendorID.String()))
+		vs.logger.Warn("vendor not found", zap.String("store_id", req.StoreID.String()), zap.String("vendorID", req.ID.String()))
 		return nil, fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
 	}
 
 	// validate email
 	if req.Email != nil {
 		if vendor.Email != *req.Email {
-			_, found, err = vs.vendorRepo.GetVendorByEmail(ctx, nil, *req.Email)
+			_, found, err = vs.vendorRepo.GetVendorByStoreIDAndVendorEmail(ctx, nil, req.StoreID, *req.Email)
 			if err != nil {
-				vs.logger.Error("failed to get vendor by email", zap.String("email", *req.Email), zap.Error(err))
-				return nil, fmt.Errorf("failed to get vendor by email: %w", dto.ErrInternal)
+				vs.logger.Error("failed to get vendor by store ID and email", zap.String("store_id", req.StoreID.String()), zap.String("email", *req.Email), zap.Error(err))
+				return nil, fmt.Errorf("failed to get vendor by store ID and email: %w", dto.ErrInternal)
 			}
-
 			if found {
 				vs.logger.Warn("vendor email already exists", zap.String("email", *req.Email))
-				return nil, fmt.Errorf("vendor email already exists: %w", dto.ErrAlreadyExists)
+				return nil, fmt.Errorf("vendor already exists: %w", dto.ErrAlreadyExists)
 			}
 		}
 		vendor.Email = *req.Email
@@ -174,14 +174,14 @@ func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, 
 		return nil, fmt.Errorf("invalid phone number: %w", dto.ErrBadRequest)
 	}
 	if vendor.PhoneNumber != phoneNumber {
-		_, found, err = vs.vendorRepo.GetVendorByPhoneNumber(ctx, nil, phoneNumber)
+		_, found, err = vs.vendorRepo.GetVendorByStoreIDAndVendorPhoneNumber(ctx, nil, req.StoreID, phoneNumber)
 		if err != nil {
-			vs.logger.Error("failed to get vendor by phone number", zap.String("phone_number", phoneNumber), zap.Error(err))
-			return nil, fmt.Errorf("failed to get vendor by phone number: %w", dto.ErrInternal)
+			vs.logger.Error("failed to get vendor by store ID and phone number", zap.String("store_id", req.StoreID.String()), zap.String("phone_number", phoneNumber), zap.Error(err))
+			return nil, fmt.Errorf("failed to get vendor by store ID and phone number: %w", dto.ErrInternal)
 		}
 		if found {
-			vs.logger.Warn("vendor phone number already exists", zap.String("phone_number", phoneNumber))
-			return nil, fmt.Errorf("vendor phone number already exists: %w", dto.ErrAlreadyExists)
+			vs.logger.Warn("vendor already exists", zap.String("phone_number", phoneNumber))
+			return nil, fmt.Errorf("vendor already exists: %w", dto.ErrAlreadyExists)
 		}
 		vendor.PhoneNumber = phoneNumber
 	}
@@ -197,28 +197,28 @@ func (vs *vendorService) UpdateVendor(ctx context.Context, vendorID *uuid.UUID, 
 	}
 	vendor.Name = req.Name
 
-	err = vs.vendorRepo.UpdateVendor(ctx, nil, vendor)
+	err = vs.vendorRepo.UpdateVendor(ctx, nil, req.StoreID, vendor)
 	if err != nil {
-		vs.logger.Error("failed to update vendor", zap.String("id", vendorID.String()), zap.Error(err))
+		vs.logger.Error("failed to update vendor", zap.String("id", vendor.ID.String()), zap.Error(err))
 		return nil, fmt.Errorf("failed to update vendor: %w", dto.ErrInternal)
 	}
 
 	return mapToVendorResponse(vendor), nil
 }
 
-func (vs *vendorService) DeleteVendorByID(ctx context.Context, vendorID *uuid.UUID) error {
-	_, found, err := vs.vendorRepo.GetVendorByID(ctx, nil, vendorID)
+func (vs *vendorService) DeleteVendorByStoreIDAndVendorID(ctx context.Context, storeID, vendorID *uuid.UUID) error {
+	_, found, err := vs.vendorRepo.GetVendorByStoreIDAndVendorID(ctx, nil, storeID, vendorID)
 	if err != nil {
-		vs.logger.Error("failed to get vendor by ID", zap.String("vendorID", vendorID.String()), zap.Error(err))
-		return fmt.Errorf("failed to get vendor ID: %w", dto.ErrInternal)
+		vs.logger.Error("failed to get vendor by store ID and Vendor ID", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
+		return fmt.Errorf("failed to get vendor by store ID and Vendor ID: %w", dto.ErrInternal)
 	}
 	if !found {
-		vs.logger.Warn("vendor not found", zap.String("vendorID", vendorID.String()))
+		vs.logger.Warn("vendor not found", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()))
 		return fmt.Errorf("vendor not found: %v", dto.ErrNotFound)
 	}
 
-	if err := vs.vendorRepo.DeleteVendorByID(ctx, nil, vendorID); err != nil {
-		vs.logger.Error("failed to delete vendor by id", zap.String("vendorID", vendorID.String()), zap.Error(err))
+	if err := vs.vendorRepo.DeleteVendorByStoreIDAndVendorID(ctx, nil, storeID, vendorID); err != nil {
+		vs.logger.Error("failed to delete vendor by id", zap.String("store_id", storeID.String()), zap.String("vendorID", vendorID.String()), zap.Error(err))
 		return fmt.Errorf("failed to delete vendor by id: %w", dto.ErrInternal)
 	}
 

@@ -41,14 +41,14 @@ func NewStoreUserHandler(storeUserService service.IStoreUserService, logger *zap
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			store_id	path		string								true	"Store ID (UUID)"
-//	@Param			payload		body		dto.CreateStoreUsersRequest			true	"List of user IDs"
-//	@Success		201			{object}	dto.StoreUserEmptyResponseWrapper	"Success"
-//	@Failure		400			{object}	dto.ErrorResponse					"Invalid input / UUID"
-//	@Failure		401			{object}	dto.ErrorResponse					"Unauthorized"
-//	@Failure		403			{object}	dto.ErrorResponse					"Forbidden"
-//	@Failure		404			{object}	dto.ErrorResponse					"Store/User not found"
-//	@Failure		500			{object}	dto.ErrorResponse					"Internal Server Error"
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			payload		body		dto.CreateStoreUsersRequest		true	"List of user IDs"
+//	@Success		201			{object}	dto.EmptySuccessResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid input / UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Store/User not found"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
 //	@Router			/stores/{store_id}/users [post]
 func (suh *storeUserHandler) CreateStoreUsers(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
@@ -192,14 +192,14 @@ func (suh *storeUserHandler) GetStoreUserByStoreIDAndUserID(ctx *gin.Context) {
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Param			store_id	path		string								true	"Store ID (UUID)"
-//	@Param			user_id		path		string								true	"User ID (UUID)"
-//	@Success		200			{object}	dto.StoreUserEmptyResponseWrapper	"Success"
-//	@Failure		400			{object}	dto.ErrorResponse					"Invalid UUID"
-//	@Failure		401			{object}	dto.ErrorResponse					"Unauthorized"
-//	@Failure		403			{object}	dto.ErrorResponse					"Forbidden"
-//	@Failure		404			{object}	dto.ErrorResponse					"Store/User not found"
-//	@Failure		500			{object}	dto.ErrorResponse					"Internal Server Error"
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			user_id		path		string							true	"User ID (UUID)"
+//	@Success		200			{object}	dto.EmptySuccessResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Store/User not found"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
 //	@Router			/stores/{store_id}/users/{user_id} [delete]
 func (suh *storeUserHandler) DeleteStoreUserByStoreIDAndUserID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")

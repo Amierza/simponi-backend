@@ -7,6 +7,9 @@ import (
 type Store struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 
+	OwnerID *uuid.UUID `gorm:"type:uuid" json:"owner_id"`
+	Owner   User       `gorm:"foreignKey:OwnerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	ImageURL    string `json:"image_url"`

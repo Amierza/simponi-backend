@@ -288,6 +288,176 @@ const docTemplate = `{
                 }
             }
         },
+        "/platforms/connect": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Connect Shopee/Tokopedia. Jika belum ada store, otomatis buat store baru.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Platforms"
+                ],
+                "summary": "Connect platform (mock OAuth)",
+                "parameters": [
+                    {
+                        "description": "Connect request",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ConnectPlatformRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MyStoreResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Platform sudah terkoneksi",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/platforms/my-store": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get store + connected platforms milik user yang sedang login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Platforms"
+                ],
+                "summary": "Get my store",
+                "responses": {
+                    "200": {
+                        "description": "Store ditemukan",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MyStoreResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "Belum punya store"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/platforms/{store_platform_id}/disconnect": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hapus koneksi platform. Jika ini platform terakhir, store juga dihapus.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Platforms"
+                ],
+                "summary": "Disconnect platform",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "StorePlatform ID (UUID)",
+                        "name": "store_platform_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "security": [
@@ -582,7 +752,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.RoleEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -912,7 +1082,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.StoreEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -1657,7 +1827,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -1740,7 +1910,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -1763,6 +1933,172 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Product not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/{store_id}/products/{product_id}/vendors/{vendor_id}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Attach a vendor to a product inside a store (Requires permission: AttachVendorToProduct)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Attach vendor to product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Product ID (UUID)",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Store/Product/Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Vendor already attached",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Detach a vendor from a product inside a store (Requires permission: DetachVendorFromProduct)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Detach vendor from product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Product ID (UUID)",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Store/Product/Vendor relation not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -1893,7 +2229,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.StoreUserEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -2039,7 +2375,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.StoreUserEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -2062,6 +2398,386 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Store/User not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/{store_id}/vendors": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get paginated vendors in a store (Requires permission: GetVendors)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Get vendors",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VendorsResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Store not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new vendor inside a store (Requires permission: CreateVendor)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Create vendor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Create vendor request",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateVendorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VendorResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input / UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Store not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/{store_id}/vendors/{vendor_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get detail vendor in a store by vendor ID (Requires permission: GetVendorByID)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Get vendor by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VendorResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update vendor data in a store (Requires permission: UpdateVendor)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Update vendor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update vendor request",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateVendorRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.VendorResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID / Request Body",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete vendor from a store by vendor ID (Requires permission: DeleteVendorByID)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Delete vendor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Store ID (UUID)",
+                        "name": "store_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "vendor_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -2529,7 +3245,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/dto.UserEmptyResponseWrapper"
+                            "$ref": "#/definitions/dto.EmptySuccessResponseWrapper"
                         }
                     },
                     "400": {
@@ -2643,6 +3359,63 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.ConnectPlatformRequest": {
+            "type": "object",
+            "required": [
+                "external_name",
+                "external_shop_id",
+                "platform_id"
+            ],
+            "properties": {
+                "external_name": {
+                    "description": "nama toko di marketplace",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "external_shop_id": {
+                    "description": "shop_id dari marketplace",
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "string"
+                },
+                "store_description": {
+                    "type": "string"
+                },
+                "store_image_url": {
+                    "type": "string"
+                },
+                "store_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ConnectedPlatformDetail": {
+            "type": "object",
+            "properties": {
+                "external_name": {
+                    "description": "nama toko di marketplace",
+                    "type": "string"
+                },
+                "external_shop_id": {
+                    "description": "shop_id",
+                    "type": "string"
+                },
+                "is_connected": {
+                    "type": "boolean"
+                },
+                "platform_id": {
+                    "type": "string"
+                },
+                "platform_name": {
+                    "type": "string"
+                },
+                "store_platform_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateExternalProductRequest": {
             "type": "object",
             "required": [
@@ -2784,6 +3557,46 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateVendorRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "phone_number"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CustomProductResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CustomUserResponse": {
             "type": "object",
             "properties": {
@@ -2795,6 +3608,19 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.EmptySuccessResponseWrapper": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "success"
+                },
+                "status": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -2949,6 +3775,32 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.MyStoreResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "platforms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ConnectedPlatformDetail"
+                    }
+                }
+            }
+        },
         "dto.PermissionPaginationResponseWrapper": {
             "type": "object",
             "properties": {
@@ -3034,19 +3886,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ProductEmptyResponseWrapper": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success"
-                },
-                "status": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
         "dto.ProductImageResponse": {
             "type": "object",
             "properties": {
@@ -3097,7 +3936,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "store": {
-                    "$ref": "#/definitions/dto.ProductStoreResponse"
+                    "$ref": "#/definitions/dto.CustomProductResponse"
                 }
             }
         },
@@ -3141,7 +3980,7 @@ const docTemplate = `{
                     "example": 100
                 },
                 "store": {
-                    "$ref": "#/definitions/dto.ProductStoreResponse"
+                    "$ref": "#/definitions/dto.CustomProductResponse"
                 },
                 "updated_at": {
                     "type": "string"
@@ -3203,17 +4042,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ProductStoreResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.ProductsResponseWrapper": {
             "type": "object",
             "properties": {
@@ -3267,19 +4095,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "success refresh token"
-                },
-                "status": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.RoleEmptyResponseWrapper": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success delete role"
                 },
                 "status": {
                     "type": "boolean",
@@ -3386,16 +4201,17 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.StoreEmptyResponseWrapper": {
+        "dto.StoreOwnerResponse": {
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success delete store"
+                "email": {
+                    "type": "string"
                 },
-                "status": {
-                    "type": "boolean",
-                    "example": true
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -3417,6 +4233,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "owner": {
+                    "$ref": "#/definitions/dto.StoreOwnerResponse"
+                },
                 "platforms": {
                     "type": "array",
                     "items": {
@@ -3434,19 +4253,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "success get store"
-                },
-                "status": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.StoreUserEmptyResponseWrapper": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success delete store user"
                 },
                 "status": {
                     "type": "boolean",
@@ -3531,6 +4337,12 @@ const docTemplate = `{
                 "description": {
                     "type": "string",
                     "example": "A very nice hat"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "name": {
                     "type": "string",
@@ -3640,6 +4452,35 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateVendorRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "phone_number"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UploadImageResponse": {
             "type": "object",
             "properties": {
@@ -3660,19 +4501,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "success upload files"
-                },
-                "status": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.UserEmptyResponseWrapper": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success delete user"
                 },
                 "status": {
                     "type": "boolean",
@@ -3739,6 +4567,68 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.VendorResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VendorResponseWrapper": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.VendorResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "success get vendor"
+                },
+                "status": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.VendorsResponseWrapper": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VendorResponse"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "success get vendors"
+                },
+                "meta": {},
+                "status": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -3786,6 +4676,10 @@ const docTemplate = `{
         {
             "description": "Manage users within a store (membership \u0026 access)",
             "name": "Store Users"
+        },
+        {
+            "description": "Platform connection management (Shopee, Tokopedia)",
+            "name": "Platforms"
         },
         {
             "description": "Product and inventory management",

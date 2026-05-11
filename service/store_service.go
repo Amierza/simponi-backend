@@ -49,7 +49,12 @@ func NewStoreService(tx repository.ITransaction, storeRepo repository.IStoreRepo
 
 func mapToStoreResponse(s *entity.Store) *dto.StoreResponse {
 	res := &dto.StoreResponse{
-		ID:          s.ID,
+		ID: s.ID,
+		Owner: dto.StoreOwnerResponse{
+			ID:    s.Owner.ID,
+			Name:  s.Owner.Name,
+			Email: s.Owner.Email,
+		},
 		Name:        s.Name,
 		ImageURL:    s.ImageURL,
 		Description: s.Description,
@@ -87,6 +92,7 @@ func (ss *storeService) CreateStore(ctx context.Context, req *dto.CreateStoreReq
 	newStoreID := uuid.New()
 	newStore := &entity.Store{
 		ID:          newStoreID,
+		OwnerID:     &userID,
 		Name:        req.Name,
 		ImageURL:    req.ImageURL,
 		Description: req.Description,

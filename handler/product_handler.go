@@ -21,6 +21,8 @@ type (
 		UpdateProductByStoreIDAndProductID(ctx *gin.Context)
 		UpdateStockByStoreIDAndProductID(ctx *gin.Context)
 		DeleteProductByStoreIDAndProductID(ctx *gin.Context)
+		AttachVendorToProduct(ctx *gin.Context)
+		DetachVendorFromProduct(ctx *gin.Context)
 	}
 
 	productHandler struct {
@@ -294,7 +296,7 @@ func (ph *productHandler) UpdateProductByStoreIDAndProductID(ctx *gin.Context) {
 //	@Param			store_id	path		string							true	"Store ID (UUID)"
 //	@Param			product_id	path		string							true	"Product ID (UUID)"
 //	@Param			payload		body		dto.UpdateStockRequest			true	"Stock update request"
-//	@Success		200			{object}	dto.ProductEmptyResponseWrapper	"Success"
+//	@Success		200			{object}	dto.EmptySuccessResponseWrapper	"Success"
 //	@Failure		400			{object}	dto.ErrorResponse				"Invalid input"
 //	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
 //	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
@@ -352,7 +354,7 @@ func (ph *productHandler) UpdateStockByStoreIDAndProductID(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			store_id	path		string							true	"Store ID (UUID)"
 //	@Param			product_id	path		string							true	"Product ID (UUID)"
-//	@Success		200			{object}	dto.ProductEmptyResponseWrapper	"Success"
+//	@Success		200			{object}	dto.EmptySuccessResponseWrapper	"Success"
 //	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
 //	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
 //	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
@@ -387,4 +389,119 @@ func (ph *productHandler) DeleteProductByStoreIDAndProductID(ctx *gin.Context) {
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s product", dto.SUCCESS_DELETE), nil)
 	ctx.JSON(http.StatusOK, res)
+}
+
+// AttachVendorToProduct godoc
+//
+//	@Summary		Attach vendor to product
+//	@Description	Attach a vendor to a product inside a store (Requires permission: AttachVendorToProduct)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			product_id	path		string							true	"Product ID (UUID)"
+//	@Param			vendor_id	path		string							true	"Vendor ID (UUID)"
+//	@Success		201			{object}	dto.EmptySuccessResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Store/Product/Vendor not found"
+//	@Failure		409			{object}	dto.ErrorResponse				"Vendor already attached"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id}/vendors/{vendor_id} [post]
+func (ph *productHandler) AttachVendorToProduct(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed attach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	productIDStr := ctx.Param("product_id")
+	productID, err := uuid.Parse(productIDStr)
+	if err != nil {
+		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed attach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	vendorIDStr := ctx.Param("vendor_id")
+	vendorID, err := uuid.Parse(vendorIDStr)
+	if err != nil {
+		ph.logger.Error("invalid vendor ID", zap.String("id", vendorIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed attach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if err := ph.productService.AttachVendorToProduct(ctx, &storeID, &productID, &vendorID); err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed("failed attach vendor to product", cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess("success attach vendor to product", nil)
+	ctx.JSON(http.StatusCreated, res)
+}
+
+// DetachVendorFromProduct godoc
+//
+//	@Summary		Detach vendor from product
+//	@Description	Detach a vendor from a product inside a store (Requires permission: DetachVendorFromProduct)
+//	@Tags			Products
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string							true	"Store ID (UUID)"
+//	@Param			product_id	path		string							true	"Product ID (UUID)"
+//	@Param			vendor_id	path		string							true	"Vendor ID (UUID)"
+//	@Success		200			{object}	dto.EmptySuccessResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse				"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse				"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse				"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse				"Store/Product/Vendor relation not found"
+//	@Failure		500			{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/stores/{store_id}/products/{product_id}/vendors/{vendor_id} [delete]
+func (ph *productHandler) DetachVendorFromProduct(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		ph.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed detach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	productIDStr := ctx.Param("product_id")
+	productID, err := uuid.Parse(productIDStr)
+	if err != nil {
+		ph.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed detach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	vendorIDStr := ctx.Param("vendor_id")
+	vendorID, err := uuid.Parse(vendorIDStr)
+	if err != nil {
+		ph.logger.Error("invalid vendor ID", zap.String("id", vendorIDStr), zap.Error(err))
+		res := response.BuildResponseFailed("failed detach vendor to product", dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if err := ph.productService.DetachVendorFromProduct(ctx, &storeID, &productID, &vendorID); err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed("failed detach vendor to product", cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess("success detach vendor to product", nil)
+	ctx.JSON(http.StatusCreated, res)
 }

@@ -324,7 +324,7 @@ func (uh *userHandler) UpdateUserProfile(ctx *gin.Context) {
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	dto.UserEmptyResponseWrapper	"Success"
+//	@Success		200	{object}	dto.EmptySuccessResponseWrapper	"Success"
 //	@Failure		400	{object}	dto.ErrorResponse				"Invalid UUID"
 //	@Failure		401	{object}	dto.ErrorResponse				"Unauthorized"
 //	@Failure		403	{object}	dto.ErrorResponse				"Forbidden"

@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type Product struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 
-	StoreID uuid.UUID `gorm:"type:uuid;index" json:"store_id"`
+	StoreID uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_store_sku;index" json:"store_id"`
 	Store   Store     `gorm:"foreignKey:StoreID;references:ID;constraint:OnDelete:CASCADE;"`
 
 	CategoryID *uuid.UUID      `gorm:"type:uuid" json:"category_id"`
@@ -13,7 +13,7 @@ type Product struct {
 
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	SKU         string `gorm:"uniqueIndex" json:"sku"`
+	SKU         string `gorm:"uniqueIndex:idx_store_sku" json:"sku"`
 	Stock       int    `json:"stock"` // central stok
 
 	Images           []*ProductImage    `gorm:"foreignKey:ProductID"`

@@ -103,13 +103,13 @@ func (ph *platformHandler) ConnectPlatform(ctx *gin.Context) {
 //	@Tags			Platforms
 //	@Security		BearerAuth
 //	@Produce		json
-//	@Param			store_platform_id	path	string	true	"StorePlatform ID (UUID)"
-//	@Success		200	{object}	map[string]string
-//	@Failure		400	{object}	dto.ErrorResponse
-//	@Failure		401	{object}	dto.ErrorResponse
-//	@Failure		403	{object}	dto.ErrorResponse
-//	@Failure		404	{object}	dto.ErrorResponse
-//	@Failure		500	{object}	dto.ErrorResponse
+//	@Param			store_platform_id	path		string	true	"StorePlatform ID (UUID)"
+//	@Success		200					{object}	map[string]string
+//	@Failure		400					{object}	dto.ErrorResponse
+//	@Failure		401					{object}	dto.ErrorResponse
+//	@Failure		403					{object}	dto.ErrorResponse
+//	@Failure		404					{object}	dto.ErrorResponse
+//	@Failure		500					{object}	dto.ErrorResponse
 //	@Router			/platforms/{store_platform_id}/disconnect [delete]
 func (ph *platformHandler) DisconnectPlatform(ctx *gin.Context) {
 	idStr := ctx.Param("store_platform_id")

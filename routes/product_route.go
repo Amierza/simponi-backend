@@ -11,12 +11,20 @@ import (
 func Product(route *gin.Engine, productHandler handler.IProductHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/stores/:store_id/products").Use(middleware.Authentication(jwtService))
 	{
+		// product domain
 		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateProduct"), productHandler.CreateProduct)
+
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetProducts"), productHandler.GetProducts)
 		routes.GET("/stats", middleware.RBAC(rolePermissionRepo, "GetProductStats"), productHandler.GetProductStats)
 		routes.GET("/:product_id", middleware.RBAC(rolePermissionRepo, "GetProductByStoreIDAndProductID"), productHandler.GetProductByStoreIDAndProductID)
+
 		routes.PUT("/:product_id", middleware.RBAC(rolePermissionRepo, "UpdateProductByStoreIDAndProductID"), productHandler.UpdateProductByStoreIDAndProductID)
 		routes.PATCH("/:product_id/stock", middleware.RBAC(rolePermissionRepo, "UpdateStockByStoreIDAndProductID"), productHandler.UpdateStockByStoreIDAndProductID)
+
 		routes.DELETE("/:product_id", middleware.RBAC(rolePermissionRepo, "DeleteProductByStoreIDAndProductID"), productHandler.DeleteProductByStoreIDAndProductID)
+
+		// product vendor damain
+		routes.POST("/:product_id/vendors/:vendor_id", middleware.RBAC(rolePermissionRepo, "AttachVendorToProduct"), productHandler.AttachVendorToProduct)
+		routes.DELETE("/:product_id/vendors/:vendor_id", middleware.RBAC(rolePermissionRepo, "DetachVendorFromProduct"), productHandler.DetachVendorFromProduct)
 	}
 }

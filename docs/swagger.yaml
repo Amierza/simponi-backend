@@ -1,5 +1,45 @@
 basePath: /api/v1
 definitions:
+  dto.ConnectPlatformRequest:
+    properties:
+      external_name:
+        description: nama toko di marketplace
+        maxLength: 100
+        minLength: 2
+        type: string
+      external_shop_id:
+        description: shop_id dari marketplace
+        type: string
+      platform_id:
+        type: string
+      store_description:
+        type: string
+      store_image_url:
+        type: string
+      store_name:
+        type: string
+    required:
+    - external_name
+    - external_shop_id
+    - platform_id
+    type: object
+  dto.ConnectedPlatformDetail:
+    properties:
+      external_name:
+        description: nama toko di marketplace
+        type: string
+      external_shop_id:
+        description: shop_id
+        type: string
+      is_connected:
+        type: boolean
+      platform_id:
+        type: string
+      platform_name:
+        type: string
+      store_platform_id:
+        type: string
+    type: object
   dto.CreateExternalProductRequest:
     properties:
       platform_id:
@@ -99,6 +139,33 @@ definitions:
     - name
     - password
     type: object
+  dto.CreateVendorRequest:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone_number:
+        type: string
+    required:
+    - name
+    - phone_number
+    type: object
+  dto.CustomProductResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   dto.CustomUserResponse:
     properties:
       email:
@@ -107,6 +174,15 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  dto.EmptySuccessResponseWrapper:
+    properties:
+      message:
+        example: success
+        type: string
+      status:
+        example: true
+        type: boolean
     type: object
   dto.ErrorResponse:
     properties:
@@ -211,6 +287,23 @@ definitions:
         example: true
         type: boolean
     type: object
+  dto.MyStoreResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      platforms:
+        items:
+          $ref: '#/definitions/dto.ConnectedPlatformDetail'
+        type: array
+    type: object
   dto.PermissionPaginationResponseWrapper:
     properties:
       data:
@@ -268,15 +361,6 @@ definitions:
         example: Electronics
         type: string
     type: object
-  dto.ProductEmptyResponseWrapper:
-    properties:
-      message:
-        example: success
-        type: string
-      status:
-        example: true
-        type: boolean
-    type: object
   dto.ProductImageResponse:
     properties:
       id:
@@ -311,7 +395,7 @@ definitions:
       stock:
         type: integer
       store:
-        $ref: '#/definitions/dto.ProductStoreResponse'
+        $ref: '#/definitions/dto.CustomProductResponse'
     type: object
   dto.ProductResponse:
     properties:
@@ -341,7 +425,7 @@ definitions:
         example: 100
         type: integer
       store:
-        $ref: '#/definitions/dto.ProductStoreResponse'
+        $ref: '#/definitions/dto.CustomProductResponse'
       updated_at:
         type: string
     type: object
@@ -382,13 +466,6 @@ definitions:
         example: true
         type: boolean
     type: object
-  dto.ProductStoreResponse:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-    type: object
   dto.ProductsResponseWrapper:
     properties:
       data:
@@ -425,15 +502,6 @@ definitions:
         $ref: '#/definitions/dto.RefreshTokenResponse'
       message:
         example: success refresh token
-        type: string
-      status:
-        example: true
-        type: boolean
-    type: object
-  dto.RoleEmptyResponseWrapper:
-    properties:
-      message:
-        example: success delete role
         type: string
       status:
         example: true
@@ -507,14 +575,14 @@ definitions:
         example: true
         type: boolean
     type: object
-  dto.StoreEmptyResponseWrapper:
+  dto.StoreOwnerResponse:
     properties:
-      message:
-        example: success delete store
+      email:
         type: string
-      status:
-        example: true
-        type: boolean
+      id:
+        type: string
+      name:
+        type: string
     type: object
   dto.StoreResponse:
     properties:
@@ -528,6 +596,8 @@ definitions:
         type: boolean
       name:
         type: string
+      owner:
+        $ref: '#/definitions/dto.StoreOwnerResponse'
       platforms:
         items:
           $ref: '#/definitions/dto.PlatformResponse'
@@ -539,15 +609,6 @@ definitions:
         $ref: '#/definitions/dto.StoreResponse'
       message:
         example: success get store
-        type: string
-      status:
-        example: true
-        type: boolean
-    type: object
-  dto.StoreUserEmptyResponseWrapper:
-    properties:
-      message:
-        example: success delete store user
         type: string
       status:
         example: true
@@ -607,6 +668,10 @@ definitions:
       description:
         example: A very nice hat
         type: string
+      images:
+        items:
+          type: string
+        type: array
       name:
         example: Refined Bronze Hat
         type: string
@@ -681,6 +746,26 @@ definitions:
     required:
     - status
     type: object
+  dto.UpdateVendorRequest:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone_number:
+        type: string
+    required:
+    - name
+    - phone_number
+    type: object
   dto.UploadImageResponse:
     properties:
       image_url:
@@ -694,15 +779,6 @@ definitions:
         type: array
       message:
         example: success upload files
-        type: string
-      status:
-        example: true
-        type: boolean
-    type: object
-  dto.UserEmptyResponseWrapper:
-    properties:
-      message:
-        example: success delete user
         type: string
       status:
         example: true
@@ -742,6 +818,48 @@ definitions:
         type: array
       message:
         example: success get users
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.VendorResponse:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  dto.VendorResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/dto.VendorResponse'
+      message:
+        example: success get vendor
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  dto.VendorsResponseWrapper:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.VendorResponse'
+        type: array
+      message:
+        example: success get vendors
         type: string
       meta: {}
       status:
@@ -950,6 +1068,116 @@ paths:
       summary: Get list of permissions
       tags:
       - Permissions
+  /platforms/{store_platform_id}/disconnect:
+    delete:
+      description: Hapus koneksi platform. Jika ini platform terakhir, store juga
+        dihapus.
+      parameters:
+      - description: StorePlatform ID (UUID)
+        in: path
+        name: store_platform_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Disconnect platform
+      tags:
+      - Platforms
+  /platforms/connect:
+    post:
+      consumes:
+      - application/json
+      description: Connect Shopee/Tokopedia. Jika belum ada store, otomatis buat store
+        baru.
+      parameters:
+      - description: Connect request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ConnectPlatformRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MyStoreResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Platform sudah terkoneksi
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Connect platform (mock OAuth)
+      tags:
+      - Platforms
+  /platforms/my-store:
+    get:
+      description: Get store + connected platforms milik user yang sedang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Store ditemukan
+          schema:
+            $ref: '#/definitions/dto.MyStoreResponse'
+        "204":
+          description: Belum punya store
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my store
+      tags:
+      - Platforms
   /roles:
     get:
       consumes:
@@ -1046,7 +1274,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.RoleEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid UUID
           schema:
@@ -1258,7 +1486,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.StoreEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid UUID
           schema:
@@ -1690,7 +1918,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.ProductEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid UUID
           schema:
@@ -1846,7 +2074,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.ProductEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid input
           schema:
@@ -1870,6 +2098,117 @@ paths:
       security:
       - BearerAuth: []
       summary: Update product stock
+      tags:
+      - Products
+  /stores/{store_id}/products/{product_id}/vendors/{vendor_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Detach a vendor from a product inside a store (Requires permission:
+        DetachVendorFromProduct)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Vendor ID (UUID)
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store/Product/Vendor relation not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Detach vendor from product
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: 'Attach a vendor to a product inside a store (Requires permission:
+        AttachVendorToProduct)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Product ID (UUID)
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Vendor ID (UUID)
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store/Product/Vendor not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Vendor already attached
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Attach vendor to product
       tags:
       - Products
   /stores/{store_id}/products/stats:
@@ -1986,7 +2325,7 @@ paths:
         "201":
           description: Success
           schema:
-            $ref: '#/definitions/dto.StoreUserEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid input / UUID
           schema:
@@ -2034,7 +2373,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.StoreUserEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid UUID
           schema:
@@ -2108,6 +2447,255 @@ paths:
       summary: Get specific user in a store
       tags:
       - Store Users
+  /stores/{store_id}/vendors:
+    get:
+      consumes:
+      - application/json
+      description: 'Get paginated vendors in a store (Requires permission: GetVendors)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.VendorsResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get vendors
+      tags:
+      - Vendors
+    post:
+      consumes:
+      - application/json
+      description: 'Create a new vendor inside a store (Requires permission: CreateVendor)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Create vendor request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateVendorRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.VendorResponseWrapper'
+        "400":
+          description: Invalid input / UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create vendor
+      tags:
+      - Vendors
+  /stores/{store_id}/vendors/{vendor_id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete vendor from a store by vendor ID (Requires permission:
+        DeleteVendorByID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Vendor ID (UUID)
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete vendor
+      tags:
+      - Vendors
+    get:
+      consumes:
+      - application/json
+      description: 'Get detail vendor in a store by vendor ID (Requires permission:
+        GetVendorByID)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Vendor ID (UUID)
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.VendorResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get vendor by ID
+      tags:
+      - Vendors
+    put:
+      consumes:
+      - application/json
+      description: 'Update vendor data in a store (Requires permission: UpdateVendor)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      - description: Vendor ID (UUID)
+        in: path
+        name: vendor_id
+        required: true
+        type: string
+      - description: Update vendor request
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateVendorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.VendorResponseWrapper'
+        "400":
+          description: Invalid UUID / Request Body
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update vendor
+      tags:
+      - Vendors
   /uploads:
     post:
       consumes:
@@ -2235,7 +2823,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/dto.UserEmptyResponseWrapper'
+            $ref: '#/definitions/dto.EmptySuccessResponseWrapper'
         "400":
           description: Invalid UUID
           schema:
@@ -2489,6 +3077,8 @@ tags:
   name: Stores
 - description: Manage users within a store (membership & access)
   name: Store Users
+- description: Platform connection management (Shopee, Tokopedia)
+  name: Platforms
 - description: Product and inventory management
   name: Products
 - description: External product integration (Shopee, Tokopedia, etc.)

@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func StoreUser(route *gin.Engine, storeUserHandler handler.IStoreUserHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
+func StoreUser(route *gin.Engine, storeUserHandler handler.IStoreUserHandler, jwtService jwt.IJWT, storeRepo repository.IStoreRepository, rolePermissionRepo repository.IRolePermissionRepository) {
 	routes := route.Group("/api/v1/stores/:store_id/users").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateStoreUsers"), storeUserHandler.CreateStoreUsers)
+		routes.POST("/", middleware.StoreOwnerOnly(storeRepo), middleware.RBAC(rolePermissionRepo, "CreateStoreUsers"), storeUserHandler.CreateStoreUsers)
 
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetStoreUsers"), storeUserHandler.GetStoreUsers)
 		routes.GET("/:user_id", middleware.RBAC(rolePermissionRepo, "GetStoreUserByStoreIDAndUserID"), storeUserHandler.GetStoreUserByStoreIDAndUserID)
 
-		routes.DELETE("/:user_id", middleware.RBAC(rolePermissionRepo, "DeleteStoreUserByStoreIDAndUserID"), storeUserHandler.DeleteStoreUserByStoreIDAndUserID)
+		routes.DELETE("/:user_id", middleware.StoreOwnerOnly(storeRepo), middleware.RBAC(rolePermissionRepo, "DeleteStoreUserByStoreIDAndUserID"), storeUserHandler.DeleteStoreUserByStoreIDAndUserID)
 	}
 }

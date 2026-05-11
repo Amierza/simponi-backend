@@ -10,6 +10,14 @@ type ErrorResponse struct {
 }
 
 // =====================
+// COMMON - EMPTY RESPONSE
+// =====================
+type EmptySuccessResponseWrapper struct {
+	Status  bool   `json:"status" example:"true"`
+	Message string `json:"message" example:"success"`
+}
+
+// =====================
 // AUTHENTICATION
 // =====================
 type (
@@ -41,10 +49,6 @@ type (
 		Data    []*UserResponse `json:"data"`
 		Meta    any             `json:"meta"`
 	}
-	UserEmptyResponseWrapper struct {
-		Status  bool   `json:"status" example:"true"`
-		Message string `json:"message" example:"success delete user"`
-	}
 )
 
 // =====================
@@ -62,10 +66,6 @@ type (
 		Message string          `json:"message" example:"success get roles"`
 		Data    []*RoleResponse `json:"data"`
 		Meta    any             `json:"meta"`
-	}
-	RoleEmptyResponseWrapper struct {
-		Status  bool   `json:"status" example:"true"`
-		Message string `json:"message" example:"success delete role"`
 	}
 )
 
@@ -103,10 +103,6 @@ type (
 		Data    []*StoreResponse `json:"data"`
 		Meta    any              `json:"meta"`
 	}
-	StoreEmptyResponseWrapper struct {
-		Status  bool   `json:"status" example:"true"`
-		Message string `json:"message" example:"success delete store"`
-	}
 )
 
 // =====================
@@ -124,10 +120,6 @@ type (
 		Status  bool               `json:"status" example:"true"`
 		Message string             `json:"message" example:"success get store user"`
 		Data    CustomUserResponse `json:"data"`
-	}
-	StoreUserEmptyResponseWrapper struct {
-		Status  bool   `json:"status" example:"true"`
-		Message string `json:"message" example:"success delete store user"`
 	}
 )
 
@@ -151,10 +143,6 @@ type (
 		Status  bool                 `json:"status" example:"true"`
 		Message string               `json:"message" example:"success get product stats"`
 		Data    ProductStatsResponse `json:"data"`
-	}
-	ProductEmptyResponseWrapper struct {
-		Status  bool   `json:"status" example:"true"`
-		Message string `json:"message" example:"success"`
 	}
 )
 
@@ -215,3 +203,21 @@ type ImpersonateSuccessResponse struct {
 	Message string              `json:"message" example:"success impersonate"`
 	Data    ImpersonateResponse `json:"data"`
 }
+
+// =====================
+// VENDOR - SUCCESS RESPONSE
+// =====================
+
+type (
+	VendorsResponseWrapper struct {
+		Status  bool              `json:"status" example:"true"`
+		Message string            `json:"message" example:"success get vendors"`
+		Data    []*VendorResponse `json:"data"`
+		Meta    any               `json:"meta"`
+	}
+	VendorResponseWrapper struct {
+		Status  bool            `json:"status" example:"true"`
+		Message string          `json:"message" example:"success get vendor"`
+		Data    *VendorResponse `json:"data"`
+	}
+)

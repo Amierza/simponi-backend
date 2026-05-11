@@ -19,16 +19,16 @@ type (
 		CreateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error
 
 		// READ
-		GetVendors(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error)
-		GetVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) (*entity.Vendor, bool, error)
-		GetVendorByPhoneNumber(ctx context.Context, tx *gorm.DB, phoneNumber string) (*entity.Vendor, bool, error)
-		GetVendorByEmail(ctx context.Context, tx *gorm.DB, email string) (*entity.Vendor, bool, error)
+		GetVendorsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error)
+		GetVendorByStoreIDAndVendorID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendorID *uuid.UUID) (*entity.Vendor, bool, error)
+		GetVendorByStoreIDAndVendorPhoneNumber(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, phoneNumber string) (*entity.Vendor, bool, error)
+		GetVendorByStoreIDAndVendorEmail(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, email string) (*entity.Vendor, bool, error)
 
 		// UPDATE
-		UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error
+		UpdateVendor(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendor *entity.Vendor) error
 
 		// DELETE
-		DeleteVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) error
+		DeleteVendorByStoreIDAndVendorID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendorID *uuid.UUID) error
 	}
 
 	vendorRepository struct {
@@ -52,7 +52,7 @@ func (vr *vendorRepository) CreateVendor(ctx context.Context, tx *gorm.DB, vendo
 }
 
 // READ
-func (vr *vendorRepository) GetVendors(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error) {
+func (vr *vendorRepository) GetVendorsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, req *response.PaginationRequest) (dto.VendorPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -71,6 +71,8 @@ func (vr *vendorRepository) GetVendors(ctx context.Context, tx *gorm.DB, req *re
 
 	query := tx.WithContext(ctx).
 		Model(&entity.Vendor{}).
+		Where("store_id = ?", storeID).
+		Preload("Store").
 		Preload("ProductVendors")
 
 	if req.Search != "" {
@@ -98,7 +100,7 @@ func (vr *vendorRepository) GetVendors(ctx context.Context, tx *gorm.DB, req *re
 		},
 	}, err
 }
-func (vr *vendorRepository) GetVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) (*entity.Vendor, bool, error) {
+func (vr *vendorRepository) GetVendorByStoreIDAndVendorID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendorID *uuid.UUID) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -106,8 +108,10 @@ func (vr *vendorRepository) GetVendorByID(ctx context.Context, tx *gorm.DB, vend
 	var vendor *entity.Vendor
 	err := tx.WithContext(ctx).
 		Model(&entity.Vendor{}).
+		Preload("Store").
 		Preload("ProductVendors").
 		Where("id = ?", vendorID).
+		Where("store_id = ?", storeID).
 		First(&vendor).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -118,7 +122,7 @@ func (vr *vendorRepository) GetVendorByID(ctx context.Context, tx *gorm.DB, vend
 
 	return vendor, true, nil
 }
-func (vr *vendorRepository) GetVendorByPhoneNumber(ctx context.Context, tx *gorm.DB, phoneNumber string) (*entity.Vendor, bool, error) {
+func (vr *vendorRepository) GetVendorByStoreIDAndVendorPhoneNumber(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, phoneNumber string) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -126,8 +130,10 @@ func (vr *vendorRepository) GetVendorByPhoneNumber(ctx context.Context, tx *gorm
 	var vendor entity.Vendor
 	err := tx.WithContext(ctx).
 		Model(&entity.Vendor{}).
+		Preload("Store").
 		Preload("ProductVendors").
 		Where("phone_number = ?", phoneNumber).
+		Where("store_id = ?", storeID).
 		First(&vendor).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -138,7 +144,7 @@ func (vr *vendorRepository) GetVendorByPhoneNumber(ctx context.Context, tx *gorm
 
 	return &vendor, true, nil
 }
-func (vr *vendorRepository) GetVendorByEmail(ctx context.Context, tx *gorm.DB, email string) (*entity.Vendor, bool, error) {
+func (vr *vendorRepository) GetVendorByStoreIDAndVendorEmail(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, email string) (*entity.Vendor, bool, error) {
 	if tx == nil {
 		tx = vr.db
 	}
@@ -146,8 +152,10 @@ func (vr *vendorRepository) GetVendorByEmail(ctx context.Context, tx *gorm.DB, e
 	var vendor entity.Vendor
 	err := tx.WithContext(ctx).
 		Model(&entity.Vendor{}).
+		Preload("Store").
 		Preload("ProductVendors").
 		Where("email = ?", email).
+		Where("store_id = ?", storeID).
 		First(&vendor).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, false, nil
@@ -160,19 +168,19 @@ func (vr *vendorRepository) GetVendorByEmail(ctx context.Context, tx *gorm.DB, e
 }
 
 // UPDATE
-func (vr *vendorRepository) UpdateVendor(ctx context.Context, tx *gorm.DB, vendor *entity.Vendor) error {
+func (vr *vendorRepository) UpdateVendor(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendor *entity.Vendor) error {
 	if tx == nil {
 		tx = vr.db
 	}
 
-	return tx.WithContext(ctx).Model(&entity.Vendor{}).Where("id = ?", vendor.ID).Updates(&vendor).Error
+	return tx.WithContext(ctx).Model(&entity.Vendor{}).Where("id = ?", vendor.ID).Where("store_id = ?", storeID).Updates(&vendor).Error
 }
 
 // DELETE
-func (vr *vendorRepository) DeleteVendorByID(ctx context.Context, tx *gorm.DB, vendorID *uuid.UUID) error {
+func (vr *vendorRepository) DeleteVendorByStoreIDAndVendorID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, vendorID *uuid.UUID) error {
 	if tx == nil {
 		tx = vr.db
 	}
 
-	return tx.WithContext(ctx).Where("id = ?", &vendorID).Delete(&entity.Vendor{}).Error
+	return tx.WithContext(ctx).Where("id = ?", &vendorID).Where("store_id = ?", storeID).Delete(&entity.Vendor{}).Error
 }

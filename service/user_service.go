@@ -68,6 +68,7 @@ func mapToProfileResponse(u *entity.User, r *entity.Role) *dto.UserResponse {
 				Name:     rp.Permission.Name,
 				Endpoint: rp.Permission.Endpoint,
 				Method:   rp.Permission.Method,
+				Module:   rp.Permission.Module,
 			})
 		}
 	}

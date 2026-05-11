@@ -9,15 +9,16 @@ import (
 )
 
 func Vendor(route *gin.Engine, vendorHandler handler.IVendorHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
-	routes := route.Group("/api/v1/vendors").Use(middleware.Authentication(jwtService))
+	routes := route.Group("/api/v1/stores/:store_id/vendors").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateVendor"), vendorHandler.CreateVendor)
+		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateVendorByStoreID"), vendorHandler.CreateVendorByStoreID)
 
-		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetVendors"), vendorHandler.GetVendors)
-		routes.GET("/:id", middleware.RBAC(rolePermissionRepo, "GetVendorByID"), vendorHandler.GetVendorByID)
+		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetVendorsByStoreID"), vendorHandler.GetVendorsByStoreID)
+		routes.GET("/:vendor_id", middleware.RBAC(rolePermissionRepo, "GetVendorByStoreIDAndVendorID"), vendorHandler.GetVendorByStoreIDAndVendorID)
+		// routes.GET("/:vendor_id/products", middleware.RBAC(rolePermissionRepo, "GetVendorProducts"), vendorHandler.GetVendorProducts)
 
-		routes.PUT("/:id", middleware.RBAC(rolePermissionRepo, "UpdateVendor"), vendorHandler.UpdateVendor)
+		routes.PUT("/:vendor_id", middleware.RBAC(rolePermissionRepo, "UpdateVendorByStoreIDAndVendorID"), vendorHandler.UpdateVendorByStoreIDAndVendorID)
 
-		routes.DELETE("/:id", middleware.RBAC(rolePermissionRepo, "DeleteVendorByID"), vendorHandler.DeleteVendorByID)
+		routes.DELETE("/:vendor_id", middleware.RBAC(rolePermissionRepo, "DeleteVendorByStoreIDAndVendorID"), vendorHandler.DeleteVendorByStoreIDAndVendorID)
 	}
 }

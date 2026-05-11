@@ -71,6 +71,7 @@ func (vr *storeRepository) GetStores(ctx context.Context, tx *gorm.DB, req *resp
 
 	query := tx.WithContext(ctx).
 		Model(&entity.Store{}).
+		Preload("Owner").
 		Preload("StorePlatforms.Platform").
 		Preload("Orders").
 		Preload("Logs")
@@ -121,6 +122,7 @@ func (vr *storeRepository) GetStoresByUserID(ctx context.Context, tx *gorm.DB, r
 		Model(&entity.Store{}).
 		Joins("JOIN store_users su ON su.store_id = stores.id").
 		Where("su.user_id = ?", userID).
+		Preload("Owner").
 		Preload("StorePlatforms.Platform").
 		Preload("Orders").
 		Preload("Logs")
@@ -182,6 +184,7 @@ func (vr *storeRepository) GetStoreByUserID(
 	var store entity.Store
 	err = tx.WithContext(ctx).
 		Where("id = ? AND deleted_at IS NULL", storeID).
+		Preload("Owner").
 		Preload("StorePlatforms", "deleted_at IS NULL").
 		Preload("StorePlatforms.Platform").
 		First(&store).Error
@@ -204,6 +207,7 @@ func (vr *storeRepository) GetStoreByStoreID(ctx context.Context, tx *gorm.DB, s
 	var store *entity.Store
 	err := tx.WithContext(ctx).
 		Model(&entity.Store{}).
+		Preload("Owner").
 		Preload("StorePlatforms.Platform").
 		Preload("Orders").
 		Preload("Logs").

@@ -242,6 +242,16 @@
     "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
     "permission_id": "12345678-0ea2-426c-89e7-e25e71c0b88f"
   },
+  {
+    "id": "768ff8c1-82aa-4621-bd19-f3c3cc579250",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "49b3d7f9-a6aa-4c13-a406-8e020306de22"
+  },
+  {
+    "id": "7460ab5c-b52e-4312-9f83-11e416a15a6f",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "c775eebc-6dd5-478e-9dbd-25f27d19cffe"
+  },
 
   {
     "id": "110baaeb-5938-4516-a4eb-27a880d63058",
