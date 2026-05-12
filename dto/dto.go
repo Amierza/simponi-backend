@@ -304,41 +304,6 @@ type (
 	}
 )
 
-// Platform
-type (
-	PlatformResponse struct {
-		ID   uuid.UUID `json:"id"`
-		Name string    `json:"name"`
-	}
-	ConnectPlatformRequest struct {
-		PlatformID     *uuid.UUID `json:"platform_id" binding:"required"`
-		ExternalName   string     `json:"external_name" binding:"required,min=2,max=100"` // nama toko di marketplace
-		ExternalShopID string     `json:"external_shop_id" binding:"required"`            // shop_id dari marketplace
-
-		StoreName        string  `json:"store_name"`
-		StoreDescription *string `json:"store_description,omitempty"`
-		StoreImageURL    *string `json:"store_image_url,omitempty"`
-	}
-
-	MyStoreResponse struct {
-		ID          uuid.UUID                 `json:"id"`
-		Name        string                    `json:"name"`
-		Description string                    `json:"description"`
-		ImageURL    string                    `json:"image_url"`
-		IsActive    bool                      `json:"is_active"`
-		Platforms   []ConnectedPlatformDetail `json:"platforms"`
-	}
-
-	ConnectedPlatformDetail struct {
-		StorePlatformID uuid.UUID `json:"store_platform_id"`
-		PlatformID      uuid.UUID `json:"platform_id"`
-		PlatformName    string    `json:"platform_name"`
-		ExternalName    string    `json:"external_name"`    // nama toko di marketplace
-		ExternalShopID  string    `json:"external_shop_id"` // shop_id
-		IsConnected     bool      `json:"is_connected"`
-	}
-)
-
 // Store
 type (
 	StoreResponse struct {
@@ -382,6 +347,85 @@ type (
 		Stores []*entity.Store
 	}
 )
+
+// Platform
+type (
+	PlatformResponse struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+	}
+)
+
+// Store Platform
+type (
+	ConnectPlatformResponse struct {
+		AuthURL string `json:"auth_url"`
+	}
+)
+
+// Shopee
+type (
+	ShopeeOAuthState struct {
+		StoreID    string `json:"store_id"`
+		PlatformID string `json:"platform_id"`
+	}
+	ShopeeBaseResponse struct {
+		RequestID string `json:"request_id"`
+		Error     string `json:"error"`
+		Message   string `json:"message"`
+	}
+	ShopeeAccessTokenResponse struct {
+		ShopeeBaseResponse
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+		ExpireIn     int64  `json:"expire_in"`
+	}
+	ShopeeRefreshTokenResponse struct {
+		ShopeeBaseResponse
+		PartnerID    int64  `json:"partner_id"`
+		ShopID       int64  `json:"shop_id"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+		ExpireIn     int64  `json:"expire_in"`
+	}
+	ShopeeGetItemListResponse struct {
+		Error   string `json:"error"`
+		Message string `json:"message"`
+
+		Response struct {
+			HasNextPage bool `json:"has_next_page"`
+
+			Item []struct {
+				ItemID int64 `json:"item_id"`
+			} `json:"item"`
+		} `json:"response"`
+	}
+	ShopeeGetItemBaseInfoResponse struct {
+		Error   string `json:"error"`
+		Message string `json:"message"`
+
+		Response struct {
+			ItemList []struct {
+				ItemID      int64  `json:"item_id"`
+				ItemName    string `json:"item_name"`
+				Description string `json:"description"`
+				PriceInfo   []struct {
+					CurrentPrice float64 `json:"current_price"`
+				} `json:"price_info"`
+				StockInfo []struct {
+					CurrentStock int `json:"current_stock"`
+				} `json:"stock_info"`
+			} `json:"item_list"`
+		} `json:"response"`
+	}
+)
+
+func (s ShopeeBaseResponse) GetError() string {
+	return s.Error
+}
+func (s ShopeeBaseResponse) GetMessage() string {
+	return s.Message
+}
 
 // Product
 type (

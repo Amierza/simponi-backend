@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Amierza/simponi-backend/constants"
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/response"
 	"github.com/Amierza/simponi-backend/service"
@@ -89,6 +90,28 @@ func (sh *storeHandler) CreateStore(ctx *gin.Context) {
 //	@Failure		500		{object}	dto.ErrorResponse			"Internal Server Error"
 //	@Router			/stores [get]
 func (sh *storeHandler) GetStores(ctx *gin.Context) {
+	userIDString := ctx.Value("user_id").(string)
+	if userIDString != constants.SUPER_ADMIN_ROLE_ID {
+		userID, err := uuid.Parse(userIDString)
+		if err != nil {
+			sh.logger.Error("failed to parse user_id", zap.String("user_id", userIDString), zap.Error(err))
+			res := response.BuildResponseFailed(fmt.Sprintf("%s stores", dto.FAILED_GET_ALL), dto.MESSAGE_FAILED_INVALID_UUID)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+			return
+		}
+		result, err := sh.storeService.GetStoresByUserID(ctx, &userID)
+		if err != nil {
+			status := mapErrorStatus(err)
+			res := response.BuildResponseFailed(fmt.Sprintf("%s stores", dto.FAILED_GET_ALL), cleanErrorMessage(err))
+			ctx.AbortWithStatusJSON(status, res)
+			return
+		}
+
+		res := response.BuildResponseSuccess(fmt.Sprintf("%s stores", dto.SUCCESS_GET_ALL), result)
+		ctx.JSON(http.StatusOK, res)
+		return
+	}
+
 	var payload response.PaginationRequest
 	if err := ctx.ShouldBindQuery(&payload); err != nil {
 		sh.logger.Error("invalid get stores query payload", zap.Error(err), zap.Any("payload", payload))

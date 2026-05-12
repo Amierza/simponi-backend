@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Amierza/simponi-backend/constants"
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/jwt"
@@ -19,6 +18,7 @@ type (
 	IStoreService interface {
 		CreateStore(ctx context.Context, req *dto.CreateStoreRequest) (*dto.StoreResponse, error)
 		GetStores(ctx context.Context, req *response.PaginationRequest) (dto.StorePaginationResponse, error)
+		GetStoresByUserID(ctx context.Context, userID *uuid.UUID) ([]*dto.StoreResponse, error)
 		GetStoreByStoreID(ctx context.Context, storeID *uuid.UUID) (*dto.StoreResponse, error)
 		UpdateStoreByStoreID(ctx context.Context, req *dto.UpdateStoreRequest) (*dto.StoreResponse, error)
 		DeleteStoreByStoreID(ctx context.Context, storeID *uuid.UUID) error
@@ -146,28 +146,11 @@ func (ss *storeService) CreateStore(ctx context.Context, req *dto.CreateStoreReq
 }
 
 func (ss *storeService) GetStores(ctx context.Context, req *response.PaginationRequest) (dto.StorePaginationResponse, error) {
-	userIDString := ctx.Value("user_id").(string)
-	userID, err := uuid.Parse(userIDString)
-	if err != nil {
-		ss.logger.Error("failed to parse user_id", zap.String("user_id", userIDString), zap.Error(err))
-		return dto.StorePaginationResponse{}, fmt.Errorf("failed to create store: %w", dto.ErrInternal)
-	}
-
-	roleIDString := ctx.Value("role_id").(string)
 	var datas dto.StorePaginationRepositoryResponse
-
-	if roleIDString == constants.SUPER_ADMIN_ROLE_ID {
-		datas, err = ss.storeRepo.GetStores(ctx, nil, req)
-		if err != nil {
-			ss.logger.Error("failed to get stores", zap.Error(err))
-			return dto.StorePaginationResponse{}, fmt.Errorf("failed to get stores: %w", dto.ErrInternal)
-		}
-	} else {
-		datas, err = ss.storeRepo.GetStoresByUserID(ctx, nil, req, &userID)
-		if err != nil {
-			ss.logger.Error("failed to get stores by user id", zap.String("user_id", userIDString), zap.Error(err))
-			return dto.StorePaginationResponse{}, fmt.Errorf("failed to get stores: %w", dto.ErrInternal)
-		}
+	datas, err := ss.storeRepo.GetStores(ctx, nil, req)
+	if err != nil {
+		ss.logger.Error("failed to get stores", zap.Error(err))
+		return dto.StorePaginationResponse{}, fmt.Errorf("failed to get stores: %w", dto.ErrInternal)
 	}
 
 	ss.logger.Info("success to get stores", zap.Int64("count", datas.Count))
@@ -181,6 +164,24 @@ func (ss *storeService) GetStores(ctx context.Context, req *response.PaginationR
 		Data:               stores,
 		PaginationResponse: datas.PaginationResponse,
 	}, nil
+}
+
+func (ss *storeService) GetStoresByUserID(ctx context.Context, userID *uuid.UUID) ([]*dto.StoreResponse, error) {
+	var datas dto.StorePaginationRepositoryResponse
+	datas, err := ss.storeRepo.GetStoresByUserID(ctx, nil, &response.PaginationRequest{}, userID)
+	if err != nil {
+		ss.logger.Error("failed to get stores by user id", zap.String("user_id", userID.String()), zap.Error(err))
+		return nil, fmt.Errorf("failed to get stores: %w", dto.ErrInternal)
+	}
+
+	ss.logger.Info("success to get stores by user id", zap.String("user_id", userID.String()))
+
+	stores := make([]*dto.StoreResponse, 0)
+	for _, store := range datas.Stores {
+		stores = append(stores, mapToStoreResponse(store))
+	}
+
+	return stores, nil
 }
 
 func (ss *storeService) GetStoreByStoreID(ctx context.Context, storeID *uuid.UUID) (*dto.StoreResponse, error) {

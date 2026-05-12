@@ -20,6 +20,9 @@ type (
 		GetStorePlatformByStoreIDAndPlatformID(ctx context.Context, tx *gorm.DB, storeID, platformID *uuid.UUID) (*entity.StorePlatform, bool, error)
 		CountStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (int64, error)
 
+		// UPDATE
+		UpdateStorePlatform(ctx context.Context, tx *gorm.DB, storePlatform *entity.StorePlatform) error
+
 		// DELETE
 		DeleteStorePlatformByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) error
 	}
@@ -45,12 +48,11 @@ func (spr *storePlatformRepository) CreateStorePlatform(ctx context.Context, tx 
 }
 
 // READ
-func (r *storePlatformRepository) GetStorePlatformByID(
-	ctx context.Context, tx *gorm.DB, id *uuid.UUID,
-) (*entity.StorePlatform, bool, error) {
+func (r *storePlatformRepository) GetStorePlatformByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) (*entity.StorePlatform, bool, error) {
 	if tx == nil {
 		tx = r.db
 	}
+
 	var sp entity.StorePlatform
 	err := tx.WithContext(ctx).
 		Preload("Platform").
@@ -63,29 +65,29 @@ func (r *storePlatformRepository) GetStorePlatformByID(
 	if err != nil {
 		return nil, false, err
 	}
+
 	return &sp, true, nil
 }
 
-func (r *storePlatformRepository) GetStorePlatformsByStoreID(
-	ctx context.Context, tx *gorm.DB, storeID *uuid.UUID,
-) ([]*entity.StorePlatform, error) {
+func (r *storePlatformRepository) GetStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) ([]*entity.StorePlatform, error) {
 	if tx == nil {
 		tx = r.db
 	}
+
 	var sps []*entity.StorePlatform
 	err := tx.WithContext(ctx).
 		Preload("Platform").
 		Where("store_id = ?", storeID).
 		Find(&sps).Error
+
 	return sps, err
 }
 
-func (r *storePlatformRepository) GetStorePlatformByStoreIDAndPlatformID(
-	ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, platformID *uuid.UUID,
-) (*entity.StorePlatform, bool, error) {
+func (r *storePlatformRepository) GetStorePlatformByStoreIDAndPlatformID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID, platformID *uuid.UUID) (*entity.StorePlatform, bool, error) {
 	if tx == nil {
 		tx = r.db
 	}
+
 	var sp entity.StorePlatform
 	err := tx.WithContext(ctx).
 		Where("store_id = ? AND platform_id = ?", storeID, platformID).
@@ -96,29 +98,38 @@ func (r *storePlatformRepository) GetStorePlatformByStoreIDAndPlatformID(
 	if err != nil {
 		return nil, false, err
 	}
+
 	return &sp, true, nil
 }
-func (r *storePlatformRepository) CountStorePlatformsByStoreID(
-	ctx context.Context, tx *gorm.DB, storeID *uuid.UUID,
-) (int64, error) {
+func (r *storePlatformRepository) CountStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (int64, error) {
 	if tx == nil {
 		tx = r.db
 	}
+
 	var count int64
 	err := tx.WithContext(ctx).
 		Model(&entity.StorePlatform{}).
 		Where("store_id = ?", storeID).
 		Count(&count).Error
+
 	return count, err
 }
 
-// DELETE
-func (r *storePlatformRepository) DeleteStorePlatformByID(
-	ctx context.Context, tx *gorm.DB, id *uuid.UUID,
-) error {
+// UPDATE
+func (r *storePlatformRepository) UpdateStorePlatform(ctx context.Context, tx *gorm.DB, storePlatform *entity.StorePlatform) error {
 	if tx == nil {
 		tx = r.db
 	}
+
+	return tx.WithContext(ctx).Model(&entity.StorePlatform{}).Where("id = ?", storePlatform.ID).Updates(storePlatform).Error
+}
+
+// DELETE
+func (r *storePlatformRepository) DeleteStorePlatformByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) error {
+	if tx == nil {
+		tx = r.db
+	}
+
 	return tx.WithContext(ctx).
 		Where("id = ?", id).
 		Delete(&entity.StorePlatform{}).Error

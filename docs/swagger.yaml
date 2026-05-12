@@ -1,45 +1,5 @@
 basePath: /api/v1
 definitions:
-  dto.ConnectPlatformRequest:
-    properties:
-      external_name:
-        description: nama toko di marketplace
-        maxLength: 100
-        minLength: 2
-        type: string
-      external_shop_id:
-        description: shop_id dari marketplace
-        type: string
-      platform_id:
-        type: string
-      store_description:
-        type: string
-      store_image_url:
-        type: string
-      store_name:
-        type: string
-    required:
-    - external_name
-    - external_shop_id
-    - platform_id
-    type: object
-  dto.ConnectedPlatformDetail:
-    properties:
-      external_name:
-        description: nama toko di marketplace
-        type: string
-      external_shop_id:
-        description: shop_id
-        type: string
-      is_connected:
-        type: boolean
-      platform_id:
-        type: string
-      platform_name:
-        type: string
-      store_platform_id:
-        type: string
-    type: object
   dto.CreateExternalProductRequest:
     properties:
       platform_id:
@@ -286,23 +246,6 @@ definitions:
       status:
         example: true
         type: boolean
-    type: object
-  dto.MyStoreResponse:
-    properties:
-      description:
-        type: string
-      id:
-        type: string
-      image_url:
-        type: string
-      is_active:
-        type: boolean
-      name:
-        type: string
-      platforms:
-        items:
-          $ref: '#/definitions/dto.ConnectedPlatformDetail'
-        type: array
     type: object
   dto.PermissionPaginationResponseWrapper:
     properties:
@@ -1068,116 +1011,6 @@ paths:
       summary: Get list of permissions
       tags:
       - Permissions
-  /platforms/{store_platform_id}/disconnect:
-    delete:
-      description: Hapus koneksi platform. Jika ini platform terakhir, store juga
-        dihapus.
-      parameters:
-      - description: StorePlatform ID (UUID)
-        in: path
-        name: store_platform_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Disconnect platform
-      tags:
-      - Platforms
-  /platforms/connect:
-    post:
-      consumes:
-      - application/json
-      description: Connect Shopee/Tokopedia. Jika belum ada store, otomatis buat store
-        baru.
-      parameters:
-      - description: Connect request
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ConnectPlatformRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.MyStoreResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "409":
-          description: Platform sudah terkoneksi
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Connect platform (mock OAuth)
-      tags:
-      - Platforms
-  /platforms/my-store:
-    get:
-      description: Get store + connected platforms milik user yang sedang login
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Store ditemukan
-          schema:
-            $ref: '#/definitions/dto.MyStoreResponse'
-        "204":
-          description: Belum punya store
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get my store
-      tags:
-      - Platforms
   /roles:
     get:
       consumes:

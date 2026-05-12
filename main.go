@@ -6,6 +6,9 @@ import (
 
 	"github.com/Amierza/simponi-backend/cmd"
 	"github.com/Amierza/simponi-backend/config/database"
+	"github.com/Amierza/simponi-backend/config/platforms"
+	"github.com/Amierza/simponi-backend/config/rabbitmq"
+	"github.com/Amierza/simponi-backend/config/redis"
 	_ "github.com/Amierza/simponi-backend/docs"
 	"github.com/Amierza/simponi-backend/handler"
 	"github.com/Amierza/simponi-backend/jwt"
@@ -88,15 +91,29 @@ import (
 // @externalDocs.description	OpenAPI Specification
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
+	// setup potgres connection
 	db := database.SetUpPostgreSQLConnection()
 	defer database.ClosePostgreSQLConnection(db)
 
+	// setup redis connection
+	redisClient := redis.SetUpRedisConnection()
+	defer redis.CloseRedisConnection(redisClient)
+
+	// setup rabbitmq connection
+	rabbitConn := rabbitmq.SetUpRabbitMQConnection()
+	defer rabbitmq.CloseRabbitMQConnection(rabbitConn)
+
+	// setup zap logger
 	zapLogger, err := logger.New()
 	if err != nil {
 		log.Fatalf("failed to init logger: %v", err)
 	}
 	defer zapLogger.Sync()
 
+	// setup shopee config
+	shopeeConfig := platforms.NewShopeeConfig()
+
+	// run command if args provided
 	if len(os.Args) > 1 {
 		cmd.Command(db)
 		return
@@ -143,17 +160,23 @@ func main() {
 		storeUserHandler = handler.NewStoreUserHandler(storeUserService, zapLogger)
 
 		// Platform & Store Platform repos (dipakai oleh store service DAN platform service)
-		platformRepo      = repository.NewPlatformRepository(db)
-		storePlatformRepo = repository.NewStorePlatformRepository(db)
+		platformRepo        = repository.NewPlatformRepository(db)
+		storePlatformRepo   = repository.NewStorePlatformRepository(db)
+		storeCredentialRepo = repository.NewStoreCredentialRepository(db)
+		externalProductRepo = repository.NewExternalProductRepository(db)
+		productRepo         = repository.NewProductRepository(db)
+
+		// Shopee
+		shopeeService = service.NewShopeeService(tx, storePlatformRepo, storeCredentialRepo, productRepo, externalProductRepo, zapLogger, shopeeConfig.GetShopeeConfig(), redisClient)
 
 		// Store
 		storeRepo    = repository.NewStoreRepository(db)
 		storeService = service.NewStoreService(tx, storeRepo, storeUserRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		storeHandler = handler.NewStoreHandler(storeService, zapLogger)
 
-		// Platform connection (tambahan baru)
-		platformService = service.NewPlatformService(tx, storeRepo, storeUserRepo, platformRepo, storePlatformRepo, zapLogger)
-		platformHandler = handler.NewPlatformHandler(platformService, zapLogger)
+		// Store Platform
+		storePlatformService = service.NewStorePlatformService(tx, storePlatformRepo, storeRepo, platformRepo, storeCredentialRepo, zapLogger, shopeeService)
+		storePlatformHandler = handler.NewStorePlatformHandler(storePlatformService, zapLogger)
 
 		// Product Categories
 		productCategoriesRepo    = repository.NewProductCategoriesRepository(db)
@@ -174,12 +197,10 @@ func main() {
 		productVendorRepo = repository.NewProductVendorRepository(db)
 
 		// Product
-		productRepo    = repository.NewProductRepository(db)
 		productService = service.NewProductService(productRepo, storeRepo, vendorRepo, productVendorRepo, inventoryLogService, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
 		// External Product
-		externalProductRepo    = repository.NewExternalProductRepository(db)
 		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, storeRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
 
@@ -192,6 +213,10 @@ func main() {
 		logRepo    = repository.NewLogRepository(db)
 		logService = service.NewLogService(logRepo, zapLogger, jwt)
 		logHandler = handler.NewLogHandler(logService, zapLogger)
+
+		// OAuth
+		oAuthService = service.NewOAuthService(tx, storePlatformRepo, storeCredentialRepo, redisClient, zapLogger, shopeeService)
+		oAuthHandler = handler.NewOAuthHandler(oAuthService, zapLogger)
 	)
 
 	server := gin.Default()
@@ -203,9 +228,10 @@ func main() {
 	routes.User(server, userHandler, jwt, rolePermissionRepo)
 	routes.Impersonate(server, impersonateHandler, jwt, rolePermissionRepo)
 	routes.Auth(server, authHandler)
+	routes.OAuth(server, oAuthHandler, jwt, rolePermissionRepo)
 	routes.StoreUser(server, storeUserHandler, jwt, storeRepo, rolePermissionRepo)
 	routes.Store(server, storeHandler, jwt, storeRepo, rolePermissionRepo)
-	routes.Platform(server, platformHandler, jwt)
+	routes.StorePlatform(server, storePlatformHandler, rolePermissionRepo, jwt)
 	routes.ProductCategories(server, productCategoriesHandler, jwt)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)

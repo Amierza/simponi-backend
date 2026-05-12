@@ -12,9 +12,10 @@ type StoreCredential struct {
 	StorePlatformID uuid.UUID      `gorm:"type:uuid;not null;uniqueIndex"`
 	StorePlatform   *StorePlatform `gorm:"foreignKey:StorePlatformID;constraint:OnDelete:CASCADE;"`
 
-	AccessToken  string     `gorm:"type:text"`
-	RefreshToken string     `gorm:"type:text"`
-	ExpiresAt    *time.Time `gorm:"column:expires_at"`
+	AccessToken  string `gorm:"type:text"`
+	RefreshToken string `gorm:"type:text"`
+
+	ExpiresAt *time.Time `gorm:"column:expires_at"`
 
 	TimeStamp
 }

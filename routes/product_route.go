@@ -23,7 +23,7 @@ func Product(route *gin.Engine, productHandler handler.IProductHandler, jwtServi
 
 		routes.DELETE("/:product_id", middleware.RBAC(rolePermissionRepo, "DeleteProductByStoreIDAndProductID"), productHandler.DeleteProductByStoreIDAndProductID)
 
-		// product vendor damain
+		// product vendor domain
 		routes.POST("/:product_id/vendors/:vendor_id", middleware.RBAC(rolePermissionRepo, "AttachVendorToProduct"), productHandler.AttachVendorToProduct)
 		routes.DELETE("/:product_id/vendors/:vendor_id", middleware.RBAC(rolePermissionRepo, "DetachVendorFromProduct"), productHandler.DetachVendorFromProduct)
 	}
