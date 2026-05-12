@@ -3,7 +3,10 @@
     "id": "d1b2c3d4-0004-4000-8000-000000000001",
     "product_id": "b1b2c3d4-0002-4000-8000-000000000001",
     "store_platform_id": "c1b2c3d4-0008-4000-8000-000000000001",
+    "external_id": "SP001",
+    "external_name": "Product A",
     "price": 459000,
+    "last_sync": "2024-01-05T08:00:00Z",
     "created_at": "2024-01-05T08:00:00Z",
     "updated_at": "2024-01-05T08:00:00Z"
   },
@@ -11,7 +14,10 @@
     "id": "d1b2c3d4-0004-4000-8000-000000000002",
     "product_id": "b1b2c3d4-0002-4000-8000-000000000001",
     "store_platform_id": "c1b2c3d4-0008-4000-8000-000000000002",
+    "external_id": "SP002",
+    "external_name": "Product B",
     "price": 449000,
+    "last_sync": "2024-01-05T08:00:00Z",
     "created_at": "2024-01-05T08:00:00Z",
     "updated_at": "2024-01-05T08:00:00Z"
   },
@@ -19,7 +25,10 @@
     "id": "d1b2c3d4-0004-4000-8000-000000000003",
     "product_id": "b1b2c3d4-0002-4000-8000-000000000002",
     "store_platform_id": "c1b2c3d4-0008-4000-8000-000000000001",
+    "external_id": "SP003",
+    "external_name": "Product C",
     "price": 189000,
+    "last_sync": "2024-01-06T08:00:00Z",
     "created_at": "2024-01-06T08:00:00Z",
     "updated_at": "2024-01-06T08:00:00Z"
   },
@@ -27,7 +36,10 @@
     "id": "d1b2c3d4-0004-4000-8000-000000000004",
     "product_id": "b1b2c3d4-0002-4000-8000-000000000005",
     "store_platform_id": "c1b2c3d4-0008-4000-8000-000000000001",
+    "external_id": "SP004",
+    "external_name": "Product D",
     "price": 899000,
+    "last_sync": "2024-01-09T08:00:00Z",
     "created_at": "2024-01-09T08:00:00Z",
     "updated_at": "2024-01-09T08:00:00Z"
   },
@@ -35,7 +47,10 @@
     "id": "d1b2c3d4-0004-4000-8000-000000000005",
     "product_id": "b1b2c3d4-0002-4000-8000-000000000005",
     "store_platform_id": "c1b2c3d4-0008-4000-8000-000000000002",
+    "external_id": "SP005",
+    "external_name": "Product E",
     "price": 879000,
+    "last_sync": "2024-01-09T08:00:00Z",
     "created_at": "2024-01-09T08:00:00Z",
     "updated_at": "2024-01-09T08:00:00Z"
   }
