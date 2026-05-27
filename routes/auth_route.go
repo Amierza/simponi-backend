@@ -8,6 +8,7 @@ import (
 func Auth(route *gin.Engine, authHandler handler.IAuthHandler) {
 	routes := route.Group("/api/v1/auth")
 	{
+		routes.POST("/signup", authHandler.SignUp)
 		routes.POST("/signin", authHandler.SignIn)
 		routes.POST("/refresh-token", authHandler.RefreshToken)
 	}

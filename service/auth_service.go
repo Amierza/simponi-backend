@@ -6,14 +6,17 @@ import (
 	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
+	"github.com/Amierza/simponi-backend/entity"
 	"github.com/Amierza/simponi-backend/helper"
 	"github.com/Amierza/simponi-backend/jwt"
 	"github.com/Amierza/simponi-backend/repository"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 type (
 	IAuthService interface {
+		SignUp(ctx context.Context, req dto.SignUpRequest) error
 		SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error)
 		RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error)
 	}
@@ -33,6 +36,37 @@ func NewAuthService(userRepo repository.IUserRepository, permissionRepo reposito
 		logger:         logger,
 		jwt:            jwt,
 	}
+}
+
+func (as *authService) SignUp(ctx context.Context, req dto.SignUpRequest) error {
+	hashedPassword, err := helper.HashPassword(req.Password)
+	if err != nil {
+		as.logger.Error("failed to hash password", zap.String("email", req.Email), zap.Error(err))
+		return fmt.Errorf("failed to hash password: %w", dto.ErrInternal)
+	}
+
+	roleID, err := uuid.Parse("791cb0fa-dc65-4510-b51d-38d52c1d73c3")
+	if err != nil {
+		as.logger.Error("failed to parse role id", zap.Error(err))
+		return fmt.Errorf("failed to parse role id: %w", dto.ErrInternal)
+	}
+
+	newUser := &entity.User{
+		ID:       uuid.New(),
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: hashedPassword,
+		RoleID:   &roleID,
+	}
+
+	err = as.userRepo.CreateUser(ctx, nil, newUser)
+	if err != nil {
+		as.logger.Error("failed to create user", zap.String("email", req.Email), zap.Error(err))
+		return fmt.Errorf("failed to create user: %w", dto.ErrInternal)
+	}
+
+	as.logger.Info("Sign Up Success", zap.String("email", req.Email))
+	return nil
 }
 
 func (as *authService) SignIn(ctx context.Context, req dto.SignInRequest) (dto.SignInResponse, error) {

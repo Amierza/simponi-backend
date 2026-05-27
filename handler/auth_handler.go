@@ -13,6 +13,7 @@ import (
 
 type (
 	IAuthHandler interface {
+		SignUp(ctx *gin.Context)
 		SignIn(ctx *gin.Context)
 		RefreshToken(ctx *gin.Context)
 	}
@@ -28,6 +29,39 @@ func NewAuthHandler(authService service.IAuthService, logger *zap.Logger) *authH
 		authService: authService,
 		logger:      logger,
 	}
+}
+
+// SignUp godoc
+//
+//	@Summary		Register new user
+//	@Description	Register a new user with email and password
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.SignUpRequest	true	"Sign up request"
+//	@Success		201		{object}	dto.EmptySuccessResponseWrapper	"Success"
+//	@Failure		400		{object}	dto.ErrorResponse				"Bad Request - Invalid payload"
+//	@Failure		500		{object}	dto.ErrorResponse				"Internal Server Error"
+//	@Router			/auth/signup [post]
+func (ah *authHandler) SignUp(ctx *gin.Context) {
+	var payload dto.SignUpRequest
+	if err := ctx.ShouldBind(&payload); err != nil {
+		ah.logger.Error("invalid signup request payload", zap.Error(err), zap.Any("payload", payload))
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s auth", dto.FAILED_SIGNUP), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	if err := ah.authService.SignUp(ctx, payload); err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(dto.FAILED_SIGNUP, cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(dto.SUCCESS_SIGNUP, nil)
+	ctx.JSON(http.StatusCreated, res)
 }
 
 // SignIn godoc

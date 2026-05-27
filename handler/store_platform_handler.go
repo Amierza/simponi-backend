@@ -32,22 +32,6 @@ func NewStorePlatformHandler(storePlatformService service.IStorePlatformService,
 	}
 }
 
-// ConnectPlatform godoc
-//
-//	@Summary		Connect platform to store
-//	@Description	Connect a platform to a store (Requires permission: ConnectPlatform)
-//	@Tags			Stores
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			store_id		path	string	true	"Store ID"
-//	@Param			platform_id		path	string	true	"Platform ID"
-//	@Success		200				{object}	response.ResponseWrapper	"Success"
-//	@Failure		400				{object}	response.ResponseWrapper	"Bad Request"
-//	@Failure		401				{object}	response.ResponseWrapper	"Unauthorized"
-//	@Failure		403				{object}	response.ResponseWrapper	"Forbidden"
-//	@Failure		500				{object}	response.ResponseWrapper	"Internal Server Error"
-//	@Router			/store/{store_id}/platforms/{platform_id}/connect [post]
 func (sph *storePlatformHandler) ConnectPlatform(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -79,21 +63,6 @@ func (sph *storePlatformHandler) ConnectPlatform(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// DisconnectPlatform godoc
-//
-//	@Summary		Disconnect platform from store
-//	@Description	Disconnect a platform from a store (Requires permission: DisconnectPlatform)
-//	@Tags			Stores
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			store_platform_id	path	string	true	"Store Platform ID"
-//	@Success		200					{object}	response.ResponseWrapper	"Success"
-//	@Failure		400					{object}	response.ResponseWrapper	"Bad Request"
-//	@Failure		401					{object}	response.ResponseWrapper	"Unauthorized"
-//	@Failure		403					{object}	response.ResponseWrapper	"Forbidden"
-//	@Failure		500					{object}	response.ResponseWrapper	"Internal Server Error"
-//	@Router			/store/{store_id}/platforms/{store_platform_id} [delete]
 func (sph *storePlatformHandler) DisconnectPlatform(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
@@ -125,21 +94,6 @@ func (sph *storePlatformHandler) DisconnectPlatform(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// SyncProducts godoc
-//
-//	@Summary		Sync products from platform to store
-//	@Description	Sync products from a connected platform to the store (Requires permission: SyncPlatform)
-//	@Tags			Stores
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			store_platform_id	path	string	true	"Store Platform ID"
-//	@Success		200					{object}	response.ResponseWrapper	"Success"
-//	@Failure		400					{object}	response.ResponseWrapper	"Bad Request"
-//	@Failure		401					{object}	response.ResponseWrapper	"Unauthorized"
-//	@Failure		403					{object}	response.ResponseWrapper	"Forbidden"
-//	@Failure		500					{object}	response.ResponseWrapper	"Internal Server Error"
-//	@Router			/store/{store_id}/platforms/{store_platform_id}/sync/products [post]
 func (sph *storePlatformHandler) SyncProducts(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)

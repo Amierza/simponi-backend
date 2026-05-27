@@ -37,6 +37,7 @@ const (
 
 	// Authentication Errors
 	FAILED_SIGNIN        = "failed signin"
+	FAILED_SIGNUP        = "failed signup"
 	FAILED_REFRESH_TOKEN = "failed refresh token"
 
 	// logging Errors
@@ -79,6 +80,7 @@ const (
 
 	// Authentication Sucess
 	SUCCESS_SIGNIN        = "success signin"
+	SUCCESS_SIGNUP        = "success signup"
 	SUCCESS_REFRESH_TOKEN = "success refresh token"
 
 	// Logging Success
@@ -179,6 +181,11 @@ type (
 	}
 
 	// Authentication
+	SignUpRequest struct {
+		Name     string `json:"name" binding:"required,min=3,max=100"`
+		Email    string `json:"email" binding:"email"`
+		Password string `json:"password" binding:"required,min=3"`
+	}
 	SignInRequest struct {
 		Email    string `json:"email" binding:"required" example:"admin@mail.com"`
 		Password string `json:"password" binding:"required" example:"secret123"`
