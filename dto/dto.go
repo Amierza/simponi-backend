@@ -719,4 +719,84 @@ type (
 		response.PaginationResponse
 		InventoryLogs []entity.InventoryLog
 	}
+
+	// Dashboard
+	DashboardSummaryResponse struct {
+		Store   CustomStoreResponse           `json:"store"`
+		Metrics DashboardSummaryMetricsResponse `json:"metrics"`
+	}
+	DashboardSummaryMetricsResponse struct {
+		RevenueMonthToDate int64 `json:"revenue_month_to_date"`
+		OrdersMonthToDate  int64 `json:"orders_month_to_date"`
+		ActiveProducts     int64 `json:"active_products"`
+		LowStockProducts   int64 `json:"low_stock_products"`
+		OutOfStockProducts int64 `json:"out_of_stock_products"`
+		PendingOrders      int64 `json:"pending_orders"`
+		ReadyToShipOrders  int64 `json:"ready_to_ship_orders"`
+		CompletedOrders    int64 `json:"completed_orders"`
+	}
+	DashboardTrendResponse struct {
+		StoreID uuid.UUID                    `json:"store_id"`
+		Range   string                       `json:"range"`
+		Series  []DashboardTrendPointResponse `json:"series"`
+	}
+	DashboardTrendPointResponse struct {
+		Month   string `json:"month"`
+		Revenue int64  `json:"revenue"`
+		Orders  int64  `json:"orders"`
+	}
+	DashboardRecentOrdersResponse struct {
+		StoreID uuid.UUID                         `json:"store_id"`
+		Items   []DashboardRecentOrderItemResponse `json:"items"`
+	}
+	DashboardRecentOrderItemResponse struct {
+		ID           uuid.UUID  `json:"id"`
+		OrderNumber  string     `json:"order_number"`
+		BuyerName    string     `json:"buyer_name"`
+		OrderStatus  string     `json:"order_status"`
+		PaymentStatus string    `json:"payment_status"`
+		TotalAmount  int64      `json:"total_amount"`
+		OrderedAt    *time.Time `json:"ordered_at,omitempty"`
+	}
+	DashboardLowStockResponse struct {
+		StoreID uuid.UUID                       `json:"store_id"`
+		Items   []DashboardLowStockItemResponse `json:"items"`
+	}
+	DashboardLowStockItemResponse struct {
+		ProductID uuid.UUID `json:"product_id"`
+		Name      string    `json:"name"`
+		SKU       string    `json:"sku"`
+		Stock     int       `json:"stock"`
+		Threshold int       `json:"threshold"`
+	}
+	DashboardTopProductsResponse struct {
+		StoreID uuid.UUID                        `json:"store_id"`
+		Items   []DashboardTopProductItemResponse `json:"items"`
+	}
+	DashboardTopProductItemResponse struct {
+		ProductID uuid.UUID `json:"product_id"`
+		Name      string    `json:"name"`
+		SKU       string    `json:"sku"`
+		SoldQty   int64     `json:"sold_qty"`
+		Revenue   int64     `json:"revenue"`
+	}
+	DashboardActivityResponse struct {
+		StoreID uuid.UUID                      `json:"store_id"`
+		Items   []DashboardActivityItemResponse `json:"items"`
+	}
+	DashboardActivityItemResponse struct {
+		ID        uuid.UUID `json:"id"`
+		Type      string    `json:"type"`
+		Title     string    `json:"title"`
+		Message   string    `json:"message"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+	DashboardResponse struct {
+		Summary      DashboardSummaryResponse      `json:"summary"`
+		Trend        DashboardTrendResponse        `json:"trend"`
+		RecentOrders DashboardRecentOrdersResponse `json:"recent_orders"`
+		LowStock     DashboardLowStockResponse     `json:"low_stock"`
+		TopProducts  DashboardTopProductsResponse  `json:"top_products"`
+		Activity     DashboardActivityResponse     `json:"activity"`
+	}
 )
