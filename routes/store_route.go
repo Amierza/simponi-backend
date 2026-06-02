@@ -15,6 +15,7 @@ func Store(route *gin.Engine, storeHandler handler.IStoreHandler, jwtService jwt
 
 		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetStores"), storeHandler.GetStores)
 		routes.GET("/:store_id", middleware.RBAC(rolePermissionRepo, "GetStoreByStoreID"), storeHandler.GetStoreByStoreID)
+		routes.GET("/:store_id/dashboard", middleware.RBAC(rolePermissionRepo, "GetStoreDashboard"), storeHandler.GetStoreDashboard)
 
 		routes.PUT("/:store_id", middleware.StoreOwnerOnly(storeRepo), middleware.RBAC(rolePermissionRepo, "UpdateStoreByStoreID"), storeHandler.UpdateStoreByStoreID)
 

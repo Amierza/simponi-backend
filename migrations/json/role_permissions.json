@@ -6,6 +6,12 @@
   },
 
   {
+    "id": "a0000002-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
+    "permission_id": "4c23628b-8764-4a75-a2a9-6a24cefc975e"
+  },
+
+  {
     "id": "78ed897f-d571-45a3-a96f-e89878f9fb6d",
     "role_id": "58001c95-eab6-4f7a-b3ce-f627499d3ebe",
     "permission_id": "23ab5085-924c-4c7f-9038-2bc213f99d10"
@@ -147,6 +153,12 @@
     "id": "a3000003-0ea2-426c-89e7-e25e71c0b88f",
     "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
     "permission_id": "11111111-0ea2-426c-89e7-e25e71c0b88f"
+  },
+
+  {
+    "id": "a3000004-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "23ab5085-924c-4c7f-9038-2bc213f99d10"
   },
 
   {

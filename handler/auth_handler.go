@@ -38,7 +38,7 @@ func NewAuthHandler(authService service.IAuthService, logger *zap.Logger) *authH
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			payload	body		dto.SignUpRequest	true	"Sign up request"
+//	@Param			payload	body		dto.SignUpRequest				true	"Sign up request"
 //	@Success		201		{object}	dto.EmptySuccessResponseWrapper	"Success"
 //	@Failure		400		{object}	dto.ErrorResponse				"Bad Request - Invalid payload"
 //	@Failure		500		{object}	dto.ErrorResponse				"Internal Server Error"

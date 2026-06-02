@@ -68,7 +68,6 @@ definitions:
         type: string
     required:
     - name
-    - platform_id
     type: object
   dto.CreateStoreUsersRequest:
     properties:
@@ -134,6 +133,19 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  dto.DashboardResponse:
+    properties:
+      new_stores_last_7_days:
+        type: integer
+      total_connected_shopee:
+        type: integer
+      total_connected_tiktok_shop:
+        type: integer
+      total_stores:
+        type: integer
+      total_users:
+        type: integer
     type: object
   dto.EmptySuccessResponseWrapper:
     properties:
@@ -1480,6 +1492,49 @@ paths:
       summary: Update store
       tags:
       - Stores
+  /stores/{store_id}/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: 'Get store dashboard data (Requires permission: GetStoreDashboard)'
+      parameters:
+      - description: Store ID (UUID)
+        in: path
+        name: store_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.StoreResponseWrapper'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Store not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get store dashboard
+      tags:
+      - Stores
   /stores/{store_id}/external-products:
     get:
       consumes:
@@ -2574,6 +2629,45 @@ paths:
       summary: Update vendor
       tags:
       - Vendors
+  /superadmin/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: Get aggregated data for dashboard display (only for superadmin)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DashboardResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get Dashboard Data
+      tags:
+      - Dashboard
   /uploads:
     post:
       consumes:

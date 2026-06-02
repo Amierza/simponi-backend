@@ -18,6 +18,7 @@ type (
 		CreateStore(ctx *gin.Context)
 		GetStores(ctx *gin.Context)
 		GetStoreByStoreID(ctx *gin.Context)
+		GetStoreDashboard(ctx *gin.Context)
 		UpdateStoreByStoreID(ctx *gin.Context)
 		DeleteStoreByStoreID(ctx *gin.Context)
 	}
@@ -173,6 +174,44 @@ func (sh *storeHandler) GetStoreByStoreID(ctx *gin.Context) {
 	}
 
 	res := response.BuildResponseSuccess(fmt.Sprintf("%s store", dto.SUCCESS_GET_DETAIL), result)
+	ctx.JSON(http.StatusOK, res)
+}
+
+// GetStoreDashboard godoc
+//
+//	@Summary		Get store dashboard
+//	@Description	Get store dashboard data (Requires permission: GetStoreDashboard)
+//	@Tags			Stores
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			store_id	path		string						true	"Store ID (UUID)"
+//	@Success		200			{object}	dto.StoreResponseWrapper	"Success"
+//	@Failure		400			{object}	dto.ErrorResponse			"Invalid UUID"
+//	@Failure		401			{object}	dto.ErrorResponse			"Unauthorized"
+//	@Failure		403			{object}	dto.ErrorResponse			"Forbidden"
+//	@Failure		404			{object}	dto.ErrorResponse			"Store not found"
+//	@Failure		500			{object}	dto.ErrorResponse			"Internal Server Error"
+//	@Router			/stores/{store_id}/dashboard [get]
+func (sh *storeHandler) GetStoreDashboard(ctx *gin.Context) {
+	storeIDStr := ctx.Param("store_id")
+	storeID, err := uuid.Parse(storeIDStr)
+	if err != nil {
+		sh.logger.Error("invalid store ID", zap.String("store_id", storeIDStr), zap.Error(err))
+		res := response.BuildResponseFailed(fmt.Sprintf("%s store dashboard", dto.FAILED_GET_DETAIL), dto.MESSAGE_FAILED_INVALID_UUID)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	result, err := sh.storeService.GetStoreDashboard(ctx, &storeID)
+	if err != nil {
+		status := mapErrorStatus(err)
+		res := response.BuildResponseFailed(fmt.Sprintf("%s store dashboard", dto.FAILED_GET_DETAIL), cleanErrorMessage(err))
+		ctx.AbortWithStatusJSON(status, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(fmt.Sprintf("%s store dashboard", dto.SUCCESS_GET_DETAIL), result)
 	ctx.JSON(http.StatusOK, res)
 }
 

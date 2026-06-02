@@ -6,6 +6,20 @@
     "method": "POST",
     "module": "upload"
   },
+  {
+    "id": "4c23628b-8764-4a75-a2a9-6a24cefc975e",
+    "name": "GetDashboardData",
+    "endpoint": "/api/v1/superadmin/dashboard",
+    "method": "GET",
+    "module": "dashboard"
+  },
+  {
+    "id": "23ab5085-924c-4c7f-9038-2bc213f99d10",
+    "name": "GetStoreDashboard",
+    "endpoint": "/api/v1/stores/:store_id/dashboard",
+    "method": "GET",
+    "module": "dashboard"
+  },
 
   {
     "id": "23ab5085-924c-4c7f-9038-2bc213f99d10",

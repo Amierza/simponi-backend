@@ -214,14 +214,14 @@ func main() {
 		logService = service.NewLogService(logRepo, zapLogger, jwt)
 		logHandler = handler.NewLogHandler(logService, zapLogger)
 
-		// Dashboard
-		dashboardRepo    = repository.NewDashboardRepository(db)
-		dashboardService = service.NewDashboardService(dashboardRepo, zapLogger)
-		dashboardHandler = handler.NewDashboardHandler(dashboardService, storeUserService, zapLogger)
-
 		// OAuth
 		oAuthService = service.NewOAuthService(tx, storePlatformRepo, storeCredentialRepo, redisClient, zapLogger, shopeeService)
 		oAuthHandler = handler.NewOAuthHandler(oAuthService, zapLogger)
+
+		// Dashboard
+		dashboardRepo    = repository.NewDashboardRepository(db)
+		dashboardService = service.NewDashboardService(dashboardRepo, zapLogger, jwt)
+		dashboardHandler = handler.NewDashboardHandler(dashboardService, zapLogger)
 	)
 
 	server := gin.Default()
@@ -244,7 +244,7 @@ func main() {
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
 	routes.Log(server, logHandler, jwt, rolePermissionRepo)
 	routes.InventoryLog(server, inventoryLogHandler, jwt, rolePermissionRepo)
-	routes.Dashboard(server, dashboardHandler, jwt)
+	routes.Dashboard(server, dashboardHandler, jwt, rolePermissionRepo)
 
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	server.Static("/uploads", "./uploads")

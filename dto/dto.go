@@ -333,7 +333,7 @@ type (
 	}
 	CreateStoreRequest struct {
 		UserID      *uuid.UUID `json:"-"`
-		PlatformID  *uuid.UUID `json:"platform_id" binding:"required"`
+		PlatformID  *uuid.UUID `json:"platform_id"`
 		Name        string     `json:"name" binding:"required,min=3,max=100"`
 		ImageURL    string     `json:"image_url,omitempty"`
 		Description string     `json:"description,omitempty"`
@@ -722,7 +722,7 @@ type (
 
 	// Dashboard
 	DashboardSummaryResponse struct {
-		Store   CustomStoreResponse           `json:"store"`
+		Store   CustomStoreResponse             `json:"store"`
 		Metrics DashboardSummaryMetricsResponse `json:"metrics"`
 	}
 	DashboardSummaryMetricsResponse struct {
@@ -736,8 +736,8 @@ type (
 		CompletedOrders    int64 `json:"completed_orders"`
 	}
 	DashboardTrendResponse struct {
-		StoreID uuid.UUID                    `json:"store_id"`
-		Range   string                       `json:"range"`
+		StoreID uuid.UUID                     `json:"store_id"`
+		Range   string                        `json:"range"`
 		Series  []DashboardTrendPointResponse `json:"series"`
 	}
 	DashboardTrendPointResponse struct {
@@ -746,17 +746,17 @@ type (
 		Orders  int64  `json:"orders"`
 	}
 	DashboardRecentOrdersResponse struct {
-		StoreID uuid.UUID                         `json:"store_id"`
+		StoreID uuid.UUID                          `json:"store_id"`
 		Items   []DashboardRecentOrderItemResponse `json:"items"`
 	}
 	DashboardRecentOrderItemResponse struct {
-		ID           uuid.UUID  `json:"id"`
-		OrderNumber  string     `json:"order_number"`
-		BuyerName    string     `json:"buyer_name"`
-		OrderStatus  string     `json:"order_status"`
-		PaymentStatus string    `json:"payment_status"`
-		TotalAmount  int64      `json:"total_amount"`
-		OrderedAt    *time.Time `json:"ordered_at,omitempty"`
+		ID            uuid.UUID  `json:"id"`
+		OrderNumber   string     `json:"order_number"`
+		BuyerName     string     `json:"buyer_name"`
+		OrderStatus   string     `json:"order_status"`
+		PaymentStatus string     `json:"payment_status"`
+		TotalAmount   int64      `json:"total_amount"`
+		OrderedAt     *time.Time `json:"ordered_at,omitempty"`
 	}
 	DashboardLowStockResponse struct {
 		StoreID uuid.UUID                       `json:"store_id"`
@@ -770,7 +770,7 @@ type (
 		Threshold int       `json:"threshold"`
 	}
 	DashboardTopProductsResponse struct {
-		StoreID uuid.UUID                        `json:"store_id"`
+		StoreID uuid.UUID                         `json:"store_id"`
 		Items   []DashboardTopProductItemResponse `json:"items"`
 	}
 	DashboardTopProductItemResponse struct {
@@ -781,7 +781,7 @@ type (
 		Revenue   int64     `json:"revenue"`
 	}
 	DashboardActivityResponse struct {
-		StoreID uuid.UUID                      `json:"store_id"`
+		StoreID uuid.UUID                       `json:"store_id"`
 		Items   []DashboardActivityItemResponse `json:"items"`
 	}
 	DashboardActivityItemResponse struct {
@@ -798,5 +798,16 @@ type (
 		LowStock     DashboardLowStockResponse     `json:"low_stock"`
 		TopProducts  DashboardTopProductsResponse  `json:"top_products"`
 		Activity     DashboardActivityResponse     `json:"activity"`
+	}
+)
+
+// Dashboard
+type (
+	DashboardSuperadminResponse struct {
+		TotalUsers               int64 `json:"total_users"`
+		TotalStores              int64 `json:"total_stores"`
+		TotalConnectedTikTokShop int64 `json:"total_connected_tiktok_shop"`
+		TotalConnectedShopee     int64 `json:"total_connected_shopee"`
+		NewStoresLast7Days       int64 `json:"new_stores_last_7_days"`
 	}
 )

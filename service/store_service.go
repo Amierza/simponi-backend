@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Amierza/simponi-backend/dto"
 	"github.com/Amierza/simponi-backend/entity"
@@ -20,6 +21,7 @@ type (
 		GetStores(ctx context.Context, req *response.PaginationRequest) (dto.StorePaginationResponse, error)
 		GetStoresByUserID(ctx context.Context, userID *uuid.UUID) ([]*dto.StoreResponse, error)
 		GetStoreByStoreID(ctx context.Context, storeID *uuid.UUID) (*dto.StoreResponse, error)
+		GetStoreDashboard(ctx context.Context, storeID *uuid.UUID) (dto.DashboardResponse, error)
 		UpdateStoreByStoreID(ctx context.Context, req *dto.UpdateStoreRequest) (*dto.StoreResponse, error)
 		DeleteStoreByStoreID(ctx context.Context, storeID *uuid.UUID) error
 	}
@@ -79,14 +81,22 @@ func (ss *storeService) CreateStore(ctx context.Context, req *dto.CreateStoreReq
 		return nil, fmt.Errorf("failed to create store: %w", dto.ErrInternal)
 	}
 
-	_, found, err := ss.platformRepo.GetPlatformByPlatformID(ctx, nil, req.PlatformID)
-	if err != nil {
-		ss.logger.Error("failed to get platform by ID", zap.String("platformID", req.PlatformID.String()), zap.Error(err))
-		return nil, fmt.Errorf("failed to get platform ID: %w", dto.ErrInternal)
-	}
-	if !found {
-		ss.logger.Warn("platform not found", zap.String("platformID", req.PlatformID.String()))
-		return nil, fmt.Errorf("platform not found: %v", dto.ErrNotFound)
+	if req.PlatformID != nil {
+		_, found, err := ss.platformRepo.GetPlatformByPlatformID(ctx, nil, req.PlatformID)
+		if err != nil {
+			ss.logger.Error("failed to get platform by ID",
+				zap.String("platformID", req.PlatformID.String()),
+				zap.Error(err),
+			)
+			return nil, fmt.Errorf("failed to get platform ID: %w", dto.ErrInternal)
+		}
+
+		if !found {
+			ss.logger.Warn("platform not found",
+				zap.String("platformID", req.PlatformID.String()),
+			)
+			return nil, fmt.Errorf("platform not found: %w", dto.ErrNotFound)
+		}
 	}
 
 	newStoreID := uuid.New()
@@ -106,35 +116,37 @@ func (ss *storeService) CreateStore(ctx context.Context, req *dto.CreateStoreReq
 		StoreID: &newStoreID,
 	}
 
-	newStorePlatformID := uuid.New()
-	newStorePlatform := &entity.StorePlatform{
-		ID:         newStorePlatformID,
-		StoreID:    &newStoreID,
-		PlatformID: req.PlatformID,
+	var newStorePlatform *entity.StorePlatform
+	if req.PlatformID != nil {
+		newStorePlatform = &entity.StorePlatform{
+			ID:         uuid.New(),
+			StoreID:    &newStoreID,
+			PlatformID: req.PlatformID,
+		}
 	}
 
 	err = ss.tx.Run(ctx, func(tx *gorm.DB) error {
-		err = ss.storeRepo.CreateStore(ctx, tx, newStore)
-		if err != nil {
-			ss.logger.Error("failed to create store", zap.Error(err))
+		if err := ss.storeRepo.CreateStore(ctx, tx, newStore); err != nil {
+			ss.logger.Error("failed to create store", zap.String("id", newStore.ID.String()), zap.Error(err))
 			return fmt.Errorf("failed to create store: %w", dto.ErrInternal)
 		}
 
-		err = ss.storeUserRepo.CreateStoreUser(ctx, tx, newStoreUser)
-		if err != nil {
-			ss.logger.Error("failed to create store user", zap.Error(err))
+		if err := ss.storeUserRepo.CreateStoreUser(ctx, tx, newStoreUser); err != nil {
+			ss.logger.Error("failed to create store user", zap.String("id", newStoreUser.ID.String()), zap.Error(err))
 			return fmt.Errorf("failed to create store user: %w", dto.ErrInternal)
 		}
 
-		err = ss.storePlatformRepo.CreateStorePlatform(ctx, tx, newStorePlatform)
-		if err != nil {
-			ss.logger.Error("failed to create store platform", zap.Error(err))
-			return fmt.Errorf("failed to create store platform: %w", dto.ErrInternal)
+		if newStorePlatform != nil {
+			if err := ss.storePlatformRepo.CreateStorePlatform(ctx, tx, newStorePlatform); err != nil {
+				ss.logger.Error("failed to create store platform", zap.String("id", newStorePlatform.ID.String()), zap.Error(err))
+				return fmt.Errorf("failed to create store platform: %w", dto.ErrInternal)
+			}
 		}
+
 		return nil
 	})
 
-	store, found, err := ss.storeRepo.GetStoreByStoreID(ctx, nil, &newStoreID)
+	store, _, err := ss.storeRepo.GetStoreByStoreID(ctx, nil, &newStoreID)
 	if err != nil {
 		ss.logger.Error("failed to get store by ID", zap.String("storeID", newStoreID.String()), zap.Error(err))
 		return nil, fmt.Errorf("failed to get store ID: %w", dto.ErrInternal)
@@ -198,6 +210,61 @@ func (ss *storeService) GetStoreByStoreID(ctx context.Context, storeID *uuid.UUI
 	ss.logger.Info("success to get store by id", zap.String("id", storeID.String()))
 
 	return mapToStoreResponse(store), nil
+}
+
+func (ss *storeService) GetStoreDashboard(ctx context.Context, storeID *uuid.UUID) (dto.DashboardResponse, error) {
+	var res dto.DashboardResponse
+
+	now := time.Now()
+	from := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	to := now
+
+	summary, err := ss.storeRepo.GetSummary(ctx, nil, storeID, from, to)
+	if err != nil {
+		ss.logger.Error("failed to get dashboard summary", zap.Error(err))
+		return res, err
+	}
+
+	trend, err := ss.storeRepo.GetTrend(ctx, nil, storeID, 12)
+	if err != nil {
+		ss.logger.Error("failed to get dashboard trend", zap.Error(err))
+		return res, err
+	}
+
+	recentOrders, err := ss.storeRepo.GetRecentOrders(ctx, nil, storeID, 5)
+	if err != nil {
+		ss.logger.Error("failed to get recent orders", zap.Error(err))
+		return res, err
+	}
+
+	lowStock, err := ss.storeRepo.GetLowStock(ctx, nil, storeID, 10, 10)
+	if err != nil {
+		ss.logger.Error("failed to get low stock", zap.Error(err))
+		return res, err
+	}
+
+	topProducts, err := ss.storeRepo.GetTopProducts(ctx, nil, storeID, 5)
+	if err != nil {
+		ss.logger.Error("failed to get top products", zap.Error(err))
+		return res, err
+	}
+
+	activity, err := ss.storeRepo.GetActivity(ctx, nil, storeID, 10)
+	if err != nil {
+		ss.logger.Error("failed to get activity", zap.Error(err))
+		return res, err
+	}
+
+	res = dto.DashboardResponse{
+		Summary:      dto.DashboardSummaryResponse{Store: dto.CustomStoreResponse{ID: *storeID, Name: ""}, Metrics: summary},
+		Trend:        dto.DashboardTrendResponse{StoreID: *storeID, Range: "12m", Series: trend},
+		RecentOrders: dto.DashboardRecentOrdersResponse{StoreID: *storeID, Items: recentOrders},
+		LowStock:     dto.DashboardLowStockResponse{StoreID: *storeID, Items: lowStock},
+		TopProducts:  dto.DashboardTopProductsResponse{StoreID: *storeID, Items: topProducts},
+		Activity:     dto.DashboardActivityResponse{StoreID: *storeID, Items: activity},
+	}
+
+	return res, nil
 }
 
 func (ss *storeService) UpdateStoreByStoreID(ctx context.Context, req *dto.UpdateStoreRequest) (*dto.StoreResponse, error) {
