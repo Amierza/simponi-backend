@@ -39,12 +39,6 @@ func NewAuthService(userRepo repository.IUserRepository, permissionRepo reposito
 }
 
 func (as *authService) SignUp(ctx context.Context, req dto.SignUpRequest) error {
-	hashedPassword, err := helper.HashPassword(req.Password)
-	if err != nil {
-		as.logger.Error("failed to hash password", zap.String("email", req.Email), zap.Error(err))
-		return fmt.Errorf("failed to hash password: %w", dto.ErrInternal)
-	}
-
 	roleID, err := uuid.Parse("791cb0fa-dc65-4510-b51d-38d52c1d73c3")
 	if err != nil {
 		as.logger.Error("failed to parse role id", zap.Error(err))
@@ -55,7 +49,7 @@ func (as *authService) SignUp(ctx context.Context, req dto.SignUpRequest) error 
 		ID:       uuid.New(),
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: hashedPassword,
+		Password: req.Password,
 		RoleID:   &roleID,
 	}
 
