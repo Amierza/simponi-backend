@@ -366,5 +366,19 @@
     "endpoint": "/api/v1/inventory-logs",
     "method": "GET",
     "module": "inventory_log"
+  },
+  {
+    "id": "cc000001-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "ConnectPlatform",
+    "endpoint": "/api/v1/store/:store_id/platforms/:platform_id/connect",
+    "method": "POST",
+    "module": "platform"
+  },
+  {
+    "id": "cc000002-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "DisconnectPlatform",
+    "endpoint": "/api/v1/store/:store_id/platforms/:platform_id",
+    "method": "DELETE",
+    "module": "platform"
   }
 ]
