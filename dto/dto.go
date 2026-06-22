@@ -63,6 +63,10 @@ const (
 	FAILED_GET_PRODUCTS_BY_CATEGORY = "failed to get products by category"
 	FAILED_UPDATE_STOCK             = "failed to update stock"
 
+	// Product Review Errors
+	FAILED_CREATE_PRODUCT_REVIEW = "failed to create product review"
+	FAILED_GET_PRODUCT_REVIEWS   = "failed to get product reviews"
+
 	// General Errors
 	FAILED_CREATE         = "failed to create"
 	FAILED_UPDATE         = "failed to update"
@@ -105,6 +109,10 @@ const (
 	SUCCESS_GET_PRODUCT_DETAIL       = "success get product detail"
 	SUCCESS_GET_PRODUCTS_BY_CATEGORY = "success get products by category"
 	SUCCESS_UPDATE_STOCK             = "success update stock"
+
+	// Product Review Success
+	SUCCESS_CREATE_PRODUCT_REVIEW = "success create product review"
+	SUCCESS_GET_PRODUCT_REVIEWS   = "success get product reviews"
 
 	// General Success
 	SUCCESS_CREATE     = "success create"
@@ -522,6 +530,29 @@ type (
 	ProductImageResponse struct {
 		ID       uuid.UUID `json:"id"`
 		ImageURL string    `json:"image_url" example:"https://example.com/image.jpg"`
+	}
+
+	// Product Review
+	CreateProductReviewRequest struct {
+		StoreID   *uuid.UUID `json:"-"`
+		ProductID *uuid.UUID `json:"-"`
+		Text      string     `json:"text" binding:"required,min=1" example:"paket nya lama bangettt"`
+	}
+	ProductReviewResponse struct {
+		ID         uuid.UUID `json:"id"`
+		ProductID  uuid.UUID `json:"product_id"`
+		ReviewText string    `json:"review_text" example:"paket nya lama bangettt"`
+		Tags       []string  `json:"tags"`
+		CreatedAt  time.Time `json:"created_at"`
+		UpdatedAt  time.Time `json:"updated_at"`
+	}
+	ProductReviewPaginationResponse struct {
+		response.PaginationResponse
+		Data []ProductReviewResponse `json:"data"`
+	}
+	ProductReviewPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		ProductReviews []entity.ProductReview
 	}
 
 	// Product Stats

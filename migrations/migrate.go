@@ -26,6 +26,7 @@ func Migrate(db *gorm.DB) error {
 		&entity.ProductVendor{},
 		&entity.ExternalProduct{},
 		&entity.InventoryLog{},
+		&entity.ProductReview{},
 
 		&entity.Order{},
 		&entity.OrderDetail{},

@@ -501,5 +501,26 @@
     "id": "e1000029-0ea2-426c-89e7-e25e71c0b88f",
     "role_id": "2f3e4d5c-6b7a-4890-9abc-def012345678",
     "permission_id": "0ea2426c-89e7-426c-b88f-222222222222"
+  },
+
+  {
+    "id": "f1000001-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "bbbbbbb1-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "f1000002-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "791cb0fa-dc65-4510-b51d-38d52c1d73c3",
+    "permission_id": "bbbbbbb2-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "f1000003-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "2f3e4d5c-6b7a-4890-9abc-def012345678",
+    "permission_id": "bbbbbbb1-0ea2-426c-89e7-e25e71c0b88f"
+  },
+  {
+    "id": "f1000004-0ea2-426c-89e7-e25e71c0b88f",
+    "role_id": "2f3e4d5c-6b7a-4890-9abc-def012345678",
+    "permission_id": "bbbbbbb2-0ea2-426c-89e7-e25e71c0b88f"
   }
 ]

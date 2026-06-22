@@ -144,6 +144,17 @@ type (
 		Message string               `json:"message" example:"success get product stats"`
 		Data    ProductStatsResponse `json:"data"`
 	}
+	ProductReviewResponseWrapper struct {
+		Status  bool                  `json:"status" example:"true"`
+		Message string                `json:"message" example:"success create product review"`
+		Data    ProductReviewResponse `json:"data"`
+	}
+	ProductReviewsResponseWrapper struct {
+		Status  bool                    `json:"status" example:"true"`
+		Message string                  `json:"message" example:"success get product reviews"`
+		Data    []ProductReviewResponse `json:"data"`
+		Meta    any                     `json:"meta"`
+	}
 )
 
 // =======================

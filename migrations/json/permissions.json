@@ -380,5 +380,19 @@
     "endpoint": "/api/v1/store/:store_id/platforms/:platform_id",
     "method": "DELETE",
     "module": "platform"
+  },
+  {
+    "id": "bbbbbbb1-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "CreateProductReview",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id/reviews/",
+    "method": "POST",
+    "module": "product_review"
+  },
+  {
+    "id": "bbbbbbb2-0ea2-426c-89e7-e25e71c0b88f",
+    "name": "GetProductReviews",
+    "endpoint": "/api/v1/stores/:store_id/products/:product_id/reviews/",
+    "method": "GET",
+    "module": "product_review"
   }
 ]
