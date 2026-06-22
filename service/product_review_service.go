@@ -18,7 +18,7 @@ import (
 type (
 	IProductReviewService interface {
 		CreateProductReview(ctx context.Context, req *dto.CreateProductReviewRequest) (dto.ProductReviewResponse, error)
-		GetProductReviews(ctx context.Context, req *response.PaginationRequest, storeID, productID *uuid.UUID) (dto.ProductReviewPaginationResponse, error)
+		GetProductReviewsByStoreID(ctx context.Context, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductReviewPaginationResponse, error)
 	}
 
 	productReviewService struct {
@@ -54,18 +54,20 @@ func MapToProductReviewResponse(r entity.ProductReview) dto.ProductReviewRespons
 	}
 
 	return dto.ProductReviewResponse{
-		ID:         r.ID,
-		ProductID:  productID,
-		ReviewText: r.ReviewText,
-		Tags:       tags,
-		CreatedAt:  r.CreatedAt,
-		UpdatedAt:  r.UpdatedAt,
+		ID:          r.ID,
+		ProductID:   productID,
+		ProductName: r.Product.Name,
+		ProductSKU:  r.Product.SKU,
+		ReviewText:  r.ReviewText,
+		Tags:        tags,
+		CreatedAt:   r.CreatedAt,
+		UpdatedAt:   r.UpdatedAt,
 	}
 }
 
 func (prs *productReviewService) CreateProductReview(ctx context.Context, req *dto.CreateProductReviewRequest) (dto.ProductReviewResponse, error) {
 	// validate product exists and belongs to the store
-	_, found, err := prs.productRepo.GetProductByStoreIDAndProductID(ctx, nil, req.StoreID, req.ProductID)
+	product, found, err := prs.productRepo.GetProductByStoreIDAndProductID(ctx, nil, req.StoreID, req.ProductID)
 	if err != nil {
 		prs.logger.Error("failed to get product by ID", zap.String("productID", req.ProductID.String()), zap.Error(err))
 		return dto.ProductReviewResponse{}, fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
@@ -99,25 +101,17 @@ func (prs *productReviewService) CreateProductReview(ctx context.Context, req *d
 		return dto.ProductReviewResponse{}, fmt.Errorf("failed to create product review: %w", dto.ErrInternal)
 	}
 
+	// attach the validated product so the response includes product info
+	newReview.Product = *product
+
 	prs.logger.Info("success to create product review", zap.String("id", newReview.ID.String()))
 	return MapToProductReviewResponse(*newReview), nil
 }
 
-func (prs *productReviewService) GetProductReviews(ctx context.Context, req *response.PaginationRequest, storeID, productID *uuid.UUID) (dto.ProductReviewPaginationResponse, error) {
-	// validate product exists and belongs to the store
-	_, found, err := prs.productRepo.GetProductByStoreIDAndProductID(ctx, nil, storeID, productID)
+func (prs *productReviewService) GetProductReviewsByStoreID(ctx context.Context, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductReviewPaginationResponse, error) {
+	result, err := prs.productReviewRepo.GetProductReviewsByStoreID(ctx, nil, req, storeID)
 	if err != nil {
-		prs.logger.Error("failed to get product by ID", zap.String("productID", productID.String()), zap.Error(err))
-		return dto.ProductReviewPaginationResponse{}, fmt.Errorf("failed to get product by ID: %w", dto.ErrInternal)
-	}
-	if !found {
-		prs.logger.Warn("product not found", zap.String("productID", productID.String()))
-		return dto.ProductReviewPaginationResponse{}, fmt.Errorf("product not found: %w", dto.ErrNotFound)
-	}
-
-	result, err := prs.productReviewRepo.GetProductReviews(ctx, nil, req, productID)
-	if err != nil {
-		prs.logger.Error("failed to get product reviews", zap.String("productID", productID.String()), zap.Error(err))
+		prs.logger.Error("failed to get product reviews", zap.String("storeID", storeID.String()), zap.Error(err))
 		return dto.ProductReviewPaginationResponse{}, fmt.Errorf("failed to get product reviews: %w", dto.ErrInternal)
 	}
 
@@ -126,7 +120,7 @@ func (prs *productReviewService) GetProductReviews(ctx context.Context, req *res
 		reviews = append(reviews, MapToProductReviewResponse(r))
 	}
 
-	prs.logger.Info("success to get product reviews", zap.String("productID", productID.String()))
+	prs.logger.Info("success to get product reviews", zap.String("storeID", storeID.String()), zap.Int64("count", result.Count))
 	return dto.ProductReviewPaginationResponse{
 		PaginationResponse: result.PaginationResponse,
 		Data:               reviews,

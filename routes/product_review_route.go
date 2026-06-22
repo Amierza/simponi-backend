@@ -9,9 +9,15 @@ import (
 )
 
 func ProductReview(route *gin.Engine, productReviewHandler handler.IProductReviewHandler, jwtService jwt.IJWT, rolePermissionRepo repository.IRolePermissionRepository) {
-	routes := route.Group("/api/v1/stores/:store_id/products/:product_id/reviews").Use(middleware.Authentication(jwtService))
+	// create review is scoped to a specific product
+	productScoped := route.Group("/api/v1/stores/:store_id/products/:product_id/reviews").Use(middleware.Authentication(jwtService))
 	{
-		routes.POST("/", middleware.RBAC(rolePermissionRepo, "CreateProductReview"), productReviewHandler.CreateProductReview)
-		routes.GET("/", middleware.RBAC(rolePermissionRepo, "GetProductReviews"), productReviewHandler.GetProductReviews)
+		productScoped.POST("/", middleware.RBAC(rolePermissionRepo, "CreateProductReview"), productReviewHandler.CreateProductReview)
+	}
+
+	// listing reviews is scoped to the whole store (all products in the store)
+	storeScoped := route.Group("/api/v1/stores/:store_id/reviews").Use(middleware.Authentication(jwtService))
+	{
+		storeScoped.GET("/", middleware.RBAC(rolePermissionRepo, "GetProductReviews"), productReviewHandler.GetProductReviewsByStoreID)
 	}
 }

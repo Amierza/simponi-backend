@@ -539,12 +539,14 @@ type (
 		Text      string     `json:"text" binding:"required,min=1" example:"paket nya lama bangettt"`
 	}
 	ProductReviewResponse struct {
-		ID         uuid.UUID `json:"id"`
-		ProductID  uuid.UUID `json:"product_id"`
-		ReviewText string    `json:"review_text" example:"paket nya lama bangettt"`
-		Tags       []string  `json:"tags"`
-		CreatedAt  time.Time `json:"created_at"`
-		UpdatedAt  time.Time `json:"updated_at"`
+		ID          uuid.UUID `json:"id"`
+		ProductID   uuid.UUID `json:"product_id"`
+		ProductName string    `json:"product_name"`
+		ProductSKU  string    `json:"product_sku"`
+		ReviewText  string    `json:"review_text" example:"paket nya lama bangettt"`
+		Tags        []string  `json:"tags"`
+		CreatedAt   time.Time `json:"created_at"`
+		UpdatedAt   time.Time `json:"updated_at"`
 	}
 	ProductReviewPaginationResponse struct {
 		response.PaginationResponse
