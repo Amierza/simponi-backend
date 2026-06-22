@@ -113,6 +113,9 @@ func main() {
 	// setup shopee config
 	shopeeConfig := platforms.NewShopeeConfig()
 
+	// setup ml config
+	mlConfig := platforms.NewMLConfig()
+
 	// run command if args provided
 	if len(os.Args) > 1 {
 		cmd.Command(db)
@@ -200,6 +203,14 @@ func main() {
 		productService = service.NewProductService(productRepo, storeRepo, vendorRepo, productVendorRepo, inventoryLogService, zapLogger, jwt)
 		productHandler = handler.NewProductHandler(productService, zapLogger)
 
+		// ML (auto-tagging)
+		mlService = service.NewMLService(zapLogger, mlConfig.GetMLConfig())
+
+		// Product Review
+		productReviewRepo    = repository.NewProductReviewRepository(db)
+		productReviewService = service.NewProductReviewService(productReviewRepo, productRepo, mlService, zapLogger, jwt)
+		productReviewHandler = handler.NewProductReviewHandler(productReviewService, zapLogger)
+
 		// External Product
 		externalProductService = service.NewExternalProductService(externalProductRepo, productRepo, storeRepo, platformRepo, storePlatformRepo, zapLogger, jwt)
 		externalProductHandler = handler.NewExternalProductHandler(externalProductService, zapLogger)
@@ -239,6 +250,7 @@ func main() {
 	routes.StorePlatform(server, storePlatformHandler, rolePermissionRepo, jwt)
 	routes.ProductCategories(server, productCategoriesHandler, jwt)
 	routes.Product(server, productHandler, jwt, rolePermissionRepo)
+	routes.ProductReview(server, productReviewHandler, jwt, rolePermissionRepo)
 	routes.ExternalProduct(server, externalProductHandler, jwt, rolePermissionRepo)
 	routes.Order(server, orderHandler, jwt, rolePermissionRepo)
 	routes.Vendor(server, vendorHandler, jwt, rolePermissionRepo)
