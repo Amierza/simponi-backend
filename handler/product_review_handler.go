@@ -14,7 +14,7 @@ import (
 type (
 	IProductReviewHandler interface {
 		CreateProductReview(ctx *gin.Context)
-		GetProductReviews(ctx *gin.Context)
+		GetProductReviewsByStoreID(ctx *gin.Context)
 	}
 
 	productReviewHandler struct {
@@ -90,39 +90,28 @@ func (prh *productReviewHandler) CreateProductReview(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, res)
 }
 
-// GetProductReviews godoc
+// GetProductReviewsByStoreID godoc
 //
-//	@Summary		Get product reviews
-//	@Description	Get paginated reviews of a product (Requires permission: GetProductReviews)
+//	@Summary		Get product reviews by store
+//	@Description	Get paginated reviews across all products in a store (Requires permission: GetProductReviews)
 //	@Tags			Product Reviews
 //	@Security		BearerAuth
 //	@Accept			json
 //	@Produce		json
 //	@Param			store_id	path		string								true	"Store ID (UUID)"
-//	@Param			product_id	path		string								true	"Product ID (UUID)"
 //	@Param			page		query		int									false	"Page number"
 //	@Param			per_page	query		int									false	"Items per page"
 //	@Success		200			{object}	dto.ProductReviewsResponseWrapper	"Success"
 //	@Failure		400			{object}	dto.ErrorResponse					"Invalid UUID"
 //	@Failure		401			{object}	dto.ErrorResponse					"Unauthorized"
 //	@Failure		403			{object}	dto.ErrorResponse					"Forbidden"
-//	@Failure		404			{object}	dto.ErrorResponse					"Product not found"
 //	@Failure		500			{object}	dto.ErrorResponse					"Internal Server Error"
-//	@Router			/stores/{store_id}/products/{product_id}/reviews [get]
-func (prh *productReviewHandler) GetProductReviews(ctx *gin.Context) {
+//	@Router			/stores/{store_id}/reviews [get]
+func (prh *productReviewHandler) GetProductReviewsByStoreID(ctx *gin.Context) {
 	storeIDStr := ctx.Param("store_id")
 	storeID, err := uuid.Parse(storeIDStr)
 	if err != nil {
 		prh.logger.Error("invalid store ID", zap.String("id", storeIDStr), zap.Error(err))
-		res := response.BuildResponseFailed(dto.FAILED_GET_PRODUCT_REVIEWS, dto.MESSAGE_FAILED_INVALID_UUID)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
-	}
-
-	productIDStr := ctx.Param("product_id")
-	productID, err := uuid.Parse(productIDStr)
-	if err != nil {
-		prh.logger.Error("invalid product ID", zap.String("id", productIDStr), zap.Error(err))
 		res := response.BuildResponseFailed(dto.FAILED_GET_PRODUCT_REVIEWS, dto.MESSAGE_FAILED_INVALID_UUID)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
@@ -137,7 +126,7 @@ func (prh *productReviewHandler) GetProductReviews(ctx *gin.Context) {
 		return
 	}
 
-	result, err := prh.productReviewService.GetProductReviews(ctx, &payload, &storeID, &productID)
+	result, err := prh.productReviewService.GetProductReviewsByStoreID(ctx, &payload, &storeID)
 	if err != nil {
 		status := mapErrorStatus(err)
 		res := response.BuildResponseFailed(dto.FAILED_GET_PRODUCT_REVIEWS, cleanErrorMessage(err))

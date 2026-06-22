@@ -391,7 +391,7 @@
   {
     "id": "bbbbbbb2-0ea2-426c-89e7-e25e71c0b88f",
     "name": "GetProductReviews",
-    "endpoint": "/api/v1/stores/:store_id/products/:product_id/reviews/",
+    "endpoint": "/api/v1/stores/:store_id/reviews/",
     "method": "GET",
     "module": "product_review"
   }

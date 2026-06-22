@@ -14,7 +14,7 @@ import (
 type (
 	IProductReviewRepository interface {
 		CreateProductReview(ctx context.Context, tx *gorm.DB, review *entity.ProductReview) (*entity.ProductReview, error)
-		GetProductReviews(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, productID *uuid.UUID) (dto.ProductReviewPaginationRepositoryResponse, error)
+		GetProductReviewsByStoreID(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductReviewPaginationRepositoryResponse, error)
 	}
 
 	productReviewRepository struct {
@@ -40,7 +40,7 @@ func (prr *productReviewRepository) CreateProductReview(ctx context.Context, tx 
 	return review, nil
 }
 
-func (prr *productReviewRepository) GetProductReviews(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, productID *uuid.UUID) (dto.ProductReviewPaginationRepositoryResponse, error) {
+func (prr *productReviewRepository) GetProductReviewsByStoreID(ctx context.Context, tx *gorm.DB, req *response.PaginationRequest, storeID *uuid.UUID) (dto.ProductReviewPaginationRepositoryResponse, error) {
 	if tx == nil {
 		tx = prr.db
 	}
@@ -56,9 +56,16 @@ func (prr *productReviewRepository) GetProductReviews(ctx context.Context, tx *g
 		req.Page = 1
 	}
 
+	// all products that belong to the store (soft-delete scope auto-applied by gorm)
+	productIDs := tx.WithContext(ctx).
+		Model(&entity.Product{}).
+		Select("id").
+		Where("store_id = ?", storeID)
+
 	query := tx.WithContext(ctx).
 		Model(&entity.ProductReview{}).
-		Where("product_id = ?", productID)
+		Preload("Product").
+		Where("product_id IN (?)", productIDs)
 
 	if err := query.Count(&count).Error; err != nil {
 		return dto.ProductReviewPaginationRepositoryResponse{}, err
