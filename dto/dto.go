@@ -374,7 +374,13 @@ type (
 // Store Platform
 type (
 	ConnectPlatformResponse struct {
-		AuthURL string `json:"auth_url"`
+		AuthURL         string     `json:"auth_url,omitempty"`
+		StorePlatformID *uuid.UUID `json:"store_platform_id,omitempty"`
+		PlatformID      *uuid.UUID `json:"platform_id,omitempty"`
+		PlatformName    string     `json:"platform_name,omitempty"`
+		ExternalShopID  string     `json:"external_shop_id,omitempty"`
+		ExternalName    string     `json:"external_name,omitempty"`
+		IsConnected     *bool      `json:"is_connected,omitempty"`
 	}
 )
 

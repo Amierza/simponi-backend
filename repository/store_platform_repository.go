@@ -18,6 +18,7 @@ type (
 		GetStorePlatformByID(ctx context.Context, tx *gorm.DB, id *uuid.UUID) (*entity.StorePlatform, bool, error)
 		GetStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) ([]*entity.StorePlatform, error)
 		GetStorePlatformByStoreIDAndPlatformID(ctx context.Context, tx *gorm.DB, storeID, platformID *uuid.UUID) (*entity.StorePlatform, bool, error)
+		UpsertStorePlatformByStoreIDAndPlatformID(ctx context.Context, tx *gorm.DB, storePlatform *entity.StorePlatform) (*entity.StorePlatform, error)
 		CountStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (int64, error)
 
 		// UPDATE
@@ -101,6 +102,50 @@ func (r *storePlatformRepository) GetStorePlatformByStoreIDAndPlatformID(ctx con
 
 	return &sp, true, nil
 }
+
+func (r *storePlatformRepository) UpsertStorePlatformByStoreIDAndPlatformID(ctx context.Context, tx *gorm.DB, storePlatform *entity.StorePlatform) (*entity.StorePlatform, error) {
+	if tx == nil {
+		tx = r.db
+	}
+
+	var existing entity.StorePlatform
+	err := tx.WithContext(ctx).
+		Unscoped().
+		Where("store_id = ? AND platform_id = ?", storePlatform.StoreID, storePlatform.PlatformID).
+		First(&existing).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := tx.WithContext(ctx).Create(storePlatform).Error; err != nil {
+			return nil, err
+		}
+
+		return storePlatform, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.WithContext(ctx).
+		Unscoped().
+		Model(&entity.StorePlatform{}).
+		Where("id = ?", existing.ID).
+		Updates(map[string]interface{}{
+			"external_shop_id": storePlatform.ExternalShopID,
+			"external_name":    storePlatform.ExternalName,
+			"is_connected":     storePlatform.IsConnected,
+			"deleted_at":       nil,
+		}).Error
+	if err != nil {
+		return nil, err
+	}
+
+	existing.ExternalShopID = storePlatform.ExternalShopID
+	existing.ExternalName = storePlatform.ExternalName
+	existing.IsConnected = storePlatform.IsConnected
+	existing.DeletedAt.Valid = false
+
+	return &existing, nil
+}
+
 func (r *storePlatformRepository) CountStorePlatformsByStoreID(ctx context.Context, tx *gorm.DB, storeID *uuid.UUID) (int64, error) {
 	if tx == nil {
 		tx = r.db
